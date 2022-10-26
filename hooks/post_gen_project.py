@@ -3,13 +3,12 @@ import shutil
 import sys
 
 use_jup = "{{cookiecutter.jupyterlab_ver}}" != "none"
-use_r = "{{cookiecutter.jupyterlab_ver}}" != "none"
+use_r = "{{cookiecutter.rstudio_ver}}" != "none"
 
 if use_jup and use_r:
     os.remove("Makefile_py")
     os.remove("Makefile_r")
     shutil.move("Makefile_both", "Makefile")
-    print(f"jup: {use_jup}, r: {use_r}.")
 
 elif use_jup:
     os.remove("Makefile_both")
