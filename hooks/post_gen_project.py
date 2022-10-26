@@ -9,6 +9,7 @@ if use_jup and use_r:
     os.remove("Makefile_py")
     os.remove("Makefile_r")
     shutil.move("Makefile_both", "Makefile")
+    print(f"jup: {use_jup}, r: {use_r}.")
 
 elif use_jup:
     os.remove("Makefile_both")
