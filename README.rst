@@ -10,9 +10,6 @@ Note: beta version
 .. image:: https://readthedocs.org/projects/basalcell/badge/?version=latest
         :target: https://basalcell.readthedocs.io/en/latest/?version=latest
 
-.. image:: https://github.com/yo-aka-gene/basalcell/actions/workflows/quality_checks.yml/badge.svg?branch=main
-        :target: https://github.com/yo-aka-gene/basalcell/actions/workflows/quality_checks.yml
-
 A Docker-based project scaffold generator for bioinformatics analysis
 
 
