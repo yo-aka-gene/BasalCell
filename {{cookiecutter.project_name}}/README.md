@@ -7,7 +7,7 @@
 
 ## User Guide
 ### For Windows Users
-- Please make sure that `make` is installed to your local environment.
+- Please make sure that you can run shell scripts and `make` cmds in your local environment.
     - you can install it using [Chocolately](https://chocolatey.org/): `choco install make`
 
 ### Setting the Virtual Env
