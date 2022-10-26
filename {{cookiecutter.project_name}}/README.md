@@ -13,6 +13,6 @@
 ### Setting the Virtual Env
 1. fork this repository and clone it to your local environment
 2. install Docker into your local environment (if already satisfied, skip this)
-3. run `make init` cmd in the cloned directory. (**WARNING**: if you rather not use the make cmd, you need to edit `docker-compose.yml` to specify your user id)
+3. run `make init` cmd in the cloned directory. (**WARNING**: if you rather not use the make cmd, you need to run `auth.sh` to specify your user id)
 4. jupyter notebook is succesfully launched (password: `jupyter`).
 
