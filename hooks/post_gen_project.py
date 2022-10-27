@@ -24,7 +24,7 @@ else:
 
 for file in glob.glob(f"{path}/*"):
         shutil.move(file, ".")
-    os.rmdir(path)
-
+    
+os.rmdir(path)
 os.chdir(f"build_{path}")
 subprocess.run(["sh", "init.sh"])
