@@ -10,6 +10,8 @@ RUN mkdir codes data outputs utils
 EXPOSE 8888
 VOLUME ["/home/jovyan/code"]
 
+CMD ['/bin/bash']
+
 FROM rocker/tidyverse:{{cookiecutter.rstudio_ver}}
 
 RUN apt-get update
@@ -26,5 +28,3 @@ libgdal-dev \
 gdal-bin \
 libproj-dev \
 libv8-dev
-
-CMD ['/bin/bash']
