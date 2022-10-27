@@ -2,7 +2,6 @@ import glob
 import os
 import shutil
 import subprocess
-import sys
 
 use_jup = "{{cookiecutter.jupyterlab_ver}}" != "none"
 use_r = "{{cookiecutter.rstudio_ver}}" != "none"
