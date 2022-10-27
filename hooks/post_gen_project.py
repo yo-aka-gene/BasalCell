@@ -38,7 +38,7 @@ os.rmdir(path)
 os.rmdir(f"utils/{path}")
 subprocess.run(["sh", "init.sh"])
 
-for file in ["docker-compose.yml", "auth.sh", "init.sh"]:
+for file in ["auth.sh", "init.sh"]:
     os.remove(file)
 
 for file in glob.glob(f"build_{path}/*"):
