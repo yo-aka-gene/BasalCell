@@ -10,20 +10,21 @@ use_r = "{{cookiecutter.rstudio_ver}}" != "none"
 if use_jup and use_r:
     shutil.rmtree("jup")
     shutil.rmtree("rs")
-    for file in glob.glob("both/*"):
-        shutil.move(file, ".")
-    os.rmdir("both")
+    path = "both"
 
 elif use_jup:
     shutil.rmtree("both")
     shutil.rmtree("rs")
-    for file in glob.glob("jup/*"):
-        shutil.move(file, ".")
-    os.rmdir("jup")
+    path = "jup"
 
 else:
     shutil.rmtree("both")
     shutil.rmtree("jup")
-    for file in glob.glob("rs/*"):
+    path = "rs"
+
+for file in glob.glob(f"{path}/*"):
         shutil.move(file, ".")
-    os.rmdir("rs")
+    os.rmdir(path)
+
+os.chdir(f"build_{path}")
+subprocess.run(["sh", "init.sh"])
