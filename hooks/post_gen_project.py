@@ -5,6 +5,7 @@ import subprocess
 
 use_jup = "{{cookiecutter.jupyterlab_ver}}" != "none"
 use_r = "{{cookiecutter.rstudio_ver}}" != "none"
+prj_name = "{{cookiecutter.project_name}}"
 
 if use_jup and use_r:
     shutil.rmtree("jup")
@@ -40,4 +41,6 @@ subprocess.run(["sh", "init.sh"])
 for file in ["auth.sh", "init.sh"]:
     os.remove(file)
 
-os .remove("_auth.sh") if path == "rs" else shutil.move("_auth.sh", "auth.sh")
+os.remove("_auth.sh") if path == "rs" else shutil.move("_auth.sh", "auth.sh")
+
+print(f"{prj_name} is successfully generated: push to your github repository before you edit it")
