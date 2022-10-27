@@ -28,7 +28,7 @@ else:
     path = "rs"
 
 for file in glob.glob(f"{path}/*"):
-    shutil.move(file, ".")
+    shutil.move(file, "./init.sh" if "init" in file else ".")
 
 for file in glob.glob(f"utils/{path}/*"):
     shutil.move(file, "utils")
