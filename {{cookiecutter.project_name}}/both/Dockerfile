@@ -6,6 +6,7 @@ RUN jupyter serverextension enable --py jupyterlab
 
 WORKDIR $HOME
 RUN mkdir codes data outputs utils
+RUN rm work
 
 EXPOSE 8888
 

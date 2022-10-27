@@ -1,4 +1,4 @@
-.PHONY: clean clean-build clean-pyc init lib lib-py lib-r write-lib docker-start docker-stop terminate reboot help
+.PHONY: clean clean-build clean-pyc init lib lib-py lib-r write-lib docker-start start-py start-r docker-stop stop-py stop-r terminate reboot help
 .DEFAULT_GOAL := help
 
 clean: clean-build clean-pyc
@@ -34,11 +34,22 @@ write-lib: ## export reqired packages
 	docker exec {{cookiecutter.project_name}}-jupyterlab-1 pip list --format=freeze > ./utils/requirements_py.txt
 	docker exec {{cookiecutter.project_name}}-rstudio-1 Rscript ./home/rstudio/utils/export_deps.R
 
-docker-start: ## start docker container
+docker-start: start-py start-r
+
+start-py: ## start docker container for jupyterlab
 	docker start {{cookiecutter.project_name}}-jupyterlab-1
 	open http://localhost:8888
 
-docker-stop: ## stop docker container
+start-r: ## start docker container for rstudio
+	docker start {{cookiecutter.project_name}}-rstudio-1
+	open http://localhost:8787
+
+docker-stop: stop-py stop-r
+
+stop-py: ## stop docker container for jupyterlab
+	docker stop {{cookiecutter.project_name}}-jupyterlab-1
+
+stop-r: ## stop docker container for rstudio
 	docker stop {{cookiecutter.project_name}}-jupyterlab-1
 
 terminate: ## remove docker container
