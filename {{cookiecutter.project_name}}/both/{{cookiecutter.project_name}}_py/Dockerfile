@@ -11,20 +11,3 @@ EXPOSE 8888
 VOLUME ["/home/jovyan/code"]
 
 CMD ['/bin/bash']
-
-FROM rocker/tidyverse:{{cookiecutter.rstudio_ver}}
-
-RUN apt-get update
-RUN apt-get install -y \
-libcurl4-openssl-dev \
-libssl-dev libjq-dev \
-libprotobuf-dev \
-protobuf-compiler \
-make \
-libgeos-dev \
-libglpk40 \
-libudunits2-dev \
-libgdal-dev \
-gdal-bin \
-libproj-dev \
-libv8-dev
