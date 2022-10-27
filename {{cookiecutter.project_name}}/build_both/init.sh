@@ -1,5 +1,5 @@
 #!/bin/sh
 
-docker compose up -d
+make init
 make write-lib
 # make terminate

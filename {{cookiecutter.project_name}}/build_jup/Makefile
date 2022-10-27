@@ -5,7 +5,7 @@ init: ## setup essentials
 	docker compose up -d
 
 write-lib: ## export reqired packages
-	docker exec {{cookiecutter.project_name}}-jupyterlab-1 pip list --format=freeze > ../utils/requirements_py.txt
+	docker exec build_jup-jupyterlab-1 pip list --format=freeze > ../utils/requirements_py.txt
 
 terminate: ## remove docker container
 	docker compose down
