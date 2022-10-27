@@ -5,10 +5,9 @@ RUN pip install jupyterlab
 RUN jupyter serverextension enable --py jupyterlab
 
 WORKDIR $HOME
-RUN mkdir codes data outputs utils
 
 EXPOSE 8888
-VOLUME ["/home/jovyan/code"]
+VOLUME ["/home/jovyan"]
 
 FROM rocker/tidyverse:{{cookiecutter.rstudio_ver}}
 
