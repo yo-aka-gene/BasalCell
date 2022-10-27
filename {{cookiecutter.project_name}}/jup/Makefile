@@ -1,4 +1,4 @@
-.PHONY: clean clean-build clean-pyc init lib write-lib docker-start docker-stop terminate reboot help
+.PHONY: clean clean-build clean-pyc init lib write-lib terminate reboot help
 .DEFAULT_GOAL := help
 
 clean: clean-build clean-pyc
@@ -20,20 +20,13 @@ init: ## setup essentials
 	sh auth.sh docker-compose.yml
 	docker compose up -d
 	make lib
-	make docker-start
+	sh jupyter.sh start
 
 lib: ## install required packages in Python
 	docker exec {{cookiecutter.project_name}}-jupyterlab-1 python -m pip install -r ./utils/requirements_py.txt
 
 write-lib: ## export reqired packages
 	docker exec {{cookiecutter.project_name}}-jupyterlab-1 pip list --format=freeze > ./utils/requirements_py.txt
-
-docker-start: ## start docker container
-	docker start {{cookiecutter.project_name}}-jupyterlab-1
-	open http://localhost:8888
-
-docker-stop: ## stop docker container
-	docker stop {{cookiecutter.project_name}}-jupyterlab-1
 
 terminate: ## remove docker container
 	docker compose down
