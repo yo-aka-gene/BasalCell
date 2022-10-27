@@ -8,6 +8,5 @@ WORKDIR $HOME
 RUN mkdir codes data outputs utils
 
 EXPOSE 8888
-VOLUME ["/home/jovyan/code"]
 
 CMD ['/bin/bash']
