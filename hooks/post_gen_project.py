@@ -41,8 +41,4 @@ subprocess.run(["sh", "init.sh"])
 for file in ["auth.sh", "init.sh"]:
     os.remove(file)
 
-for file in glob.glob(f"build_{path}/*"):
-    shutil.move(file, ".")
-
-for build_dir in glob.glob("build_*"):
-    shutil.rmtree(build_dir)
+os .remove("_auth.sh") if path == "rs" else shutil.move("_auth.sh", "auth.sh")
