@@ -28,6 +28,10 @@ for file in glob.glob(f"{path}/*"):
 os.rmdir(path)
 subprocess.run(["sh", "init.sh"])
 
+os.remove("docker-compose.yml")
+os.remove("auth.sh")
+os.remove("init.sh")
+
 for file in glob.glob(f"build_{path}/*"):
     shutil.move(file, ".")
 
