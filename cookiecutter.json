@@ -4,6 +4,6 @@
     "author_name": "",
     "email": "",
     "github_username": "",
-    "jupyterlab_ver": ["latest", "lab-3.4.5", "none"],
-    "rstudio_ver": ["latest", "4", "none"]
+    "jupyterlab_ver": ["none", "latest", "lab-3.4.5"],
+    "rstudio_ver": ["none", "latest", "4"]
 }
