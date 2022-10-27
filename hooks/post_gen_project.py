@@ -27,4 +27,4 @@ for file in glob.glob(f"{path}/*"):
     
 os.rmdir(path)
 os.chdir(f"build_{path}")
-subprocess.run(["sh", "init.sh"])
+subprocess.run(["sh", "init.sh", "docker-compose.yml"])
