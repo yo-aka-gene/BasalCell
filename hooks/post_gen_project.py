@@ -23,8 +23,13 @@ else:
     path = "rs"
 
 for file in glob.glob(f"{path}/*"):
-        shutil.move(file, ".")
+    shutil.move(file, ".")
     
 os.rmdir(path)
-os.chdir(f"build_{path}")
-subprocess.run(["sh", "init.sh", "docker-compose.yml"])
+subprocess.run(["sh", "init.sh"])
+
+for file in glob.glob(f"build_{path}/*"):
+    shutil.move(file, ".")
+
+for build_dir in glob.glob("build_*"):
+    shutil.rmtree(build_dir)
