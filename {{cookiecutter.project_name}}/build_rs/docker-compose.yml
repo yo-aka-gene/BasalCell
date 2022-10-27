@@ -9,7 +9,7 @@ services:
       - PASSWORD=rstudio
       - DISABLE_AUTH=true
     volumes:
-      - "./codes:/home/rstudio/codes"
-      - "./utils:/home/rstudio/utils"
-      - "./data:/home/rstudio/data"
-      - "./outputs:/home/rstudio/outputs"
+      - "../codes:/home/rstudio/codes"
+      - "../utils:/home/rstudio/utils"
+      - "../data:/home/rstudio/data"
+      - "../outputs:/home/rstudio/outputs"
