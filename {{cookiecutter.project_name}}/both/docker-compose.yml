@@ -16,7 +16,7 @@ services:
       GRANT_SUDO: "yes"
     command: start.sh jupyter lab --NotebookApp.password='sha256:a2a45f7ca6fb:c7309099cdc02959058e34589c664559364a21da58b07f263eedd16b84629a99'
 
-    rstudio:
+  rstudio:
     image: rocker/tidyverse:{{cookiecutter.rstudio_ver}}
     ports:
       - "8787:8787"
