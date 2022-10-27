@@ -7,7 +7,10 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - "./:/home/jovyan"
+      - "./codes:/home/jovyan/codes"
+      - "./utils:/home/jovyan/utils"
+      - "./data:/home/jovyan/data"
+      - "./outputs:/home/jovyan/outputs"
     environment:
       NB_UID: YOUR_ID
       GRANT_SUDO: "yes"
@@ -22,7 +25,7 @@ services:
       - PASSWORD=rstudio
       - DISABLE_AUTH=true
     volumes:
-      - "../codes:/home/rstudio/codes"
-      - "../utils:/home/rstudio/utils"
-      - "../data:/home/rstudio/data"
-      - "../outputs:/home/rstudio/outputs"
+      - "./codes:/home/rstudio/codes"
+      - "./utils:/home/rstudio/utils"
+      - "./data:/home/rstudio/data"
+      - "./outputs:/home/rstudio/outputs"

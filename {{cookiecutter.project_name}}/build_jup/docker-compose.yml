@@ -7,10 +7,10 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - "../codes:/home/jovyan/codes"
-      - "../utils:/home/jovyan/utils"
-      - "../data:/home/jovyan/data"
-      - "../outputs:/home/jovyan/outputs"
+      - "./codes:/home/jovyan/codes"
+      - "./utils:/home/jovyan/utils"
+      - "./data:/home/jovyan/data"
+      - "./outputs:/home/jovyan/outputs"
     environment:
       NB_UID: YOUR_ID
       GRANT_SUDO: "yes"
