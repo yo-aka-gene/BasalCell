@@ -8,7 +8,7 @@ if [[ -e jupyter.sh ]]; then
     sh jupyter.sh stop
 fi
 
-if [[ -e jupyter.sh ]]; then
+if [[ -e rstudio.sh ]]; then
     sh rstudio.sh stop
 fi
 
