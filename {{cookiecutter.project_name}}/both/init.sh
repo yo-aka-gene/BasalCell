@@ -9,7 +9,8 @@ libcurl4-openssl-dev libssl-dev libjq-dev libprotobuf-dev protobuf-compiler \
 make libgeos-dev libglpk40 libudunits2-dev libgdal-dev gdal-bin libproj-dev libv8-dev
 
 make write-lib
-make docker-stop
+sh jupyter.sh stop
+sh rstudio.sh stop
 
 nb_id=$(id -u)
 sed -i '' -e s/${nb_id}/YOUR_ID/ docker-compose.yml
