@@ -32,5 +32,5 @@ Products
 * shell scripts
 * README.md
 
-.. image:: ./{{cookiecutter.project_name}}logos/default.png
+.. image:: ./{{cookiecutter.project_name}}/logos/default.png
    :align: center
