@@ -52,4 +52,5 @@ cookiecutter git@github.com:yo-aka-gene/BasalCell.git
 <div align="center">
 <img src="./{{cookiecutter.project_name}}/logos/default.png" alt="graphical abstract" width="300" height="300" title="graphical abstract">
 </div>
+
 - you can replace the image as you like (e.g., graphical abstract for your research article)
