@@ -19,6 +19,7 @@ clean-pyc: ## remove Python file artifacts
 init: ## setup essentials
 	sh auth.sh docker-compose.yml
 	docker compose up -d
+	sh linux_deps.sh
 	make lib
 	sh jupyter.sh start
 	sh rstudio.sh start
