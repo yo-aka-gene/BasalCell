@@ -1,7 +1,7 @@
 # BasalCell
 ![version](https://img.shields.io/badge/BasalCell-v.1.0.0-blue.svg?longCache=true)
-![docker](https://img.shields.io/badge/"docker-compose"-3-2496ed.svg?longCache=true&logo=docker)
-![jupyter](https://img.shields.io/badge/jupyterlab-"latest|lab-3.4.5"-f37626.svg?longCache=true&logo=jupyter)
+![docker](https://img.shields.io/badge/DockerCompose-3-2496ed.svg?longCache=true&logo=docker)
+![jupyter](https://img.shields.io/badge/jupyterlab-latest|3.4.5-f37626.svg?longCache=true&logo=jupyter)
 
 - Free software: MIT license
 
