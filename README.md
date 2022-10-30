@@ -1,13 +1,11 @@
 # BasalCell
-
-**Note**: beta version
-
-[![docs](https://readthedocs.org/projects/basalcell/badge/?version=latest)](https://readthedocs.org/projects/basalcell/badge/?version=latest)
+![version]((https://img.shields.io/badge/BasalCell-v.1.0.0-blue.svg?longCache=true))
+![jupyter]((https://img.shields.io/badge/BasalCell-v.1.0.0-f37626.svg?longCache=true&logo=jupyter))
 
 - Free software: MIT license
 
 ## Features
-- cookiecutter template for distributable data analysis environment using docker
+- [cookiecutter](https://github.com/cookiecutter/cookiecutter) template for distributable data analysis environment using docker
 - docker container for jupyterlab or rstudio (or both) can be generated
 
 ## Usage
@@ -20,7 +18,7 @@ pip install -U cookiecutter
 cookiecutter git@github.com:yo-aka-gene/BasalCell.git
 ```
 
-## Contents
+## Contents (v.1.0.0)
 - docker container
 - Makefile
 - shell scripts
@@ -54,3 +52,8 @@ cookiecutter git@github.com:yo-aka-gene/BasalCell.git
 </div>
 
 - you can replace the image as you like (e.g., graphical abstract for your research article)
+
+## Future work (v.1.0.0)
+- Unit test option (`pytest` etc.)
+- lint option (`flake8`, `black` etc.)
+- documentation option (`sphinx` etc.)
