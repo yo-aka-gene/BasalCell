@@ -10,6 +10,8 @@
 ## Features
 - [cookiecutter](https://github.com/cookiecutter/cookiecutter) template for distributable data analysis environment using docker
 - docker container for jupyterlab or rstudio (or both) can be generated
+    - jupyterlab: [jupyter/datascience-notebook](https://hub.docker.com/r/jupyter/datascience-notebook)
+    - rstudio: [rocker/tiduverse](https://hub.docker.com/r/rocker/tidyverse/tags)
 
 ## Usage
 - install cookiecutter to your local environment
