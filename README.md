@@ -1,7 +1,9 @@
 # BasalCell
 ![version](https://img.shields.io/badge/BasalCell-v.1.0.0-blue.svg?longCache=true)
 ![docker](https://img.shields.io/badge/DockerCompose-3-2496ed.svg?longCache=true&logo=docker)
-![jupyter](https://img.shields.io/badge/jupyterlab-latest|3.4.5-f37626.svg?longCache=true&logo=jupyter)
+[![jupyter](https://img.shields.io/badge/jupyterlab-latest|lab3.4.5-f37626.svg?longCache=true&logo=jupyter)](https://hub.docker.com/r/jupyter/datascience-notebook)
+[![rstudio](https://img.shields.io/badge/rstudio-latest|4-75aadb.svg?longCache=true&logo=rstudio)](https://hub.docker.com/r/rocker/tidyverse)
+
 
 - Free software: MIT license
 
