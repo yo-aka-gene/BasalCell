@@ -10,9 +10,14 @@
 - Please make sure that you can run shell scripts and `make` cmds in your local environment.
     - you can install it using [Chocolately](https://chocolatey.org/): `choco install make`
 
+{% set use_jupyter = cookiecutter.jupyterlab_ver != 'none' -%}
+{% set use_rstudio = cookiecutter.rstudio_ver != 'none' -%}
 ### Setting the Virtual Env
 1. fork this repository and clone it to your local environment
 2. install Docker into your local environment (if already satisfied, skip this)
 3. run `make init` cmd in the cloned directory. (**WARNING**: if you rather not use the make cmd, you need to run `auth.sh` to specify your user id)
-4. jupyter notebook is succesfully launched (password: `jupyter`).
-
+{% if use_jupyter and use_rstudio %}
+4. jupyterlab and rtudio is succesfully launched (password: `jupyter`).
+    - jupyterlab: `localhost:8888`
+    - rstudio: `localhost:8777`
+{% endif %}
