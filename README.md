@@ -1,6 +1,6 @@
 # BasalCell
-![version]((https://img.shields.io/badge/BasalCell-v.1.0.0-blue.svg?longCache=true))
-![jupyter]((https://img.shields.io/badge/BasalCell-v.1.0.0-f37626.svg?longCache=true&logo=jupyter))
+![version](https://img.shields.io/badge/BasalCell-v.1.0.0-blue.svg?longCache=true)
+![jupyter](https://img.shields.io/badge/BasalCell-v.1.0.0-f37626.svg?longCache=true&logo=jupyter)
 
 - Free software: MIT license
 
