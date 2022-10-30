@@ -70,3 +70,6 @@ sh rstudio.sh stop
 ### Data Installation
 
 ## Copyright of Data
+
+---
+This project was created with [Cookiecutter](https://github.com/cookiecutter/cookiecutter) and [BasalCell](https://github.com/yo-aka-gene/BasalCell)
