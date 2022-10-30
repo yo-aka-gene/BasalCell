@@ -17,7 +17,56 @@
 2. install Docker into your local environment (if already satisfied, skip this)
 3. run `make init` cmd in the cloned directory. (**WARNING**: if you rather not use the make cmd, you need to run `auth.sh` to specify your user id)
 {% if use_jupyter and use_rstudio %}
-4. jupyterlab and rtudio is succesfully launched (password: `jupyter`).
+4. jupyterlab and rtudio is succesfully launched (password for jupyterlab: `jupyter`). **Note**: some linux packages are pre-installed. See also `linux_deps.sh`.
     - jupyterlab: `localhost:8888`
     - rstudio: `localhost:8777`
+{% elif use_jupyter %}
+4. jupyterlab is succesfully launched (password: `jupyter`).
+    - jupyterlab: `localhost:8888`
+{% elif use_rstudio %}
+4. rtudio is succesfully launched. **Note**: some linux packages are pre-installed. See also `Dockerfile`.
+    - rstudio: `localhost:8777`
 {% endif %}
+### Starting or Stopping the Virtual Env
+{% if use_jupyter and use_rstudio -%}
+#### Jupyterlab
+- to start jupyterlab, run;
+```
+sh jupyter.sh start
+```
+- to stop jupyterlab, run;
+```
+sh jupyter.sh stop
+```
+#### Rstudio
+- to start rstudio, run;
+```
+sh rstudio.sh start
+```
+- to stop rstudio, run;
+```
+sh rstudio.sh stop
+```
+{% elif use_jupyter %}
+- to start jupyterlab, run;
+```
+sh jupyter.sh start
+```
+- to stop jupyterlab, run;
+```
+sh jupyter.sh stop
+```
+{% elif use_rstudio %}
+- to start rstudio, run;
+```
+sh rstudio.sh start
+```
+- to stop rstudio, run;
+```
+sh rstudio.sh stop
+```
+{% endif %}
+
+### Data Installation
+
+## Copyright of Data
