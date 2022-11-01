@@ -5,6 +5,10 @@
 <img src="./logos/default.png" alt="graphical abstract" width="300" height="300" title="graphical abstract">
 </div>
 
+{% if cookiecutter.description != ""}
+{{cookiecutter.description}}
+{% endif %}
+
 ## User Guide
 ### For Windows Users
 - Please make sure that you can run shell scripts and `make` cmds in your local environment.
@@ -71,5 +75,8 @@ sh rstudio.sh stop
 
 ## Copyright of Data
 
+## Author(s)
+- {{cookiecutter.author_name}} <[{{cookiecutter.email}}](mailto:{{cookiecutter.email}})>
+    - GitHub account: [{{cookiecutter.github_username}}](https://github.com/{{cookiecutter.github_username}})
 ---
 This project was created with [Cookiecutter](https://github.com/cookiecutter/cookiecutter) and [BasalCell](https://github.com/yo-aka-gene/BasalCell)
