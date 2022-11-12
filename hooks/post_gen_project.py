@@ -43,7 +43,7 @@ if not unit_test:
     shutil.rmtree("tests")
 
 if use_jup and not lint:
-    shutil.rmtree("utils/flake8")
+    os.remove("utils/flake8")
 
 subprocess.run(["sh", "init.sh"])
 
