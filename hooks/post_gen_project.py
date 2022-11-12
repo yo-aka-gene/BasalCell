@@ -37,14 +37,14 @@ else:
     path = "rs"
 
 for file in glob.glob(f"{path}/*"):
-    shutil.move(file, "./init.sh" if "init" in file else ".")
+    shutil.move(file, ".")
 
 for file in glob.glob(f"utils/{path}/*"):
     shutil.move(file, "utils")
 
 for file in glob.glob(f"tests/{path}/*"):
     shutil.move(file, "tests")
-    
+
 os.rmdir(path)
 os.rmdir(f"utils/{path}")
 os.rmdir(f"tests/{path}")
