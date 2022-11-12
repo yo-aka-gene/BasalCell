@@ -10,8 +10,6 @@ lint = "{{cookiecutter.lint}}" != "no"
 prj_name = "{{cookiecutter.project_name}}"
 
 if use_jup and use_r:
-    shutil.rmtree("jup")
-    shutil.rmtree("rs")
     shutil.rmtree("utils/jup")
     shutil.rmtree("utils/rs")
     shutil.rmtree("tests/jup")
@@ -19,8 +17,6 @@ if use_jup and use_r:
     path = "both"
 
 elif use_jup:
-    shutil.rmtree("both")
-    shutil.rmtree("rs")
     shutil.rmtree("utils/both")
     shutil.rmtree("utils/rs")
     shutil.rmtree("tests/both")
@@ -28,16 +24,11 @@ elif use_jup:
     path = "jup"
 
 else:
-    shutil.rmtree("both")
-    shutil.rmtree("jup")
     shutil.rmtree("utils/both")
     shutil.rmtree("utils/jup")
     shutil.rmtree("tests/both")
     shutil.rmtree("tests/jup")
     path = "rs"
-
-for file in glob.glob(f"{path}/*"):
-    shutil.move(file, ".")
 
 for file in glob.glob(f"utils/{path}/*"):
     shutil.move(file, "utils")
@@ -45,7 +36,6 @@ for file in glob.glob(f"utils/{path}/*"):
 for file in glob.glob(f"tests/{path}/*"):
     shutil.move(file, "tests")
 
-os.rmdir(path)
 os.rmdir(f"utils/{path}")
 os.rmdir(f"tests/{path}")
 
