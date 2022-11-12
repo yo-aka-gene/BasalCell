@@ -59,6 +59,4 @@ cookiecutter git@github.com:yo-aka-gene/BasalCell.git
 - you can replace the image as you like (e.g., graphical abstract for your research article)
 
 ## Future work (v.1.0.0)
-- Unit test option (`pytest` etc.)
-- lint option (`flake8`, `black` etc.)
 - documentation option (`sphinx` etc.)
