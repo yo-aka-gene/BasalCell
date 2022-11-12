@@ -45,7 +45,6 @@ lib-py: ## install required packages in Python
 lib-r: ## install required packages in R
 	docker exec {{cookiecutter.project_name}}-rstudio-1 Rscript ./home/rstudio/utils/install_deps.R
 
-
 write-lib: ## export reqired packages
 	docker exec {{cookiecutter.project_name}}-jupyterlab-1 pip list --format=freeze > ./utils/requirements_py.txt
 	docker exec {{cookiecutter.project_name}}-rstudio-1 Rscript ./home/rstudio/utils/export_deps.R
