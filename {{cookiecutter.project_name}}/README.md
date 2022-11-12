@@ -5,7 +5,7 @@
 <img src="./logos/default.png" alt="graphical abstract" width="300" height="300" title="graphical abstract">
 </div>
 
-{% if cookiecutter.description != ""}
+{% if cookiecutter.description != "" %}
 {{cookiecutter.description}}
 {% endif %}
 
