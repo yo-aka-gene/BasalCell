@@ -5,7 +5,5 @@
     "email": "",
     "github_username": "",
     "jupyterlab_ver": ["none", "latest", "lab-3.4.5"],
-    "rstudio_ver": ["none", "latest", "4"],
-    "unit_test": ["no", "yes"],
-    "lint": ["no", "yes"]
+    "rstudio_ver": ["none", "latest", "4"]
 }
