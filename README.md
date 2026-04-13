@@ -1,62 +1,94 @@
 # BasalCell
 ![version](https://img.shields.io/badge/BasalCell-v.1.0.0-blue.svg?longCache=true)
-![docker](https://img.shields.io/badge/DockerCompose-3-2496ed.svg?longCache=true&logo=docker)
-[![jupyter](https://img.shields.io/badge/jupyterlab-latest|lab3.4.5-f37626.svg?longCache=true&logo=jupyter)](https://hub.docker.com/r/jupyter/datascience-notebook)
-[![rstudio](https://img.shields.io/badge/rstudio-latest|4-75aadb.svg?longCache=true&logo=rstudio)](https://hub.docker.com/r/rocker/tidyverse)
 
 
 - Free software: MIT license
 
+BasalCell is a [cookiecutter](https://github.com/cookiecutter/cookiecutter) template designed for reproducible and distributable bioinformatics data analysis. It streamlines the creation of isolated Python and R environments integrated within JupyterLab.
+
 ## Features
-- [cookiecutter](https://github.com/cookiecutter/cookiecutter) template for distributable data analysis environment using docker
-- docker container for jupyterlab or rstudio (or both) can be generated
-    - jupyterlab: [jupyter/datascience-notebook](https://hub.docker.com/r/jupyter/datascience-notebook)
-    - rstudio: [rocker/tiduverse](https://hub.docker.com/r/rocker/tidyverse/tags)
+- **Poetry-managed Python environment**: Pre-configured with `jupyterlab` and essential data science tools.
+- **Optional R Integration**: Seamlessly setup an isolated R kernel using `rig` and `renv`.
+- **Automated Documentation**: Ready-to-use `Sphinx` configuration (supporting MyST Markdown and Jupyter Notebooks).
+- **One-command Workflow**: Setup and launch everything via `make`.
 
 ## Usage
-- install cookiecutter to your local environment
-```
+### 1. Prerequisites
+Ensure you have the `make` command installed:
+- **macOS**: `brew install make`
+- **Windows**: Use **WSL2** and run `sudo apt update && sudo apt install make`
+
+### 2. Install `cookiecutter`
+```bash
 pip install -U cookiecutter
 ```
-- To create a new project, run
-```
+### 3. Create your project
+```bash
 cookiecutter git@github.com:yo-aka-gene/BasalCell.git
 ```
 
-## Contents (v.1.0.0)
-- docker container
-- Makefile
-- shell scripts
-- README file
+### 4. Setup and Initialization
+Answer the prompts to define your project configurations:
+- **arguments**:
+    - ``project_name``: name your project here
+    - ``description``: description for your project
+    - ``author_name``: your name
+    - ``email``: your contact info
+    - ``github_username``: your GitHub ID
+    - ``python_ver``: the version of Python: choose from `3.10`, `3.11`, or `3.12` (we recommend `3.11` for bioinformatics analyses)
+    - `r_ver`: the version of R: choose from `none` (then R setup will be omitted), `4.2`, `4.3`, or `4.4` (we recommend `4.3` for bioinformatics analyses)
+    - `create_package`: choose `true` if you will publish your project as a Python package; otherwise `false`
 
-### Docker container
-- you can choose a configuration from below;
-    - jupyterlab (datascience-notebook): version `lab-3.4.5` or `latest`
-    - rstudio (rocker/tidyverse): version `4` or `latest`
-    - or both
-- package dependency info is exported as `requirements_py.txt` or `requirements_r.csv`
-    - you can add other packages in the list afterwards.
+After answering the prompts, navigate to your project and run:
+```bash
+cd <your-project-slug>
+make init
+```
 
-### Makefile
-- some make cmds are preset for building initial environments
-- it's good to add customized make cmds to make your environment reproducible and distributable in such cases as follows;
-    - downloading large data
-    - installation of non-default software for linux os
+### 5. Launch Jupyter Lab
+```bash
+make launch
+```
+## Maintenance
+### Add new Python packages
+```bash
+# For main analysis (e.g., polars, torch, scanpy)
+poetry add polars torch scanpy
 
-### Shell scripts
-- shell scripts are designed to reduce cli operations
-- `auth.sh` adjusts user id for every local environment. This script is automatically executed and you don't need to mannually run codes.
-- `jupyter.sh` can start/stop docker containers of jupyterlab by `sh jupyter.sh start` or `sh.jupyter.sh stop`
-- `rstudio.sh` can start/stop docker containers of rstudio by `sh rstudio.sh start` or `sh.rstudio.sh stop`
+# For development tools (e.g., flake8)
+poetry add -D flake8
+```
 
-### README file
-- appropriate README file (for your configuration of docker containers) will be generated
-- defaul README file includes a default image as follows;
-<div align="center">
-<img src="./{{cookiecutter.project_name}}/logos/default.png" alt="graphical abstract" width="300" height="300" title="graphical abstract">
-</div>
+### **[Optional]** Add new R packages
+To add new packages within the isolated `renv` env:
+```bash
+# Run R within the project context and install
+Rscript -e "renv::install('ggplot2')"
+```
 
-- you can replace the image as you like (e.g., graphical abstract for your research article)
+### Other Contents (v.1.0.0)
+1. README file
+    - appropriate README file (depending on your project configuration) will be generated
+    - defaul README file includes a default image as follows;
+    <div align="center">
+    <img src="./{{cookiecutter.__Project_Slug}}/docs/_static/default_logo.png" alt="graphical abstract" width="300" height="300" title="graphical abstract">
+    </div>
 
-## Future work (v.1.0.0)
-- documentation option (`sphinx` etc.)
+    - you can replace the image as you like (e.g., graphical abstract for your research article)
+2. documentation
+    - Documentation is powered by `Sphinx`. To build the HTML version:
+    ```bash
+    make docs
+    ```
+    The output will be generated in `docs/_build/html/`.
+
+## Feature(s) to be added in the near future
+- Julia kernel
+- Executable ipynb
+
+## Author(s)
+- Yuji Okano
+    - GitHub: [@yo-aka-gene](https://github.com/yo-aka-gene)
+    - email: [yujiokano@keio.jp](mailto:yujiokano@keio.jp)
+---
+Open for collaboration! Feel free to open issues or pull requests.

@@ -1,9 +1,13 @@
 {
     "project_name": "analysis",
+    "__Project_Slug": "{{ cookiecutter.project_name.replace(' ', '_').replace('-', '_') }}",
+    "__project_slug": "{{ cookiecutter.__Project_Slug.lower() }}",
     "description": "",
     "author_name": "",
     "email": "",
     "github_username": "",
-    "jupyterlab_ver": ["none", "latest", "lab-3.4.5"],
-    "rstudio_ver": ["none", "latest", "4"]
+    "python_ver": ["3.10", "3.11", "3.12"],
+    "__pyver": "{{ 'py' + cookiecutter.python_ver.replace('.', '') }}",
+    "r_ver": ["none", "4.2", "4.3", "4.4"],
+    "create_package": ["false", "true"]
 }

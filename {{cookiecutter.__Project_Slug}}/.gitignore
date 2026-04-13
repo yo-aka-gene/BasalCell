@@ -180,3 +180,10 @@ rsconnect/
 
 # MacOS
 .DS_Store
+
+# Data
+*.csv
+*.tsv
+*.h5ad
+*.bam
+*.fastq

@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "{{ cookiecutter.__project_slug }}"
+version = "0.0.1"
+description = "{{ cookiecutter.description }}"
+authors = ["{{ cookiecutter.author_name }} <{{ cookiecutter.email }}>"]
+readme = "README.md"
+{%- if cookiecutter.create_package == "false" %}
+package-mode = false
+{%- endif %}
+
+[tool.poetry.dependencies]
+python = ">={{ cookiecutter.python_ver }},<4.0"
+matplotlib = "^3.10.8"
+pandas = ">=1.5.3"
+scipy = "<1.16"
+scikit-learn = "<1.8"
+seaborn = "^0.13.2"
+numpy = "<2.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.0.2"
+mypy = "^1.19.1"
+pre-commit = "^4.5.1"
+sphinx = "<9.0.0"
+numpydoc = "^1.10.0"
+sphinx-gallery = "^0.20.0"
+sphinx-rtd-theme = "^3.1.0"
+pandoc = "^2.4"
+watchdog = "^6.0.0"
+myst-parser = "<5.0.0"
+nbsphinx = "^0.9.8"
+twine = "^6.2.0"
+tomli = "^2.4.0"
+ruff = "^0.3.0"
+jupyterlab = "^4.5.4"
+ipywidgets = "^8.1.8"
+ipykernel = "^7.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88
+target-version = "{{ cookiecutter.__pyver }}"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]

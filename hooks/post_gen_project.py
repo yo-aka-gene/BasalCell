@@ -1,37 +1,65 @@
-import glob
 import os
 import shutil
+import site
 import subprocess
+import sys
 
-use_jup = "{{cookiecutter.jupyterlab_ver}}" != "none"
-use_r = "{{cookiecutter.rstudio_ver}}" != "none"
-prj_name = "{{cookiecutter.project_name}}"
 
-if use_jup and use_r:
-    shutil.rmtree("utils/jup")
-    shutil.rmtree("utils/rs")
-    path = "both"
+def is_tool_installed(name):
+    return shutil.which(name) is not None
 
-elif use_jup:
-    shutil.rmtree("utils/both")
-    shutil.rmtree("utils/rs")
-    path = "jup"
 
-else:
-    shutil.rmtree("utils/both")
-    shutil.rmtree("utils/jup")
-    path = "rs"
+def install_poetry():
+    print("Installing Poetry")
+    try:
+        subprocess.run([sys.executable, "-m", "pip", "install", "poetry"], check=True)
+        print("Installing Poetry: Done!")
 
-for file in glob.glob(f"utils/{path}/*"):
-    shutil.move(file, "utils")
+        if os.name == "nt":
+            user_bin = os.path.join(site.USER_BASE, "Scripts")
+        else:
+            user_bin = os.path.join(site.USER_BASE, "bin")
 
-os.rmdir(f"utils/{path}")
+        python_bin = os.path.dirname(sys.executable)
+        os.environ["PATH"] = f"{user_bin}{os.pathsep}{python_bin}{os.pathsep}{os.environ.get('PATH', '')}"
 
-subprocess.run(["sh", "init.sh"])
+        poetry_path = shutil.which("poetry")
+        if poetry_path:
+            installed_dir = os.path.dirname(poetry_path)
+            print(f"Note: Poetry was installed to {installed_dir}")
+        else:
+            print("Note: Poetry was installed successfully, but its location could not be determined.")
+        print("If 'poetry' command is not found after this, please restart your terminal.")
 
-for file in ["auth.sh", "init.sh"]:
-    os.remove(file)
+    except subprocess.CalledProcessError:
+        print("Failed in Poetry Installation")
+        sys.exit(1)
 
-os.remove("_auth.sh") if path == "rs" else shutil.move("_auth.sh", "auth.sh")
 
-print(f"{prj_name} is successfully generated: push to your github repository before you edit it")
+if __name__ == "__main__":
+    print("Cookiecutter project generation: Done!")
+    use_r = "{{ cookiecutter.r_ver }}".lower() != "none"
+    if not use_r and os.path.exists("setup_r_env.sh"):
+        os.remove("setup_r_env.sh")
+
+    create_package = "{{ cookiecutter.create_package }}".lower() == "true"
+    if not create_package and os.path.exists("src"):
+        shutil.rmtree("src")
+
+    if not is_tool_installed("poetry"):
+        install_poetry()
+
+    if is_tool_installed("make"):
+        try:
+            subprocess.run(["make", "init"], check=True)
+            print("Env setup: Done!")
+        except subprocess.CalledProcessError:
+            print("Failed in 'make init' execution")
+            sys.exit(1)
+
+    else:
+        print("'make' command is not found; halting env setup")
+        print("[for Windows users] run the code below via WSL")
+        print("sudo apt update && sudo apt install make")
+        print("then run `make init` in this directory")
+        sys.exit(1)
