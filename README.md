@@ -85,6 +85,7 @@ Rscript -e "renv::install('ggplot2')"
 ## Feature(s) to be added in the near future
 - Julia kernel
 - Executable ipynb
+- GitHub Workflow Test for R scripts
 
 ## Author(s)
 - Yuji Okano
