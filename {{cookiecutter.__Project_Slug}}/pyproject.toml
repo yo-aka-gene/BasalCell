@@ -46,3 +46,18 @@ target-version = "{{ cookiecutter.__pyver }}"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
+fixable = ["ALL"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["{{ cookiecutter.__project_slug }}"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --durations=10"
