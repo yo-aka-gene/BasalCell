@@ -69,7 +69,7 @@ Rscript -e "renv::install('ggplot2')"
 ### Other Contents (v.1.0.0)
 1. README file
     - appropriate README file (depending on your project configuration) will be generated
-    - defaul README file includes a default image as follows;
+    - default README file includes a default image as follows;
     <div align="center">
     <img src="./{{cookiecutter.__Project_Slug}}/docs/_static/default_logo.png" alt="graphical abstract" width="300" height="300" title="graphical abstract">
     </div>
