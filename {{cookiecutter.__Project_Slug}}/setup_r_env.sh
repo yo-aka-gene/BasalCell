@@ -19,10 +19,16 @@ if ! command -v rig &> /dev/null; then
     elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # for Linux (Ubuntu/Debian)
         echo "Installing rig with sudo"
-        curl -Ls https://rig.r-lib.org/install.sh | sudo bash
+        echo "Administrator privileges are required for Linux/WSL environments. Please enter your sudo password."
+        sudo -v
+        curl -L https://rig.r-lib.org/install | sudo bash
         hash -r
-        if [ -x "/usr/local/bin/rig" ]; then
-            export PATH="/usr/local/bin:$PATH"
+        if ! command -v rig &> /dev/null; then
+            echo "[ERROR] Automated installation of rig failed."
+            echo "Please execute the following command manually in your terminal:"
+            echo "    curl -L https://rig.r-lib.org/install | sudo bash"
+            echo "After the installation is complete, please run 'make init' again."
+            exit 1
         fi
     elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
         # Git Bash (Windows native)
