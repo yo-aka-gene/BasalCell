@@ -20,6 +20,17 @@ if ! command -v rig &> /dev/null; then
         # for Linux (Ubuntu/Debian)
         echo "Installing rig with sudo"
         curl -Ls https://rig.r-lib.org/install.sh | sudo bash
+        hash -r
+        if [ -x "/usr/local/bin/rig" ]; then
+            export PATH="/usr/local/bin:$PATH"
+        fi
+    elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+        # Git Bash (Windows native)
+        echo "[ERROR] Windows native environment (Git Bash) detected."
+        echo "Please open PowerShell as Administrator and run the following command:"
+        echo "      winget install -e --id RProject.rig"
+        echo "After installation, restart this terminal and run 'make init' again."
+        exit 1
     else
         echo "this OS is unsupported; install rig manually"
         exit 1
