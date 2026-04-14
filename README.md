@@ -44,9 +44,13 @@ Once you've answered the prompts, the initialization script (`make init`) will a
 ### 5. Launch Jupyter Lab
 Navigate to your project directory and run:
 ```bash
-cd <your-project-slug>
+cd <your-directory-name>
 make launch
 ```
+Then `Jupyter Lab` will pop up in your default browser.
+Default token will be your project slug:
+e.g., `Your Project Name` -> `your_project_name`
+
 :warning: in case error codes as follows appear, reboot the terminal:
 ```
 make: poetry: No such file or directory
