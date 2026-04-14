@@ -13,14 +13,14 @@ on:
 
 jobs:
   test:
-    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    name: Python {% raw %}${{ matrix.python-version }}{% endraw %} on {% raw %}${{ matrix.os }}{% endraw %}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
         python-version: [{{ cookiecutter.python_ver }}]
 
-    runs-on: ${{ matrix.os }}
+    runs-on: {% raw %}${{ matrix.os }}{% endraw %}
 
     steps:
       - name: Checkout code
@@ -32,10 +32,10 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python {% raw %}${{ matrix.python-version }}{% endraw %}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: {% raw %}${{ matrix.python-version }}{% endraw %}
           cache: 'poetry'
 
       - name: Install dependencies
