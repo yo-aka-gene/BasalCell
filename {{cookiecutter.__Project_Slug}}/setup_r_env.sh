@@ -18,16 +18,15 @@ if ! command -v rig &> /dev/null; then
         brew install --cask rig
     elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # for Linux (Ubuntu/Debian)
-        echo "Installing rig with sudo"
         echo "Administrator privileges are required for Linux/WSL environments. Please enter your sudo password."
         sudo -v
-        curl -kL https://rig.r-lib.org/install | sudo bash
+        echo "Downloading rig directly from GitHub releases..."
+        curl -kL "https://github.com/r-lib/rig/releases/latest/download/rig-linux-latest.tar.gz" | sudo tar -xz -C /usr/local
         hash -r
         if ! command -v rig &> /dev/null; then
             echo "[ERROR] Automated installation of rig failed."
             echo "Please execute the following command manually in your terminal:"
-            echo "    curl -kL https://rig.r-lib.org/install | sudo bash"
-            echo "After the installation is complete, please run 'make init' again."
+            echo "Please download the binary manually and place it in /usr/local/bin."
             exit 1
         fi
     elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
