@@ -21,8 +21,7 @@ if ! command -v rig &> /dev/null; then
         echo "Administrator privileges are required for Linux/WSL environments. Please enter your sudo password."
         sudo -v
         echo "Downloading rig directly from GitHub releases..."
-        curl -kL "https://github.com/r-lib/rig/releases/latest/download/rig-linux-latest.tar.gz" | sudo tar -xz -C /usr/local
-        hash -r
+        curl -kLs "https://github.com/r-lib/rig/releases/download/latest/rig-linux-latest.tar.gz" | sudo tar -xz -C /usr/local
         if ! command -v rig &> /dev/null; then
             echo "[ERROR] Automated installation of rig failed."
             echo "Please execute the following command manually in your terminal:"
