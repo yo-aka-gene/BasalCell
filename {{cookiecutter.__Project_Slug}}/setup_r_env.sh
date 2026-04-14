@@ -22,9 +22,9 @@ if ! command -v rig &> /dev/null; then
         sudo -v
         echo "Downloading rig directly from GitHub releases..."
         curl -kLs "https://github.com/r-lib/rig/releases/download/latest/rig-linux-latest.tar.gz" | sudo tar -xz -C /usr/local
+        hash -r
         if ! command -v rig &> /dev/null; then
             echo "[ERROR] Automated installation of rig failed."
-            echo "Please execute the following command manually in your terminal:"
             echo "Please download the binary manually and place it in /usr/local/bin."
             exit 1
         fi
