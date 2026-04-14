@@ -36,8 +36,38 @@ def install_poetry():
         sys.exit(1)
 
 
+def setup_symbolic_links():
+    print("Setting up symbolic links for Jupyter Notebooks...")
+    links = [
+        {"src": "../../tools", "dest": "docs/jupyternb/tools"},
+        {"src": "../../data", "dest": "docs/jupyternb/data"}
+    ]
+
+    for link in links:
+        src = link["src"]
+        dest = link["dest"]
+
+        dest_dir = os.path.dirname(dest)
+        if not os.path.exists(dest_dir):
+            os.makedirs(dest_dir, exist_ok=True)
+
+        if os.path.lexists(dest):
+            if os.path.isdir(dest) and not os.path.islink(dest):
+                shutil.rmtree(dest)
+            else:
+                os.remove(dest)
+
+        try:
+            os.symlink(src, dest)
+            print(f"  - Created link: {dest} -> {src}")
+        except Exception as e:
+            print(f"  - [WARNING] Failed to create link {dest}: {e}")
+            print("    If you are on Windows, ensure Developer Mode is ON or run as Admin.")
+
+
 if __name__ == "__main__":
     print("Cookiecutter project generation: Done!")
+    setup_symbolic_links()
     use_r = "{{ cookiecutter.r_ver }}".lower() != "none"
     if not use_r and os.path.exists("setup_r_env.sh"):
         os.remove("setup_r_env.sh")
