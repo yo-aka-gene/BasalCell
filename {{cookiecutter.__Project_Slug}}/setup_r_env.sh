@@ -21,12 +21,12 @@ if ! command -v rig &> /dev/null; then
         echo "Installing rig with sudo"
         echo "Administrator privileges are required for Linux/WSL environments. Please enter your sudo password."
         sudo -v
-        curl -L https://rig.r-lib.org/install | sudo bash
+        curl -kL https://rig.r-lib.org/install | sudo bash
         hash -r
         if ! command -v rig &> /dev/null; then
             echo "[ERROR] Automated installation of rig failed."
             echo "Please execute the following command manually in your terminal:"
-            echo "    curl -L https://rig.r-lib.org/install | sudo bash"
+            echo "    curl -kL https://rig.r-lib.org/install | sudo bash"
             echo "After the installation is complete, please run 'make init' again."
             exit 1
         fi
