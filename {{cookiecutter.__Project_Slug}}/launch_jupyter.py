@@ -36,10 +36,14 @@ def start_jupyter():
     )
 
     browser_opened = False
+    log_file_path = "jupyter.log"
 
     try:
-        for line in process.stdout:
-            sys.stdout.write(line)
+        with open(log_file_path, "w", encoding="utf-8") as log_file:
+            for line in process.stdout:
+                log_file.write(line)
+        # for line in process.stdout:
+        #     sys.stdout.write(line)
 
             if "http://127.0.0.1" in line and "/lab" in line and not browser_opened:
                 url = line.strip().split(" ")[-1]
@@ -56,7 +60,9 @@ def start_jupyter():
                 try:
                     open_browser(url)
                 except Exception as e:
-                    print("Failed to open browser automatically. Please open the URL below manually")
+                    print("Failed to open browser automatically.")
+                    print(f"Reason: {e}")
+                    print("\nPlease open the URL below manually:")
                     print(f"\n    \033[1;36m{url}\033[0m\n") 
 
                 browser_opened = True
