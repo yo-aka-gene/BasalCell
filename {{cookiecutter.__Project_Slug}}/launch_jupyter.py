@@ -1,7 +1,21 @@
 import os
+import platform
 import subprocess
 import sys
 import webbrowser
+
+
+def open_browser(url):
+    is_wsl = "microsoft" in platform.uname().release.lower()
+    
+    if is_wsl:
+        try:
+            subprocess.run(["wslview", url], check=True)
+        except FileNotFoundError:
+            safe_url = url.replace("&", "^&")
+            subprocess.run(["cmd.exe", "/c", "start", safe_url])
+    else:
+        webbrowser.open(url)
 
 def start_jupyter():
     print("Initiating Jupyter Lab")
@@ -27,7 +41,7 @@ def start_jupyter():
         for line in process.stdout:
             sys.stdout.write(line)
 
-            if "http://127.0.0.1" in line and "/lab" in line:
+            if "http://127.0.0.1" in line and "/lab" in line and not browser_opened:
                 url = line.strip().split(" ")[-1]
 
                 if "token=" not in url:
@@ -38,20 +52,14 @@ def start_jupyter():
                 print(f"\033[1;36m{url}\033[0m")
                 print("=" * 70 + "\n")
 
-                if not browser_opened:
-                    print("Connecting to Jupyter Lab via default browser...")
-                    try:
-                        is_wsl = os.path.exists("/proc/version") and "microsoft" in open("/proc/version").read().lower()
-                        
-                        if is_wsl:
-                            subprocess.run(["powershell.exe", "-Command", f"Start-Process '{url}'"], check=False)
-                        else:
-                            webbrowser.open(url)
-                    except Exception:
-                        print("Failed to open browser automatically. Please open the URL above manually")
-                        print(f"\n    \033[1;36m{url}\033[0m\n") 
+                print("Connecting to Jupyter Lab via default browser...")
+                try:
+                    open_browser(url)
+                except Exception as e:
+                    print("Failed to open browser automatically. Please open the URL below manually")
+                    print(f"\n    \033[1;36m{url}\033[0m\n") 
 
-                    browser_opened = True
+                browser_opened = True
 
     except KeyboardInterrupt:
         print("Terminating Jupyter Lab")
