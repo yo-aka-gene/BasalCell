@@ -39,16 +39,20 @@ Answer the prompts to define your project configurations:
     - `r_ver`: the version of R: choose from `none` (then R setup will be omitted), `4.2`, `4.3`, or `4.4` (we recommend `4.3` for bioinformatics analyses)
     - `create_package`: choose `true` if you will publish your project as a Python package; otherwise `false`
 
-After answering the prompts, navigate to your project and run:
-```bash
-cd <your-project-slug>
-make init
-```
+Once you've answered the prompts, the initialization script (`make init`) will automatically run to set up your environments.
 
 ### 5. Launch Jupyter Lab
+Navigate to your project directory and run:
 ```bash
+cd <your-project-slug>
 make launch
 ```
+:warning: in case error codes as follows appear, reboot the terminal:
+```
+make: poetry: No such file or directory
+make: *** [Makefile:25: launch] Error 127
+```
+
 ## Maintenance
 ### Add new Python packages
 ```bash
