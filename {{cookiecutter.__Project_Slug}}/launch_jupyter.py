@@ -26,8 +26,8 @@ def start_jupyter():
             "--no-browser", 
             "--port=8888", 
             "--ip=0.0.0.0",
+            "--allow-root",
             "--IdentityProvider.token={{ cookiecutter.__project_slug }}",
-            "--ServerApp.token={{ cookiecutter.__project_slug }}"
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -36,14 +36,10 @@ def start_jupyter():
     )
 
     browser_opened = False
-    log_file_path = "jupyter.log"
 
     try:
-        with open(log_file_path, "w", encoding="utf-8") as log_file:
-            for line in process.stdout:
-                log_file.write(line)
-        # for line in process.stdout:
-        #     sys.stdout.write(line)
+        for line in process.stdout:
+            sys.stdout.write(line)
 
             if "http://127.0.0.1" in line and "/lab" in line and not browser_opened:
                 url = line.strip().split(" ")[-1]
