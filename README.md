@@ -74,26 +74,56 @@ To add new packages within the isolated `renv` env:
 Rscript -e "renv::install('ggplot2')"
 ```
 
-### Other Contents (v.1.0.0)
-1. README file
-    - appropriate README file (depending on your project configuration) will be generated
-    - default README file includes a default image as follows;
-    <div align="center">
-    <img src="./{{cookiecutter.__Project_Slug}}/docs/_static/default_logo.png" alt="graphical abstract" width="300" height="300" title="graphical abstract">
-    </div>
+## Development Tips
+### How to upload your project to GitHub
+Create a new blank repository on GitHub:
+- Repository name: the same as `<your-directory-name>`
+- Add README: `OFF`
+- Add .gitignore: `No .gitignore`
+- Add lisence: `No lisence`
 
-    - you can replace the image as you like (e.g., graphical abstract for your research article)
-2. documentation
-    - Documentation is powered by `Sphinx`. To build the HTML version:
-    ```bash
-    make docs
-    ```
-    The output will be generated in `docs/_build/html/`.
+Then, after generating your project, run:
+```bash
+cd <your-directory-name>
+git init
+git add .
+git commit -m ':tada: Initial commit from BasalCell template'
+git remote add origin https://github.com/<your-id>/<project-name>.git
+git push -u origin main
+```
+
+### Documentation
+Documentation is a cornerstone of the readability of your analysis code. Utilize the following frameworks to create your own documentation:
+- [Sphinx](https://www.sphinx-doc.org/en/master/): A widely used framework for Python code documentation. BasalCell comes with a built-in system that allows you to easily write documentation in `.md` format and build it into HTML. Please refer to `docs/index.md` inside the generated project for syntax examples.
+- [docstrings](https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html): If you create custom modules in directories like `tools` within the generated project, or if you publish your project as a package, adding docstrings to your functions and classes will allow Sphinx to automatically build documentation for them. BasalCell supports the NumPy style by default.
+- [Read the Docs](https://about.readthedocs.com/): Hosts and publishes documentation directly from your GitHub repository. While BasalCell comes pre-configured with the basic settings, you will need to create a Read the Docs account, link it to your GitHub account, and import your repository to actually publish the documentation.
+
+Once you are ready to build your documentation, run:
+```bash
+cd <your-directory-name>
+make docs
+```
+This allows you to preview the documentation in your local environment. The output will be generated in `docs/_build/html/`.
+The HTML files that will actually be published are automatically generated on the server when you push to the `main` branch.
+
+As a placeholder for the `README.md` and documentation icon, the following image is inserted by default:
+
+<div align="center">
+<img src="./{{cookiecutter.__Project_Slug}}/docs/_static/default_logo.png" alt="graphical abstract" width="300" height="300" title="graphical abstract">
+</div>
+
+Please create your own icon image or graphical abstract and replace it accordingly.
+
+### Test and Readability Improvement
+Writing test code is crucial for verifying the behavior of your developed code. Additionally, linting is essential to improve code readability. BasalCell makes it easy to run tests and linters by utilizing the following frameworks:
+- [Pytest](https://docs.pytest.org/en/stable/): The standard testing library for Python. Please refer to the official documentation on how to write test code, and place your tests in the appropriate paths within the `tests` directory of your generated project.
+- [Ruff](https://docs.astral.sh/ruff/): Performs linting and automatically reformats your `.py` files. In BasalCell, Ruff is integrated with `pre-commit`, meaning it will automatically run whenever you make a `git commit`.
 
 ## Feature(s) to be added in the near future
 - Julia kernel
 - Executable ipynb
-- GitHub Workflow Test for R scripts
+- Linting, unit tests, GitHub Workflow Test for R scripts
+- documentation for R scripts (maybe with `myst-parser` and `knitr`?)
 
 ## Author(s)
 - Yuji Okano
