@@ -28,7 +28,7 @@ dev = [
 [tool.ruff]
 line-length = 88
 target-version = "py311"
-exclude = ["{{cookiecutter.__Project_Slug}}"]
+exclude = [".*cookiecutter.*"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
