@@ -39,7 +39,7 @@ jobs:
           r-version: '4.3'
 
       - name: Install dependencies
-        run: poetry install --with dev --no-interaction
+        run: poetry install --with dev --no-interaction --no-root
 
       - name: Run pre-commit hooks
         run: poetry run pre-commit run --all-files
