@@ -1,6 +1,6 @@
 {
     "project_name": "analysis",
-    "__Project_Slug": "{{ cookiecutter.project_name.replace(' ', '_').replace('-', '_') }}",
+    "__Project_Slug": "{{ cookiecutter.project_name.replace(' ', '_').replace('-', '_').replace('/', '_') }}",
     "__project_slug": "{{ cookiecutter.__Project_Slug.lower() }}",
     "description": "",
     "author_name": "",
