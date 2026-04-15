@@ -1,10 +1,5 @@
-# {{ cookiecutter.project_name }} Documentation
-
-{% if cookiecutter.description != "" %}
-> {{ cookiecutter.description }}
-{% endif %}
-
-Welcome to the documentation for **{{ cookiecutter.project_name }}**. This site contains the analysis details, reproducible workflows, and API references (if applicable) for this project.
+```{include} ../README.md
+```
 
 ## Table of Contents
 
