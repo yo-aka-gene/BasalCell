@@ -32,8 +32,8 @@ Answer the prompts to define your project configurations:
 - **arguments**:
     - ``project_name``: name your project here
     - ``description``: description for your project
-    - ``author_name``: your name
-    - ``email``: your contact info
+    - ``author_name``: your name (required when `create_package` is `true`)
+    - ``email``: your contact info (required when `create_package` is `true`)
     - ``github_username``: your GitHub ID
     - ``python_ver``: the version of Python: choose from `3.10`, `3.11`, or `3.12` (we recommend `3.11` for bioinformatics analyses)
     - `r_ver`: the version of R: choose from `none` (then R setup will be omitted), `4.2`, `4.3`, or `4.4` (we recommend `4.3` for bioinformatics analyses)
