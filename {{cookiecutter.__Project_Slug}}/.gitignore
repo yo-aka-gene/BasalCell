@@ -187,3 +187,9 @@ rsconnect/
 *.h5ad
 *.bam
 *.fastq
+
+# renv
+renv/library/
+renv/local/
+renv/staging/
+renv/.cache/
