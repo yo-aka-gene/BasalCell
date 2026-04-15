@@ -71,6 +71,8 @@ if __name__ == "__main__":
     use_r = "{{ cookiecutter.r_ver }}".lower() != "none"
     if not use_r and os.path.exists("setup_r_env.sh"):
         os.remove("setup_r_env.sh")
+        os.remove("tests/testthat.R")
+        shutil.rmtree("tests/testthat")
 
     create_package = "{{ cookiecutter.create_package }}".lower() == "true"
     if not create_package and os.path.exists("src"):

@@ -42,7 +42,9 @@ def rlang_files():
         "renv.lock",
         ".Rprofile",
         "renv/activate.R",
-        "renv/settings.json"
+        "renv/settings.json",
+        "tests/testthat.R",
+        "tests/testthat/.gitkeep"
     ]
 
 
