@@ -58,6 +58,12 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-addopts = "-v --durations=10"
+addopts = ["--doctest-modules", "-v", "--durations=10"]
+testpaths = [
+    "tests",
+    "tools",
+{%- if cookiecutter.create_package == "true" %}
+    "src",
+{%- endif %}
+]
+norecursedirs = ["docs", "renv", ".venv", ".git", ".github"]

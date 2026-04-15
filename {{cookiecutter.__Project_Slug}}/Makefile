@@ -1,4 +1,4 @@
-.PHONY: init setup-r launch docs clean
+.PHONY: init setup-r launch docs clean test
 
 DIR_NAME := $(shell basename $(CURDIR))
 PY_KERNEL := $(DIR_NAME)_py
@@ -36,3 +36,6 @@ clean:
 	@rm -rf .pytest_cache
 	@rm -rf .ruff_cache
 	@echo "Clean up complete."
+
+test:
+	poetry run pytest --doctest-modules .
