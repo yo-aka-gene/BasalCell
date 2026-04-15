@@ -117,13 +117,27 @@ Please create your own icon image or graphical abstract and replace it according
 ### Test and Readability Improvement
 Writing test code is crucial for verifying the behavior of your developed code. Additionally, linting is essential to improve code readability. BasalCell makes it easy to run tests and linters by utilizing the following frameworks:
 - [Pytest](https://docs.pytest.org/en/stable/): The standard testing library for Python. Please refer to the official documentation on how to write test code, and place your tests in the appropriate paths within the `tests` directory of your generated project.
-- [Ruff](https://docs.astral.sh/ruff/): Performs linting and automatically reformats your `.py` files. In BasalCell, Ruff is integrated with `pre-commit`, meaning it will automatically run whenever you make a `git commit`.
+- [Ruff](https://docs.astral.sh/ruff/): Performs linting and automatically reformats your `.py` files. In BasalCell, Ruff is integrated with [`pre-commit`](https://pre-commit.com/), meaning it will automatically run whenever you make a `git commit`.
+- [GitHub Actions](https://github.com/features/actions): A CI/CD platform. BasalCell is pre-configured to automatically run the aforementioned workflows on the server whenever a `pull request` is created or `git push origin main` is executed, ensuring code quality and reproducibility even during collaborative data analysis.
+
+### **[Optional]**: Integration of R env
+- Usage: select `r_ver` and an R kernel will be set in your Jupyter Lab env.
+- Analysis: run analysis codes in R using `.ipynb` files and the R kernel in Jupyter Lab. 
+- Documentation: `nbsphinx` will handle your R analysis codes. If you need to show your `.R` scripts, create a `.md` file in `docs` and reference your R scripts as follows:
+````
+```{literalinclude} ../tools/example.R
+:language: r
+:linenos: true
+```
+````
+- Test: use [`testthat`](https://testthat.r-lib.org/) package. `testthat.R` and test directory for R `testthat/` are all set in `tests` inside your project directory.
+- Linting: `pre-commit` automatically runs linting using [`lintr`](https://lintr.r-lib.org/) and [`styler`](https://styler.r-lib.org/).
+- CI/CD: GitHub Actions are also implemented for R language as well.
+
 
 ## Feature(s) to be added in the near future
 - Julia kernel
 - Executable ipynb
-- Linting, unit tests, GitHub Workflow Test for R scripts
-- documentation for R scripts (maybe with `myst-parser` and `knitr`?)
 
 ## Author(s)
 - Yuji Okano
