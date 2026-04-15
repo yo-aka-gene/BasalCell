@@ -15,3 +15,14 @@ repos:
         args: [ --fix ]
       # Formatter
       - id: ruff-format
+
+{% if cookiecutter.r_ver != "none" %}
+  - repo: https://github.com/lorenzwalthert/precommit
+    rev: v0.4.3.9003
+    hooks:
+      - id: style-files
+        args: [--style_pkg=styler, --style_fun=tidyverse_style]
+      - id: lintr
+      - id: parsable-R
+
+{%- endif %}

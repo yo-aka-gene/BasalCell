@@ -70,8 +70,13 @@ else
     options(repos = c(RSPM = 'https://packagemanager.posit.co/cran/latest', CRAN = 'https://cloud.r-project.org'))
     if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')
     renv::init(bare = TRUE, bioconductor = TRUE)
-    install.packages('BiocManager')
-    install.packages('IRkernel')
+    install.packages(c(
+        'testthat',
+        'styler',
+        'lintr',
+        'BiocManager',
+        'IRkernel'
+    ))
     renv::snapshot(prompt = FALSE)
     "
 fi
