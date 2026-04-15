@@ -39,3 +39,4 @@ clean:
 
 test:
 	poetry run pytest --doctest-modules .
+	rm -fr .pytest_cache
