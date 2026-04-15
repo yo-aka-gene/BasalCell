@@ -46,7 +46,11 @@ jobs:
           cache: 'poetry'
 
       - name: Install dependencies
+{%- if cookiecutter.create_package == "true" %}
         run: poetry install --with dev --no-interaction
+{%- else %}
+        run: poetry install --with dev --no-interaction --no-root
+{%- endif %}
 
 {%- if cookiecutter.r_ver != "none" %}
       - name: Set up R
