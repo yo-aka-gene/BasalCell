@@ -109,6 +109,8 @@ def test_correct_template_for_package_mode(cookies, essential_files, symbolic_li
     result = cookies.bake(
         extra_context={
             "project_name": "Test Project-CI/CD",
+            "author_name": "John Smith",
+            "email": "example@example.com",
             "create_package": "true"
         }
     )
