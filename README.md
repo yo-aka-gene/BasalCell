@@ -122,7 +122,7 @@ Writing test code is crucial for verifying the behavior of your developed code. 
 
 ### **[Optional]**: Integration of R env
 - Usage: select `r_ver` and an R kernel will be set in your Jupyter Lab env.
-- Analysis: run analysis codes in R using `.ipynb` files and the R kernel in Jupyter Lab. 
+- Analysis: run analysis codes in R using `.ipynb` files and the R kernel in Jupyter Lab.
 - Documentation: `nbsphinx` will handle your R analysis codes. If you need to show your `.R` scripts, create a `.md` file in `docs` and reference your R scripts as follows:
 ````
 ```{literalinclude} ../tools/example.R

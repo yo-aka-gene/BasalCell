@@ -20,16 +20,20 @@ def install_poetry():
         else:
             user_bin = os.path.join(site.USER_BASE, "bin")
 
-        python_bin = os.path.dirname(sys.executable)
-        os.environ["PATH"] = f"{user_bin}{os.pathsep}{python_bin}{os.pathsep}{os.environ.get('PATH', '')}"
+        py_bin = os.path.dirname(sys.executable)
+        os.environ["PATH"] = (
+            f"{user_bin}{os.pathsep}{py_bin}{os.pathsep}{os.environ.get('PATH', '')}"
+        )
 
         poetry_path = shutil.which("poetry")
         if poetry_path:
             installed_dir = os.path.dirname(poetry_path)
             print(f"Note: Poetry was installed to {installed_dir}")
         else:
-            print("Note: Poetry was installed successfully, but its location could not be determined.")
-        print("If 'poetry' command is not found after this, please restart your terminal.")
+            print(
+                "Note: Poetry was installed, but its location could not be determined."
+            )
+        print("If 'poetry' command is not found, please restart your terminal.")
 
     except subprocess.CalledProcessError:
         print("Failed in Poetry Installation")
@@ -40,7 +44,7 @@ def setup_symbolic_links():
     print("Setting up symbolic links for Jupyter Notebooks...")
     links = [
         {"src": "../../tools", "dest": "docs/jupyternb/tools"},
-        {"src": "../../data", "dest": "docs/jupyternb/data"}
+        {"src": "../../data", "dest": "docs/jupyternb/data"},
     ]
 
     for link in links:
@@ -62,7 +66,7 @@ def setup_symbolic_links():
             print(f"  - Created link: {dest} -> {src}")
         except Exception as e:
             print(f"  - [WARNING] Failed to create link {dest}: {e}")
-            print("    If you are on Windows, ensure Developer Mode is ON or run as Admin.")
+            print("If you are on Windows, ensure Developer Mode is ON or run as Admin.")
 
 
 if __name__ == "__main__":
