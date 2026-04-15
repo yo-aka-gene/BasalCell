@@ -14,6 +14,8 @@ init:
 		exit 1; \
 	fi
 	poetry install
+	git init
+	poetry run pre-commit install
 	poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 {%- if cookiecutter.r_ver != "none" %}
 	@$(MAKE) setup-r
@@ -49,7 +51,7 @@ clean:
 test-py:
 	@echo "Running Python tests..."
 	poetry run pytest
-	rm -fr .pytest_cache
+	@rm -fr .pytest_cache
 
 test-r:
 	@echo "Running R tests..."

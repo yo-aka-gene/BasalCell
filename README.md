@@ -85,12 +85,12 @@ Create a new blank repository on GitHub:
 Then, after generating your project, run:
 ```bash
 cd <your-directory-name>
-git init
 git add .
 git commit -m ':tada: Initial commit from BasalCell template'
 git remote add origin https://github.com/<your-id>/<project-name>.git
 git push -u origin main
 ```
+**Note**: During `make init`, `git init` has already executed.
 
 ### Documentation
 Documentation is a cornerstone of the readability of your analysis code. Utilize the following frameworks to create your own documentation:
