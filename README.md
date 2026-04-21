@@ -93,7 +93,7 @@ Create a new blank repository on GitHub:
 - Repository name: the same as `<your-directory-name>`
 - Add README: `OFF`
 - Add .gitignore: `No .gitignore`
-- Add license: `No lisence`
+- Add license: `No license`
 
 Then, after generating your project, run:
 ```bash
