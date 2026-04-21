@@ -19,13 +19,26 @@ BasalCell is a [cookiecutter](https://github.com/cookiecutter/cookiecutter) temp
 ## Usage
 ### 1. Prerequisites
 Before using BasalCell, ensure you have the following installed on your system:
-- `Python` (versions 3.10, 3.11, or 3.12 are covered)
+- `Python` (3.10–3.12)
 - `pip`
 - `Git`
+- `make`
 
-Ensure you have the `make` command installed:
-- **macOS**: `brew install make`
-- **Windows**: Use **WSL2** and run `sudo apt update && sudo apt install make`
+**For macOS**
+
+Using [Homebrew](https://brew.sh/) is the easiest way:
+```bash
+brew install git make
+```
+> :bulb: **Python Installation Tip**: We highly recommend using `pyenv` (`brew install pyenv`) to manage Python versions cleanly. Alternatively, for a quick setup, you can install Python directly via `brew install python@3.11`.
+
+**For Windows (WSL2 / Ubuntu)**
+
+Run the following command to install all the prerequisites at once:
+```bash
+sudo apt update && sudo apt install -y git make python3 python3-pip
+```
+> :bulb: **Python Installation Tip**: While the command above installs the system Python, setting up `pyenv` is considered a best practice in bioinformatics to prevent conflicts with the OS environment.
 
 ### 2. Install `cookiecutter`
 ```bash
@@ -35,7 +48,7 @@ pip install -U cookiecutter
 ```bash
 cookiecutter git@github.com:yo-aka-gene/BasalCell.git
 ```
-*Note for GitHub authentication:* If you haven't set up SSH keys for GitHub, use the HTTPS URL instead when running Cookiecutter:
+> :bulb: **Note for GitHub authentication**: If you haven't set up SSH keys for GitHub, use the HTTPS URL instead when running Cookiecutter:
 ```
 cookiecutter https://github.com/yo-aka-gene/BasalCell.git
 ```
