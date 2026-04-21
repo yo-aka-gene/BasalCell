@@ -38,6 +38,11 @@ jobs:
         with:
           r-version: '4.3'
 
+      - name: Install system dependencies for R packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-dev libcurl4-openssl-dev libssl-dev libzmq3-dev libuv1-dev
+
       - name: Install dependencies
         run: poetry install --with dev --no-interaction --no-root
 
