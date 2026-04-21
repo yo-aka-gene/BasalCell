@@ -9,6 +9,21 @@ PROJECT_NAME="${DIR_NAME}_R"
 echo "Building R env for ${PROJECT_NAME} (R v${R_VERSION})"
 echo "=================================================="
 
+echo "=== 0. Checking OS dependencies ==="
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    if command -v apt-get &> /dev/null; then
+        echo "Ubuntu/Debian/WSL detected. Installing essential C libraries for R packages..."
+        echo "Administrator privileges might be required. Please enter your sudo password."
+        sudo -v
+        sudo apt-get update -y
+        sudo apt-get install -y libxml2-dev libcurl4-openssl-dev libssl-dev libzmq3-dev libuv1-dev
+    else
+        echo "[WARNING] apt-get not found. Please ensure essential C libraries are installed manually."
+    fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    echo "macOS detected. Skipping OS-level dependency installation."
+fi
+
 echo "=== 1. rig installation ==="
 if ! command -v rig &> /dev/null; then
     echo "rig is not found; trying installation automatically..."
