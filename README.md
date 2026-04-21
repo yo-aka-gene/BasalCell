@@ -18,6 +18,11 @@ BasalCell is a [cookiecutter](https://github.com/cookiecutter/cookiecutter) temp
 
 ## Usage
 ### 1. Prerequisites
+Before using BasalCell, ensure you have the following installed on your system:
+- `Python` (versions 3.10, 3.11, or 3.12 are covered)
+- `pip`
+- `Git`
+
 Ensure you have the `make` command installed:
 - **macOS**: `brew install make`
 - **Windows**: Use **WSL2** and run `sudo apt update && sudo apt install make`
@@ -29,6 +34,10 @@ pip install -U cookiecutter
 ### 3. Create your project
 ```bash
 cookiecutter git@github.com:yo-aka-gene/BasalCell.git
+```
+*Note for GitHub authentication:* If you haven't set up SSH keys for GitHub, use the HTTPS URL instead when running Cookiecutter:
+```
+cookiecutter https://github.com/yo-aka-gene/BasalCell.git
 ```
 
 ### 4. Setup and Initialization
@@ -84,7 +93,7 @@ Create a new blank repository on GitHub:
 - Repository name: the same as `<your-directory-name>`
 - Add README: `OFF`
 - Add .gitignore: `No .gitignore`
-- Add lisence: `No lisence`
+- Add license: `No lisence`
 
 Then, after generating your project, run:
 ```bash
