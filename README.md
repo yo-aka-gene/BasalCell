@@ -49,9 +49,9 @@ pip install -U cookiecutter
 cookiecutter git@github.com:yo-aka-gene/BasalCell.git
 ```
 > :bulb: **Note for GitHub authentication**: If you haven't set up SSH keys for GitHub, use the HTTPS URL instead when running Cookiecutter:
-```
-cookiecutter https://github.com/yo-aka-gene/BasalCell.git
-```
+> ```bash
+> cookiecutter https://github.com/yo-aka-gene/BasalCell.git
+> ```
 
 ### 4. Setup and Initialization
 Answer the prompts to define your project configurations:
