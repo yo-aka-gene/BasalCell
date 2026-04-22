@@ -1,4 +1,3 @@
-# tests/testthat.R
 library(testthat)
 
 {%- if cookiecutter.create_package == "true" %}
