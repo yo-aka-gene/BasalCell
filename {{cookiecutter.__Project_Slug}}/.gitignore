@@ -193,3 +193,8 @@ renv/library/
 renv/local/
 renv/staging/
 renv/.cache/
+{%- if cookiecutter.r_ver != "none" %}
+
+# Jupyter–R integration
+.Rprofile_proxy
+{%- endif %}
