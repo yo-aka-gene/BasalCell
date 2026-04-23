@@ -3,7 +3,7 @@
 </h1><br>
 
 
-![version](https://img.shields.io/badge/BasalCell-v.0.1.0-blue.svg?longCache=true)
+![version](https://img.shields.io/badge/BasalCell-v.0.1.1-blue.svg?longCache=true)
 
 
 - Free software: MIT license
