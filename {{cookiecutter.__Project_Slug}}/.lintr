@@ -1,0 +1,1 @@
+exclusions: list("renv/activate.R", "renv")
