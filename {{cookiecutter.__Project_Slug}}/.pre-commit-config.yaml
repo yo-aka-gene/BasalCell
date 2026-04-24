@@ -1,3 +1,7 @@
+{%- if cookiecutter.r_ver != "none"}
+exclude: ^renv/
+
+{%- endif %}
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
