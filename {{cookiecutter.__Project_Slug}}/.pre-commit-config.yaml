@@ -1,4 +1,4 @@
-{%- if cookiecutter.r_ver != "none"}
+{%- if cookiecutter.r_ver != "none" %}
 exclude: ^renv/
 
 {%- endif %}
