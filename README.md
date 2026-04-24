@@ -10,6 +10,8 @@
 
 BasalCell is a [cookiecutter](https://github.com/cookiecutter/cookiecutter) template designed for reproducible and distributable bioinformatics data analysis. It streamlines the creation of isolated Python and R environments integrated within JupyterLab.
 
+**:eyes: See it in action:** Check out the [BasalCellDemo repository](https://github.com/yo-aka-gene/BasalCellDemo) for a complete scRNA-seq workflow example.
+
 ## Features
 - **Poetry-managed Python environment**: Pre-configured with `jupyterlab` and essential data science tools.
 - **Optional R Integration**: Seamlessly setup an isolated R kernel using `rig` and `renv`.
