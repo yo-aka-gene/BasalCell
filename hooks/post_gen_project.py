@@ -75,6 +75,7 @@ if __name__ == "__main__":
     use_r = "{{ cookiecutter.r_ver }}".lower() != "none"
     if not use_r and os.path.exists("setup_r_env.sh"):
         os.remove("setup_r_env.sh")
+        os.remove(".lintr")
         os.remove("tests/testthat.R")
         shutil.rmtree("tests/testthat")
 
