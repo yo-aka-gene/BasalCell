@@ -78,6 +78,7 @@ texinfo_documents = [
 
 sys.path.insert(0, os.path.abspath('./jupyternb'))
 
+# -- Setting Thumbnails for nbsphinx -----------------------------------------
 nbsphinx_thumbnails = {
     "/".join(
         v.split(".")[:-1]
