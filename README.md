@@ -1,5 +1,5 @@
 <h1 align="center">
-<img src=https://github.com/yo-aka-gene/BasalCell/blob/main/logo/basalcell_logo_long.png?raw=true width="500">
+<img src=https://github.com/yo-aka-gene/BasalCell/blob/main/logo/basalcell_logo_long.svg?raw=true width="500">
 </h1><br>
 
 
