@@ -3,7 +3,7 @@
 </h1><br>
 
 
-![version](https://img.shields.io/badge/BasalCell-v.0.2.1-blue.svg?longCache=true)
+![BasalCell Version](https://img.shields.io/github/v/tag/yo-aka-gene/BasalCell?label=BasalCell&color=blue)
 
 
 - Free software: MIT license
