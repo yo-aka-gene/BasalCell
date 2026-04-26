@@ -66,4 +66,4 @@ testpaths = [
     "src",
 {%- endif %}
 ]
-norecursedirs = ["docs", "renv", ".venv", ".git", ".github"]
+norecursedirs = [".ipynb_checkpoints", "docs", "renv", ".venv", ".git", ".github"]
