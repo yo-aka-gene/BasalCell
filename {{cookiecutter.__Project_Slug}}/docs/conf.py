@@ -50,7 +50,7 @@ html_theme_options = {
     "logo_only": True,
 }
 
-htmlhelp_basename = "{{ cookiecutter.__project_slug }}_doc"
+htmlhelp_basename = "{{ cookiecutter.__project_slug }}"
 
 # -- Options for LaTeX output ------------------------------------------------
 latex_documents = [
