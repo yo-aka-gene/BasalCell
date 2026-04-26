@@ -20,7 +20,8 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
             libxml2-dev libcurl4-openssl-dev libssl-dev \
             libzmq3-dev libuv1-dev libglpk-dev \
             libharfbuzz-dev libfribidi-dev libfontconfig1-dev \
-            libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
+            libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev \
+            pandoc
     else
         echo "[WARNING] apt-get not found. Please ensure essential C libraries are installed manually."
     fi
