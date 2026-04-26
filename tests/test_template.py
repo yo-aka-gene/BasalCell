@@ -40,6 +40,7 @@ def symbolic_links():
 @pytest.fixture
 def rlang_files():
     return [
+        "DESCRIPTION",
         "setup_r_env.sh",
         "renv.lock",
         ".Rprofile",

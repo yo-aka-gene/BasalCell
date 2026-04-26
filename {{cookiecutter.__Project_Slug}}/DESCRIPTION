@@ -1,0 +1,8 @@
+Package: {{ cookiecutter.__project_slug }}
+Type: Package
+Title: {{ cookiecutter.project_name }}
+Version: 0.1.0
+Authors@R: person("{{ cookiecutter.author_name }}", email = "{{ cookiecutter.email }}", role = c("aut", "cre"))
+Description: {{ cookiecutter.description }}
+Encoding: UTF-8
+LazyData: true
