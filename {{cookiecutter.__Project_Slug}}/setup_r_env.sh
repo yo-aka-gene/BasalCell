@@ -90,7 +90,10 @@ else
         'styler',
         'lintr',
         'BiocManager',
-        'IRkernel'
+        'IRkernel',
+        'devtools', 
+        'pkgdown', 
+        'roxygen2'
     ))
     renv::snapshot(prompt = FALSE, type = 'all')
     "
