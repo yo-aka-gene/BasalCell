@@ -189,7 +189,9 @@ rsconnect/
 *.fastq
 *.mtx
 *.pq
+*.parquet
 *.ipc
+*.feather
 *.pkl
 *.json
 
