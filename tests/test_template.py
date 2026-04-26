@@ -43,10 +43,21 @@ def rlang_files():
         "setup_r_env.sh",
         "renv.lock",
         ".Rprofile",
+        "_pkgdown.yml",
+        "R/.gitkeep",
         "renv/activate.R",
         "renv/settings.json",
         "tests/testthat.R",
         "tests/testthat/.gitkeep",
+    ]
+
+
+@pytest.fixture
+def rlang_symbolic_links():
+    return [
+        "docs/jupyternb/data",
+        "docs/jupyternb/tools",
+        "tools/R",
     ]
 
 
@@ -140,13 +151,13 @@ def test_correct_template_for_package_mode(cookies, essential_files, symbolic_li
 
 
 def test_correct_template_with_rlang(
-    cookies, essential_files, symbolic_links, rlang_files
+    cookies, essential_files, rlang_symbolic_links, rlang_files
 ):
     result = cookies.bake(
         extra_context={"project_name": "Test Project-CI/CD", "r_ver": "4.3"}
     )
 
-    minimal_tests(result, essential_files, symbolic_links)
+    minimal_tests(result, essential_files, rlang_symbolic_links)
 
     print("===== #10. Checking R files =====")
     path = result.project_path.name
