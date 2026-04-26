@@ -187,6 +187,11 @@ rsconnect/
 *.h5ad
 *.bam
 *.fastq
+*.mtx
+*.pq
+*.ipc
+*.pkl
+*.json
 
 # renv
 renv/library/
