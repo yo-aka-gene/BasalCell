@@ -91,6 +91,7 @@ else
         'lintr',
         'BiocManager',
         'IRkernel',
+        'usethis',
         'devtools', 
         'pkgdown', 
         'roxygen2'
