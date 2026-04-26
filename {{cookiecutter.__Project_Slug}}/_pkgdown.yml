@@ -1,15 +1,9 @@
 url: https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/r_api/
 template:
+  bootstrap: 5
   params:
     bootswatch: flatly
 navbar:
   structure:
     left:  [intro, reference, articles, news]
     right: [github]
-reference:
-  - title: "R Functions"
-    desc: "Functions employed with R in {{cookiecutter.project_name}}"
-    contents:
-      # - list your functions here:
-      # - starts_with("run_")
-      # - explicitly_designated_func
