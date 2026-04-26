@@ -1,11 +1,12 @@
 {%- if cookiecutter.r_ver != "none" %}
-.PHONY: init setup-r launch docs clean test-py test-r test
+.PHONY: init setup-r launch docs clean test-py test-r test sync_ver r_docs
 {%- else %}
 .PHONY: init launch docs clean test
 {%- endif %}
 
 DIR_NAME := $(shell basename $(CURDIR))
 PY_KERNEL := $(DIR_NAME)_py
+VERSION := $(shell grep '^version = ' pyproject.toml | cut -d '"' -f 2)
 
 init:
 	@echo "Starting project environment setup..."
@@ -29,24 +30,6 @@ setup-r:
 		chmod +x setup_r_env.sh; \
 		./setup_r_env.sh; \
 	fi
-{%- endif %}
-
-launch:
-	@poetry run python launch_jupyter.py
-
-docs:
-	@echo "Building Sphinx HTML documentation..."
-	@poetry run sphinx-build -b html docs docs/_build/html
-	@echo "Opening documentation in browser..."
-	@poetry run python -c "import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
-
-clean:
-	@echo "Cleaning up built documentation and cache..."
-	@rm -rf docs/_build
-	@rm -rf .pytest_cache
-	@rm -rf .ruff_cache
-	@echo "Clean up complete."
-{%- if cookiecutter.r_ver != "none" %}
 
 test-py:
 	@echo "Running Python tests..."
@@ -58,9 +41,53 @@ test-r:
 	poetry run Rscript -e "testthat::test_dir('tests/testthat')"
 
 test: test-py test-r
+
+
+PROJECT_NAME := {{ cookiecutter.project_name }}
+DESCRIPTION_STR := $(shell grep '^description = ' pyproject.toml | cut -d '"' -f 2)
+AUTHOR_NAME := {{ cookiecutter.author_name }}
+AUTHOR_EMAIL := {{ cookiecutter.email }}
+
+sync_ver:
+	@echo "Syncing package metadata to DESCRIPTION..."
+	@if [ ! -f DESCRIPTION ]; then \
+		Rscript -e "usethis::use_description(fields = list(Package = '$(PROJECT_NAME)'), check_name = FALSE)"; \
+	fi
+	@perl -i -pe 's/^Version: .*/Version: $(VERSION)/' DESCRIPTION
+	@perl -i -pe 's/^Title: .*/Title: $(PROJECT_NAME)/' DESCRIPTION
+	@perl -i -pe 's/^Description: .*/Description: $(DESCRIPTION_STR)/' DESCRIPTION
+	@Rscript -e "desc <- read.dcf('DESCRIPTION'); \
+		desc[1, 'Authors@R'] <- \"person('$(AUTHOR_NAME)', email = '$(AUTHOR_EMAIL)', role = c('aut', 'cre'))\"; \
+		write.dcf(desc, 'DESCRIPTION')"
+	@if [ ! -f NAMESPACE ]; then \
+        Rscript -e "usethis::use_namespace()"; \
+    fi
+
+r_docs: sync_ver
+	@echo "Generating R documentation (roxygen2 & pkgdown)..."
+	@Rscript -e "devtools::document()"
+	@Rscript -e "pkgdown::build_site(override = list(destination = 'docs/_build/html/r_api'))"
+
+docs: r_docs
 {%- else %}
 
 test:
 	poetry run pytest
 	@rm -fr .pytest_cache
+
+docs:
 {%- endif %}
+	@echo "Building Sphinx HTML documentation..."
+	@poetry run sphinx-build -b html docs docs/_build/html
+	@echo "Opening documentation in browser..."
+	@poetry run python -c "import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
+
+launch:
+	@poetry run python launch_jupyter.py
+
+clean:
+	@echo "Cleaning up built documentation and cache..."
+	@rm -rf docs/_build
+	@rm -rf .pytest_cache
+	@rm -rf .ruff_cache
+	@echo "Clean up complete."
