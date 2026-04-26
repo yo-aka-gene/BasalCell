@@ -43,6 +43,7 @@ def install_poetry():
 def setup_symbolic_links():
     print("Setting up symbolic links for Jupyter Notebooks...")
     links = [
+        {"src": "../R", "dest": "tools/R"},
         {"src": "../../tools", "dest": "docs/jupyternb/tools"},
         {"src": "../../data", "dest": "docs/jupyternb/data"},
     ]
