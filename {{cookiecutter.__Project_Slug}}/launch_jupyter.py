@@ -2,6 +2,7 @@ import os
 import platform
 {%- if cookiecutter.r_ver != "none" %}
 from pathlib import Path
+import textwrap
 {%- endif %}
 import subprocess
 import sys
@@ -76,13 +77,12 @@ if __name__ == "__main__":
 {%- if cookiecutter.r_ver != "none" %}
     project_root = Path(__file__).resolve().parent
     r_profile_proxy = project_root / ".Rprofile_proxy"
-    r_profile_content = f"""
-    old_wd <- getwd()
-    setwd('{project_root.as_posix()}')
-    source('renv/activate.R')
-    setwd(old_wd)
-   
-    """
+    r_profile_content = textwrap.dedent(f"""\
+        old_wd <- getwd()
+        setwd('{project_root.as_posix()}')
+        source('renv/activate.R')
+        setwd(old_wd)
+    """)
     r_profile_proxy.write_text(r_profile_content)
     os.environ["R_PROFILE_USER"] = str(r_profile_proxy)
 {%- endif %}
