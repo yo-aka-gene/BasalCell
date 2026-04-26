@@ -16,7 +16,11 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         echo "Administrator privileges might be required. Please enter your sudo password."
         sudo -v
         sudo apt-get update -y
-        sudo apt-get install -y libxml2-dev libcurl4-openssl-dev libssl-dev libzmq3-dev libuv1-dev libglpk-dev
+        sudo apt-get install -y \
+            libxml2-dev libcurl4-openssl-dev libssl-dev \
+            libzmq3-dev libuv1-dev libglpk-dev \
+            libharfbuzz-dev libfribidi-dev libfontconfig1-dev \
+            libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
     else
         echo "[WARNING] apt-get not found. Please ensure essential C libraries are installed manually."
     fi
