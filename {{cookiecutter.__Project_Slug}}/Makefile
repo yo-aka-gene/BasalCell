@@ -112,7 +112,7 @@ clean:
 add-os:
 	@echo "Adding Linux package(s): $(PKG)..."
 	conda run -n $(CONDA_ENV) \
-		yq -i '.dependencies |= (. + ["$(PKG)"] | unique)' environment.yml
+		yq -i '.dependencies |= (. + ("$(PKG)" | split(" ")) | unique)' environment.yml
 	conda env update -f environment.yml --prune
 
 add-py:
