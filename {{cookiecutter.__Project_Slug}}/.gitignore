@@ -128,6 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+{%- if cookiecutter.r_ver != "none" %}
 # History files
 .Rhistory
 .Rapp.history
@@ -151,10 +152,6 @@ dmypy.json
 # RStudio files
 .Rproj.user/
 
-# produced vignettes
-vignettes/*.html
-vignettes/*.pdf
-
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
 .httr-oauth
 
@@ -169,14 +166,21 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# pkgdown site
-docs/_build/
-
 # translation temp files
 po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# renv
+renv/library/
+renv/local/
+renv/staging/
+renv/.cache/
+
+# Jupyter–R integration
+.Rprofile_proxy
+{%- endif %}
 
 # MacOS
 .DS_Store
@@ -193,15 +197,3 @@ rsconnect/
 *.ipc
 *.feather
 *.pkl
-*.json
-
-# renv
-renv/library/
-renv/local/
-renv/staging/
-renv/.cache/
-{%- if cookiecutter.r_ver != "none" %}
-
-# Jupyter–R integration
-.Rprofile_proxy
-{%- endif %}
