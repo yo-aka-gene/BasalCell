@@ -46,7 +46,7 @@ jobs:
             libzmq3-dev libuv1-dev libglpk-dev \
             libharfbuzz-dev libfribidi-dev libfontconfig1-dev \
             libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev \
-            pandoc
+            pandoc cmake libcairo2-dev libgit2-dev
 
       - name: Install dependencies
         run: poetry install --with dev --no-interaction --no-root
