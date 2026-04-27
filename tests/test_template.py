@@ -13,6 +13,7 @@ def essential_files():
         ".gitignore",
         ".pre-commit-config.yaml",
         ".readthedocs.yaml",
+        "environment.yml",
         "launch_jupyter.py",
         "Makefile",
         "pyproject.toml",
@@ -137,6 +138,7 @@ def test_correct_template_for_package_mode(cookies, essential_files, symbolic_li
             "project_name": "Test Project-CI/CD",
             "author_name": "John Smith",
             "email": "example@example.com",
+            "python_ver": "3.11",
             "create_package": "true",
         }
     )
@@ -155,7 +157,11 @@ def test_correct_template_with_rlang(
     cookies, essential_files, rlang_symbolic_links, rlang_files
 ):
     result = cookies.bake(
-        extra_context={"project_name": "Test Project-CI/CD", "r_ver": "4.3"}
+        extra_context={
+            "project_name": "Test Project-CI/CD",
+            "python_ver": "3.12",
+            "r_ver": "4.5",
+        }
     )
 
     minimal_tests(result, essential_files, rlang_symbolic_links)
