@@ -61,7 +61,7 @@ line-ending = "auto"
 addopts = ["--doctest-modules", "-v", "--durations=10"]
 testpaths = [
     "tests",
-    "tools",
+    "{{cookiecutter.__project_slug}}_tools",
 {%- if cookiecutter.create_package == "true" %}
     "src",
 {%- endif %}
