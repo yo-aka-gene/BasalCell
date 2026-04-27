@@ -1,7 +1,7 @@
 {%- if cookiecutter.r_ver != "none" %}
-.PHONY: init setup-r launch docs clean test-py test-r test sync-r docs-r add-os add-py add-r
+.PHONY: init setup-r launch docs clean test-py test-r test sync-r docs-r add-os add-py add-pydev add-r
 {%- else %}
-.PHONY: init launch docs clean test add-os add-py
+.PHONY: init launch docs clean test add-os add-py add-pydev
 {%- endif %}
 
 CONDA_ENV := conda_{{cookiecutter.__project_slug}}
@@ -115,3 +115,8 @@ add-py:
 	@echo "Adding $(PKG) to poetry..."
 	conda run -n $(CONDA_ENV) \
 		poetry add $(PKG)
+
+add-pydev:
+	@echo "Adding $(PKG) to poetry..."
+	conda run -n $(CONDA_ENV) \
+		poetry add -D $(PKG)
