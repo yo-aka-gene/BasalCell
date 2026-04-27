@@ -35,6 +35,7 @@ ruff = "^0.3.0"
 jupyterlab = "^4.5.4"
 ipywidgets = "^8.1.8"
 ipykernel = "^7.2.0"
+jupyter-resource-usage = "^1.2.1"
 
 [build-system]
 requires = ["poetry-core"]
