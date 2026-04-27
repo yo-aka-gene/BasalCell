@@ -61,4 +61,4 @@ make bump-major  # 0.2.0 -> 1.0.0
 - {{cookiecutter.author_name}} <[{{cookiecutter.email}}](mailto:{{cookiecutter.email}})>
     - GitHub account: [{{cookiecutter.github_username}}](https://github.com/{{cookiecutter.github_username}})
 ---
-This project was created with [Cookiecutter](https://github.com/cookiecutter/cookiecutter) and [BasalCell](https://github.com/yo-aka-gene/BasalCell)
+This project was created with [Cookiecutter](https://github.com/cookiecutter/cookiecutter) and [BasalCell](https://github.com/yo-aka-gene/BasalCell) version {{cookiecutter.__version}}
