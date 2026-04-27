@@ -11,8 +11,14 @@ def is_tool_installed(name):
 def setup_symbolic_links():
     print("Setting up symbolic links for Jupyter Notebooks...")
     links = [
-        {"src": "../R", "dest": "tools/R"},
-        {"src": "../../tools", "dest": "docs/jupyternb/tools"},
+        {
+            "src": "../../{{cookiecutter.__project_slug}}_rtools",
+            "dest": "docs/jupyternb/{{cookiecutter.__project_slug}}_rtools",
+        },
+        {
+            "src": "../../{{cookiecutter.__project_slug}}_tools",
+            "dest": "docs/jupyternb/{{cookiecutter.__project_slug}}_tools",
+        },
         {"src": "../../data", "dest": "docs/jupyternb/data"},
     ]
 
@@ -42,23 +48,11 @@ if __name__ == "__main__":
     setup_symbolic_links()
     use_r = "{{ cookiecutter.r_ver }}".lower() != "none"
     if not use_r:
-        r_files = [
-            "DESCRIPTION",
-            "setup_r_env.sh",
-            ".lintr",
-            "_pkgdown.yml",
-            "tests/testthat.R",
-        ]
+        r_files = ["setup_r_env.sh", ".lintr"]
         for f in r_files:
             if os.path.exists(f):
                 os.remove(f)
-        r_dirs = ["tests/testthat", "R", "tools/R"]
-        for d in r_dirs:
-            if os.path.exists(d):
-                if os.path.isdir(d):
-                    shutil.rmtree(d)
-                else:
-                    os.remove(d)
+        shutil.rmtree("{{cookiecutter.__project_slug}}_rtools")
 
     create_package = "{{ cookiecutter.create_package }}".lower() == "true"
     if not create_package and os.path.exists("src"):
