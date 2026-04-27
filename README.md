@@ -14,7 +14,7 @@ BasalCell is a [cookiecutter](https://github.com/cookiecutter/cookiecutter) temp
 
 ## Features
 - **Poetry-managed Python environment**: Pre-configured with `jupyterlab` and essential data science tools.
-- **Optional R Integration**: Seamlessly setup an isolated R kernel using `rig` and `renv`.
+- **Optional R Integration**: Seamlessly setup an isolated R kernel using `renv`.
 - **Automated Documentation**: Ready-to-use `Sphinx` configuration (supporting MyST Markdown and Jupyter Notebooks).
 - **One-command Workflow**: Setup and launch everything via `make`.
 
@@ -23,22 +23,22 @@ BasalCell is a [cookiecutter](https://github.com/cookiecutter/cookiecutter) temp
 Before using BasalCell, ensure you have the following installed on your system:
 - `Python` (3.10–3.12)
 - `pip`
-- `Git`
+- `miniconda`
 - `make`
 
 **For macOS**
 
 Using [Homebrew](https://brew.sh/) is the easiest way:
 ```bash
-brew install git make
+brew install miniconda make
 ```
-> :bulb: **Python Installation Tip**: We highly recommend using `pyenv` (`brew install pyenv`) to manage Python versions cleanly. Alternatively, for a quick setup, you can install Python directly via `brew install python@3.11`.
+> :bulb: **Python Installation Tip**: We highly recommend using `pyenv` (`brew install pyenv`) to manage Python versions cleanly. Alternatively, for a quick setup, you can install Python directly `brew install` (e.g.,  `brew install python@3.12`).
 
 **For Windows (WSL2 / Ubuntu)**
 
 Run the following command to install all the prerequisites at once:
 ```bash
-sudo apt update && sudo apt install -y git make python3 python3-pip
+sudo apt update && sudo apt install -y miniconda make python3 python3-pip
 ```
 > :bulb: **Python Installation Tip**: While the command above installs the system Python, setting up `pyenv` is considered a best practice in bioinformatics to prevent conflicts with the OS environment.
 
@@ -48,11 +48,11 @@ pip install -U cookiecutter
 ```
 ### 3. Create your project
 ```bash
-cookiecutter git@github.com:yo-aka-gene/BasalCell.git
+cookiecutter https://github.com/yo-aka-gene/BasalCell.git
 ```
-> :bulb: **Note for GitHub authentication**: If you haven't set up SSH keys for GitHub, use the HTTPS URL instead when running Cookiecutter:
+> :bulb: **Note for GitHub authentication**: If you have set up SSH keys for GitHub, you can run the following code instead:
 > ```bash
-> cookiecutter https://github.com/yo-aka-gene/BasalCell.git
+> cookiecutter git@github.com:yo-aka-gene/BasalCell.git
 > ```
 
 ### 4. Setup and Initialization
@@ -63,8 +63,8 @@ Answer the prompts to define your project configurations:
     - ``author_name``: your name (required when `create_package` is `true`)
     - ``email``: your contact info (required when `create_package` is `true`)
     - ``github_username``: your GitHub ID
-    - ``python_ver``: the version of Python: choose from `3.10`, `3.11`, or `3.12` (we recommend `3.11` for bioinformatics analyses)
-    - `r_ver`: the version of R: choose from `none` (then R setup will be omitted), `4.2`, `4.3`, or `4.4` (we recommend `4.3` for bioinformatics analyses)
+    - ``python_ver``: the version of Python: choose from `3.10`, `3.11`, or `3.12`.
+    - `r_ver`: the version of R: choose from `none` (then R setup will be omitted), `4.2`, `4.3`, `4.4`, or `4.5`
     - `create_package`: choose `true` if you will publish your project as a Python package; otherwise `false`
 
 Once you've answered the prompts, the initialization script (`make init`) will automatically run to set up your environments.
@@ -79,27 +79,29 @@ Then `Jupyter Lab` will pop up in your default browser.
 Default token will be your project slug:
 e.g., `Your Project Name` -> `your_project_name`
 
-:warning: in case error codes as follows appear, reboot the terminal:
-```
-make: poetry: No such file or directory
-make: *** [Makefile:25: launch] Error 127
-```
-
 ## Maintenance
 ### Add new Python packages
 ```bash
 # For main analysis (e.g., polars, torch, scanpy)
-poetry add polars torch scanpy
+make add-py PKG=polars
+make add-py PKG='torch "scanpy<1.12"'
 
-# For development tools (e.g., flake8)
-poetry add -D flake8
+# For development tools (e.g., tqdm)
+make add-pydev PKG=tqdm
 ```
 
 ### **[Optional]** Add new R packages
 To add new packages within the isolated `renv` env:
 ```bash
-# Run R within the project context and install
-Rscript -e "renv::install('ggplot2')"
+# For R packages (e.g., ggplot2)
+make add-r PKG=ggplot2
+
+# For R packages from Bioconductor (e.g., clusterProfiler, ComplexHeatmap)
+make add-bioc PKG="clusterProfiler ComplexHeatmap"
+
+# Sometimes R packages requires OS-level dependencies (e.g., perl)
+# If so, you can add them to the Conda env with add-os
+make add-os PKG=perl
 ```
 
 ## Development Tips
