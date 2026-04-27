@@ -1,7 +1,7 @@
 name: conda_{{cookiecutter.__project_slug}}
 channels:
   - conda-forge
-  - defaults
+  - nodefaults
 dependencies:
   - python={{cookiecutter.python_ver}}
   - poetry
