@@ -6,3 +6,4 @@ Authors@R: person("{{ cookiecutter.author_name }}", email = "{{ cookiecutter.ema
 Description: {{ cookiecutter.description }}
 Encoding: UTF-8
 LazyData: true
+URL: https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/r_api/
