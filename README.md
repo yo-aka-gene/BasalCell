@@ -64,7 +64,7 @@ Answer the prompts to define your project configurations:
     - ``email``: your contact info (required when `create_package` is `true`)
     - ``github_username``: your GitHub ID
     - ``python_ver``: the version of Python: choose from `3.10`, `3.11`, or `3.12`.
-    - `r_ver`: the version of R: choose from `none` (then R setup will be omitted), `4.2`, `4.3`, `4.4`, or `4.5`
+    - `r_ver`: the version of R: choose from `none` (then R setup will be omitted), `4.2`, `4.3`, or `4.4`
     - `create_package`: choose `true` if you will publish your project as a Python package; otherwise `false`
 
 Once you've answered the prompts, the initialization script (`make init`) will automatically run to set up your environments.

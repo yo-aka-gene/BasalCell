@@ -160,7 +160,7 @@ def test_correct_template_with_rlang(
         extra_context={
             "project_name": "Test Project-CI/CD",
             "python_ver": "3.12",
-            "r_ver": "4.5",
+            "r_ver": "4.4",
         }
     )
 
