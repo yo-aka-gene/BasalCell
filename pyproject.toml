@@ -1,6 +1,6 @@
 [project]
 name = "basalcell"
-version = "0.3.0"
+version = "0.3.1"
 description = "A project scaffold generator for bioinformatics analysis"
 authors = [
     {name = "yo-aka-gene",email = "yujiokano@keio.jp"}
