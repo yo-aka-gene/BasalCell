@@ -1,5 +1,5 @@
 {%- if cookiecutter.r_ver != "none" %}
-.PHONY: init setup-r launch docs clean test-py test-r test sync-r docs-r add-os add-py add-pydev add-r
+.PHONY: init setup-r launch docs clean test-py test-r test sync-r docs-r add-os add-py add-pydev add-r add-bioc
 {%- else %}
 .PHONY: init launch docs clean test add-os add-py add-pydev
 {%- endif %}
@@ -53,10 +53,14 @@ test-r:
 test: test-py test-r
 
 add-r:
-	@echo "Adding $(PKG) to renv..."
+	@echo "Adding R package(s): $(PKG)..."
 	conda run -n $(CONDA_ENV) \
-		Rscript -e "renv::install('$(PKG)'); renv::snapshot(prompt = FALSE)"
+		Rscript -e "pkgs <- unlist(strsplit('$(PKG)', '[[:space:]]+')); renv::install(pkgs); renv::snapshot(prompt = FALSE)"
 
+add-bioc:
+	@echo "Adding Bioconductor package(s): $(PKG)..."
+	conda run -n $(CONDA_ENV) \
+		Rscript -e "pkgs <- unlist(strsplit('$(PKG)', '[[:space:]]+')); renv::install(paste0('bioc::', pkgs)); renv::snapshot(prompt = FALSE)"
 
 PROJECT_NAME := $(shell grep '^name = ' pyproject.toml | cut -d '"' -f 2)
 DESCRIPTION_STR := $(shell grep '^description = ' pyproject.toml | cut -d '"' -f 2)
@@ -106,17 +110,17 @@ clean:
 	@echo "Clean up complete."
 
 add-os:
-	@echo "Adding $(PKG) to conda env..."
+	@echo "Adding Linux package(s): $(PKG)..."
 	conda run -n $(CONDA_ENV) \
 		yq -i '.dependencies |= (. + ["$(PKG)"] | unique)' environment.yml
 	conda env update -f environment.yml --prune
 
 add-py:
-	@echo "Adding $(PKG) to poetry..."
+	@echo "Adding Python package(s): $(PKG)..."
 	conda run -n $(CONDA_ENV) \
 		poetry add $(PKG)
 
 add-pydev:
-	@echo "Adding $(PKG) to poetry..."
+	@echo "Adding Python package(s) for development: $(PKG)..."
 	conda run -n $(CONDA_ENV) \
 		poetry add -D $(PKG)
