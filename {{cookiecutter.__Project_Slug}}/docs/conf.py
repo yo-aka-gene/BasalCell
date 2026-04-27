@@ -51,7 +51,9 @@ html_theme_options = {
 }
 
 htmlhelp_basename = "{{ cookiecutter.__project_slug }}"
-
+{%- if cookiecutter.r_ver != "none" %}
+html_extra_path = ["r_api"]
+{%- endif %}
 # -- Options for LaTeX output ------------------------------------------------
 latex_documents = [
     ("index", "{{ cookiecutter.__project_slug }}.tex",
@@ -78,7 +80,9 @@ texinfo_documents = [
 
 sys.path.insert(0, os.path.abspath('./jupyternb'))
 
-# -- Setting Thumbnails for nbsphinx -----------------------------------------
+# -- Options for nbsphinx -----------------------------------------
+nbsphinx_execute = 'never'
+
 nbsphinx_thumbnails = {
     "/".join(
         v.split(".")[:-1]
