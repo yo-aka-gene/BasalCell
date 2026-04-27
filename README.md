@@ -96,8 +96,8 @@ To add new packages within the isolated `renv` env:
 # For R packages (e.g., ggplot2)
 make add-r PKG=ggplot2
 
-# For R packages from Bioconductor (e.g., clusterProfiler, ComplexHeatmap)
-make add-bioc PKG="clusterProfiler ComplexHeatmap"
+# For R packages from Bioconductor (e.g., DESeq2, edgeRp)
+make add-bioc PKG="DESeq2 edgeR"
 
 # Sometimes R packages requires OS-level dependencies (e.g., perl)
 # If so, you can add them to the Conda env with add-os
