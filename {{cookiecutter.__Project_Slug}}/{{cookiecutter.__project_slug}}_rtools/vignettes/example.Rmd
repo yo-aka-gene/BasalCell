@@ -1,0 +1,153 @@
+---
+title: "{{cookiecutter.project_name}} Vignette"
+output: rmarkdown::html_vignette
+vignette: >
+    %\VignetteIndexEntry{{{cookiecutter.project_name}} Vignette}
+    %\VignetteEngine{rmarkdown::html_vignette}
+    %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+# This is a Mock Vignette
+- Manuscripts written within `{{cookiecutter.__project__slug}}_rtools` are converted to HTML 
+using `pkgdown` and published at [https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/r_api/](https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/r_api/).
+- Because these files are somewhat isolated from the documentation built by Sphinx, 
+we do not actively recommend creating vignettes other than standard `.R` script documentation (e.g., using `roxygen2`). 
+(You can achieve the same functionality using `.ipynb` files, which can be integrated and built seamlessly with Sphinx).
+- However, as demonstrated in this file, you can still add a vignette by creating an `.Rmd` file 
+and including the following YAML header tags:
+    ````yaml
+    ---
+    title: "Vignette Name"
+    output: rmarkdown::html_vignette
+    vignette: >
+        %\VignetteIndexEntry{Vignette Name}
+        %\VignetteEngine{rmarkdown::html_vignette}
+        %\VignetteEncoding{UTF-8}
+    ---
+
+    ```{r setup, include=FALSE}
+    knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+    )
+    ```
+    ````
+- Like any other `.Rmd` file, you can write your content using 
+standard Markdown (`.md`) syntax while embedding R code inside code blocks. 
+Please use this feature for purposes such as creating tutorials for your R scripts.
+
+## Example
+---
+## Polynomial Ring
+```{r}
+_sca_ <- function (a, f) {
+  function(x) a * f(x)
+}
+
+_add_ <- function (fp, fq) {
+  function(x) fp(x) + fq(x)
+}
+
+_mul_ <- function (fp, fq) {
+  function(x) fp(x) * fq(x)
+}
+
+f1 <- function (x) {
+  x
+}
+
+f2 <- function (x) {
+  x ^ 2
+}
+
+v <- 1234
+w <- 5678
+```
+
+### Scalar Multiplication
+- Closure
+```{r}
+typeof(_add_(f1, f2)(v))
+typeof(_add_(f1, f2)(w))
+```
+
+### Summation
+- Closure
+```{r}
+typeof(_add_(f1, f2)(v))
+typeof(_add_(f1, f2)(w))
+```
+
+- Commutativity
+```{r}
+_add_(f1, f2)(v) == _add_(f2, f1)(v)
+_add_(f1, f2)(w) == _add_(f2, f1)(w)
+```
+
+- Associativity
+```{r}
+_add_(_add_(f1, f2), f3)(v) == _add_(f1, _add_(f2, f3))(v)
+_add_(_add_(f1, f2), f3)(w) == _add_(f1, _add_(f2, f3))(w)
+```
+
+- Identity Element
+```{r}
+fis <- function (x) {
+  0
+}
+_add_(f1, fis)(v) == f1(v)
+_add_(f1, fis)(w) == f1(w)
+_add_(f2, fis)(v) == f2(v)
+_add_(f2, fis)(w) == f2(w)
+```
+
+- Inverse Element
+```{r}
+get_inverse <- function (f) {
+  _sca_(-1, f)
+}
+_add_(f1, get_inverse(f1))(v) == fis(v)
+_add_(f1, get_inverse(f1))(w) == fis(w)
+_add_(f2, get_inverse(f2))(v) == fis(v)
+_add_(f2, get_inverse(f2))(w) == fis(w)
+```
+
+### Multiplication
+- Closure
+```{r}
+typeof(_mul_(f1, f2)(v))
+typeof(_mul_(f1, f2)(w))
+```
+
+- Commutativity
+```{r}
+_mul_(f1, f2)(v) == _mul_(f2, f1)(v)
+_mul_(f1, f2)(w) == _mul_(f2, f1)(w)
+```
+
+- Associativity
+```{r}
+_mul_(_mul_(f1, f2), f3)(v) == _mul_(f1, _mul_(f2, f3))(v)
+_mul_(_mul_(f1, f2), f3)(w) == _mul_(f1, _mul_(f2, f3))(w)
+```
+
+- Identity Element
+```{r}
+fim <- function (x) {
+  1
+}
+_mul_(f1, fim)(v) == f1(v)
+_mul_(f1, fim)(w) == f1(w)
+_mul_(f2, fim)(v) == f2(v)
+_mul_(f2, fim)(w) == f2(w)
+```
+
+---
+This project was created with [Cookiecutter](https://github.com/cookiecutter/cookiecutter) 
+and [BasalCell](https://github.com/yo-aka-gene/BasalCell) version {{cookiecutter.__version}}
