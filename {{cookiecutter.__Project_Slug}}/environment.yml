@@ -1,0 +1,31 @@
+name: conda_{{cookiecutter.__project_slug}}
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python={{cookiecutter.python_ver}}
+  - poetry
+  - make
+  - git
+  - yq
+{%- if cookiecutter.r_ver != "none" %}
+  - r-base={{cookiecutter.r_ver}}
+  - cmake
+  - pkg-config
+  - libxml2
+  - libcurl
+  - openssl
+  - zeromq
+  - libuv
+  - glpk
+  - harfbuzz
+  - fribidi
+  - fontconfig
+  - freetype
+  - libpng
+  - libtiff
+  - jpeg
+  - pandoc
+  - cairo
+  - libgit2
+{%- endif %}

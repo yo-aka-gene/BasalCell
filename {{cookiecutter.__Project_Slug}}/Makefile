@@ -1,23 +1,32 @@
 {%- if cookiecutter.r_ver != "none" %}
-.PHONY: init setup-r launch docs clean test-py test-r test sync_ver r_docs
+.PHONY: init setup-r launch docs clean test-py test-r test sync_ver r_docs conda_add
 {%- else %}
-.PHONY: init launch docs clean test
+.PHONY: init launch docs clean test conda_add
 {%- endif %}
 
+CONDA_ENV := conda_{{cookiecutter.__project_slug}}
 DIR_NAME := $(shell basename $(CURDIR))
 PY_KERNEL := $(DIR_NAME)_py
 VERSION := $(shell grep '^version = ' pyproject.toml | cut -d '"' -f 2)
 
 init:
 	@echo "Starting project environment setup..."
-	@if ! command -v poetry >/dev/null 2>&1; then \
-		echo "Poetry is not installed. Please install it first."; \
+	@if ! command -v conda >/dev/null 2>&1; then \
+		echo "Miniconda is not installed. Please install it first."; \
 		exit 1; \
 	fi
-	poetry install
-	git init
-	poetry run pre-commit install
-	poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
+	@if ! conda env list | grep -q $(CONDA_ENV); then \
+		conda env create -f environment.yml; \
+	else \
+		echo "Environment $(CONDA_ENV) already exists. Updating..."; \
+		conda env update -f environment.yml --prune; \
+	fi
+	conda run -n $(CONDA_ENV) poetry config virtualenvs.create false
+	conda run -n $(CONDA_ENV) poetry install
+	conda run -n $(CONDA_ENV) git init
+	conda run -n $(CONDA_ENV) poetry run pre-commit install
+	conda run -n $(CONDA_ENV) \
+		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 {%- if cookiecutter.r_ver != "none" %}
 	@$(MAKE) setup-r
 {%- endif %}
@@ -28,17 +37,18 @@ setup-r:
 	@if [ -f setup_r_env.sh ]; then \
 		echo "Found setup_r_env.sh. Setting up R environment..."; \
 		chmod +x setup_r_env.sh; \
-		./setup_r_env.sh; \
+		conda run -n $(CONDA_ENV) ./setup_r_env.sh; \
 	fi
 
 test-py:
 	@echo "Running Python tests..."
-	poetry run pytest
+	conda run -n $(CONDA_ENV) poetry run pytest
 	@rm -fr .pytest_cache
 
 test-r:
 	@echo "Running R tests..."
-	poetry run Rscript -e "testthat::test_dir('tests/testthat')"
+	conda run -n $(CONDA_ENV) \
+		Rscript -e "testthat::test_dir('tests/testthat')"
 
 test: test-py test-r
 
@@ -57,25 +67,31 @@ sync_ver:
 
 r_docs: sync_ver
 	@echo "Generating R documentation (roxygen2 & pkgdown)..."
-	@Rscript -e "devtools::document()"
-	@Rscript -e "pkgdown::build_site(override = list(destination = 'docs/_build/html/r_api'))"
+	@conda run -n $(CONDA_ENV) \
+		Rscript -e "devtools::document()"
+	@conda run -n $(CONDA_ENV) \
+		Rscript -e "pkgdown::build_site(override = list(destination = 'docs/_build/html/r_api'))"
 
 docs: r_docs
 {%- else %}
 
 test:
-	poetry run pytest
+	conda run -n $(CONDA_ENV) poetry run pytest
 	@rm -fr .pytest_cache
 
 docs:
 {%- endif %}
 	@echo "Building Sphinx HTML documentation..."
-	@poetry run sphinx-build -b html docs docs/_build/html
+	@conda run -n $(CONDA_ENV) \
+		poetry run sphinx-build -b html docs docs/_build/html
 	@echo "Opening documentation in browser..."
-	@poetry run python -c "import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
+	@conda run -n $(CONDA_ENV) \
+		poetry run python -c \
+		"import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
 
 launch:
-	@poetry run python launch_jupyter.py
+	@conda run -n $(CONDA_ENV) \
+		poetry run python launch_jupyter.py
 
 clean:
 	@echo "Cleaning up built documentation and cache..."
@@ -83,3 +99,11 @@ clean:
 	@rm -rf .pytest_cache
 	@rm -rf .ruff_cache
 	@echo "Clean up complete."
+
+conda_add:
+	@echo "Adding $(PKG) to conda env..."
+	conda run -n $(CONDA_ENV) \
+		yq -i '.dependencies |= (. + ["$(PKG)"] | unique)' environment.yml
+	@echo "Updating conda env..."
+	conda env update -f environment.yml --prune
+	@echo "Done!"
