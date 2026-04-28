@@ -20,6 +20,7 @@ dependencies:
   - glpk
   - pandoc
   - libgit2
+  - glib
   - harfbuzz
   - fribidi
   - freetype
