@@ -75,7 +75,7 @@ def uninstall_kernel(name, cwd):
     subprocess.run(uninstall_cmd, cwd=cwd, capture_output=True, text=True)
 
 
-def minimal_tests(result, fixture_essential_files, fixture_symbolic_links, slug):
+def minimal_tests(result, fixture_essential_files, fixture_symbolic_links, slug, idx):
     print("===== #1. Checking exit code =====")
     if result.exit_code != 0:
         raise result.exception
@@ -91,8 +91,8 @@ def minimal_tests(result, fixture_essential_files, fixture_symbolic_links, slug)
     print("===== #3. Checking project path name =====")
     path = result.project_path.name
     assert (
-        path == "Test_Project_CI_CD"
-    ), f"FAILED in #3! Invalid path; expected `Test_Project_CI_CD`, got {path}"
+        path == f"Test_Project_CI_CD_{idx}"
+    ), f"FAILED in #3! Invalid path; expected `Test_Project_CI_CD_{idx}`, got {path}"
 
     print("===== #4. Checking project path is a directory =====")
     assert result.project_path.is_dir(), f"FAILED in #4! {path} is not a directory"
@@ -139,8 +139,8 @@ def minimal_tests(result, fixture_essential_files, fixture_symbolic_links, slug)
 
 
 def test_correct_template(cookies, essential_files, symbolic_links, prj_slug):
-    result = cookies.bake(extra_context={"project_name": "Test Project-CI/CD"})
-    minimal_tests(result, essential_files, symbolic_links, prj_slug)
+    result = cookies.bake(extra_context={"project_name": "Test Project-CI/CD-1"})
+    minimal_tests(result, essential_files, symbolic_links, prj_slug, 1)
 
 
 def test_correct_template_for_package_mode(
@@ -148,7 +148,7 @@ def test_correct_template_for_package_mode(
 ):
     result = cookies.bake(
         extra_context={
-            "project_name": "Test Project-CI/CD",
+            "project_name": "Test Project-CI/CD-2",
             "author_name": "John Smith",
             "email": "example@example.com",
             "python_ver": "3.11",
@@ -156,7 +156,7 @@ def test_correct_template_for_package_mode(
         }
     )
 
-    minimal_tests(result, essential_files, symbolic_links, prj_slug)
+    minimal_tests(result, essential_files, symbolic_links, prj_slug, 2)
 
     print("===== #10. Checking Package files =====")
     path = result.project_path.name
@@ -171,13 +171,13 @@ def test_correct_template_with_rlang(
 ):
     result = cookies.bake(
         extra_context={
-            "project_name": "Test Project-CI/CD",
+            "project_name": "Test Project-CI/CD-3",
             "python_ver": "3.12",
             "r_ver": "4.5",
         }
     )
 
-    minimal_tests(result, essential_files, rlang_symbolic_links, prj_slug)
+    minimal_tests(result, essential_files, rlang_symbolic_links, prj_slug, 3)
 
     print("===== #10. Checking R files =====")
     path = result.project_path.name
