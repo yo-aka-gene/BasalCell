@@ -32,6 +32,10 @@ jobs:
           python-version: {{cookiecutter.python_ver}}
           auto-activate-base: false
           use-mamba: true
+{% raw %}
+          cache-environment: true
+          cache-environment-key: conda-env-${{ runner.os }}-${{ hashFiles('environment.yml') }}
+{% endraw %}
 
       - name: Install dependencies
         run: |

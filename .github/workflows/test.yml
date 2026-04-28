@@ -29,6 +29,9 @@ jobs:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
           use-mamba: true
+          environment-file: environment.yml
+          cache-environment: true
+          cache-environment-key: conda-env-${{ runner.os }}-${{ hashFiles('environment.yml') }}
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
