@@ -5,5 +5,11 @@ template:
     bootswatch: flatly
 navbar:
   structure:
-    left:  [intro, reference, articles, news]
-    right: [github]
+    left:  [reference, articles]
+    right: [github, home]
+  components:
+    home:
+      text: '<img src="../_static/default_logo.png" width="20"">'
+      href: https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/
+    articles:
+      text: Vignettes
