@@ -115,6 +115,8 @@ docs:
 {%- endif %}
 	@echo "Building Sphinx HTML documentation..."
 	@mamba run -n $(MAMBA_ENV) \
+		poetry export --with docs --without-hashes --format=requirements.txt > docs/requirements.txt
+	@mamba run -n $(MAMBA_ENV) \
 		poetry run sphinx-build -b html docs docs/_build/html
 	@echo "Opening documentation in browser..."
 	@mamba run -n $(MAMBA_ENV) \

@@ -5,10 +5,13 @@ build:
   tools:
     python: "{{ cookiecutter.python_ver }}"
   jobs:
-    post_install:
-      - pip install poetry
-      - poetry config virtualenvs.create false
-      - poetry install --with dev
+    pre_install:
+      - pip install -r docs/requirements.txt
+
+python:
+  install:
+    - method: pip
+      path: .
 
 sphinx:
   builder: html
