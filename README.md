@@ -21,26 +21,32 @@ BasalCell is a [cookiecutter](https://github.com/cookiecutter/cookiecutter) temp
 ## Usage
 ### 1. Prerequisites
 Before using BasalCell, ensure you have the following installed on your system:
-- `Python` (3.10–3.12)
-- `pip`
-- `miniforge`
+- `Miniforge` (This automatically provides `Python` and `pip`)
 - `make`
+- `git`
 
 **For macOS**
 
 Using [Homebrew](https://brew.sh/) is the easiest way:
 ```bash
-brew install miniforge make
+brew install miniforge make git
+conda init zsh
 ```
-> :bulb: **Python Installation Tip**: We highly recommend using `pyenv` (`brew install pyenv`) to manage Python versions cleanly. Alternatively, for a quick setup, you can install Python directly `brew install` (e.g.,  `brew install python@3.12`).
 
 **For Windows (WSL2 / Ubuntu)**
 
 Run the following command to install all the prerequisites at once:
 ```bash
-sudo apt update && sudo apt install -y miniforge make python3 python3-pip
+sudo apt update && sudo apt install -y make git
 ```
-> :bulb: **Python Installation Tip**: While the command above installs the system Python, setting up `pyenv` is considered a best practice in bioinformatics to prevent conflicts with the OS environment.
+Then, install Miniforge by downloading the official installer:
+```bash
+wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh"
+bash Miniforge3-Linux-x86_64.sh -b -p $HOME/miniforge3
+source $HOME/miniforge3/bin/activate
+conda init bash
+
+```
 
 ### 2. Install `cookiecutter`
 ```bash
@@ -48,11 +54,11 @@ pip install -U cookiecutter
 ```
 ### 3. Create your project
 ```bash
-cookiecutter https://github.com/yo-aka-gene/BasalCell.git
+cookiecutter git@github.com:yo-aka-gene/BasalCell.git
 ```
-> :bulb: **Note for GitHub authentication**: If you have set up SSH keys for GitHub, you can run the following code instead:
+> :bulb: **Note for GitHub authentication**: Alternatively, you can install via HTTPS instead of SSH:
 > ```bash
-> cookiecutter git@github.com:yo-aka-gene/BasalCell.git
+> cookiecutter https://github.com/yo-aka-gene/BasalCell.git
 > ```
 
 ### 4. Setup and Initialization
@@ -153,13 +159,7 @@ Writing test code is crucial for verifying the behavior of your developed code. 
 ### **[Optional]**: Integration of R env
 - Usage: select `r_ver` and an R kernel will be set in your Jupyter Lab env.
 - Analysis: run analysis codes in R using `.ipynb` files and the R kernel in Jupyter Lab.
-- Documentation: `nbsphinx` will handle your R analysis codes. If you need to show your `.R` scripts, create a `.md` file in `docs` and reference your R scripts as follows:
-````
-```{literalinclude} ../tools/example.R
-:language: r
-:linenos: true
-```
-````
+- Documentation: While `nbsphinx` handles your Jupyter Notebooks, BasalCell uses [`pkgdown`](https://pkgdown.r-lib.org/) to automatically generate a dedicated reference website for your custom R functions. Simply document your functions using standard [`roxygen2`](https://roxygen2.r-lib.org/) comments, and this R API site is seamlessly integrated and accessible directly from the main Sphinx documentation.
 - Test: use [`testthat`](https://testthat.r-lib.org/) package. `testthat.R` and test directory for R `testthat/` are all set in `tests` inside your project directory.
 - Linting: `pre-commit` automatically runs linting using [`lintr`](https://lintr.r-lib.org/) and [`styler`](https://styler.r-lib.org/).
 - CI/CD: GitHub Actions are also implemented for R language as well.
