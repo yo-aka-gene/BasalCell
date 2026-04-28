@@ -20,4 +20,9 @@ dependencies:
   - glpk
   - pandoc
   - libgit2
+  - harfbuzz
+  - fribidi
+  - freetype
+  - libpng
+  - libjpeg-turbo
 {%- endif %}
