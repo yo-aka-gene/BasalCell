@@ -144,11 +144,13 @@ add-py:
 	@echo "Adding Python package(s): $(PKG)..."
 	mamba run -n $(MAMBA_ENV) \
 		poetry add $(PKG)
+	@$(MAKE) lock-py
 
 add-pydev:
 	@echo "Adding Python package(s) for development: $(PKG)..."
 	mamba run -n $(MAMBA_ENV) \
 		poetry add -D $(PKG)
+	@$(MAKE) lock-py
 
 lock-py:
 	@echo "Updating poetry.lock without installing..."
