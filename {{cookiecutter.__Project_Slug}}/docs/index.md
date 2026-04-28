@@ -25,6 +25,15 @@
 # {{ cookiecutter.__project_slug }}/modules
 ```
 {% endif %}
+{% if cookiecutter.r_ver != "none" %}
+## R Resources (pkgdown)
+
+For detailed documentation of the R tools and utilities used in this project, please refer to the following pages:
+
+- [**R API Overview**](https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/r_api/index.html): Main landing page for the R environment.
+- [Function Reference](https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/r_api/reference/index.html): Detailed documentation of functions, including arguments and return values.
+- [Vignettes / Tutorials](https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/r_api/articles/index.html): Practical analysis workflows and step-by-step guides using R.
+{% endif %}
 
 ## About
 - Author: {{ cookiecutter.author_name }}
