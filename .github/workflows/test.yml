@@ -21,15 +21,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Cache Conda env
+        uses: actions/cache@v4
+        with:
+          path: ~/conda_pkgs_dir
+          key: ${{ runner.os }}-conda-${{ hashFiles('**/environment.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-conda-
+
       - name: Setup Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-version: latest
-          python-version: ${{ matrix.python-version }}
+          mamba-version: "*"
           use-mamba: true
-          environment-file: environment.yml
-          cache-environment: true
-          cache-environment-key: mamba-env-${{ runner.os }}-${{ hashFiles('environment.yml') }}
+          pkgs-dirs: ~/conda_pkgs_dir
+          channels: conda-forge,nodefaults
+          python-version: ${{ matrix.python-version }}
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -44,4 +51,5 @@ jobs:
         run: poetry run pre-commit run --all-files
 
       - name: Run Tests (Pytest)
+        shell: bash -el {0}
         run: make test
