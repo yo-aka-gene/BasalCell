@@ -32,6 +32,8 @@ else
         'devtools', 
         'pkgdown', 
         'roxygen2'
+        'rmarkdown',
+        'knitr'
     ))
     renv::snapshot(prompt = FALSE, type = 'all')
     "
