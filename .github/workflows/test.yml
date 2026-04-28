@@ -16,6 +16,8 @@ jobs:
         python-version: ["3.12"]
 
     runs-on: ${{ matrix.os }}
+    env:
+      CONDA_PLUGINS_AUTO_ACCEPT_TOS: "true"
 
     steps:
       - name: Checkout code
