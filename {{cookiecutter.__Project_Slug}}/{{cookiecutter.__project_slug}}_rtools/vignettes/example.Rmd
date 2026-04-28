@@ -2,7 +2,7 @@
 title: "{{cookiecutter.project_name}} Vignette"
 output: rmarkdown::html_vignette
 vignette: >
-    %\VignetteIndexEntry{{{cookiecutter.project_name}} Vignette}
+    %\VignetteIndexEntry{ {{ cookiecutter.project_name }} Vignette}
     %\VignetteEngine{rmarkdown::html_vignette}
     %\VignetteEncoding{UTF-8}
 ---
