@@ -159,7 +159,7 @@ Writing test code is crucial for verifying the behavior of your developed code. 
 ### **[Optional]**: Integration of R env
 - Usage: select `r_ver` and an R kernel will be set in your Jupyter Lab env.
 - Analysis: run analysis codes in R using `.ipynb` files and the R kernel in Jupyter Lab.
-- Documentation: While `nbsphinx` handles your Jupyter Notebooks, BasalCell uses [`pkgdown`](https://pkgdown.r-lib.org/) to automatically generate a dedicated reference website for your custom R functions. Simply document your functions using standard [`roxygen2`](https://roxygen2.r-lib.org/) comments, and this R API site is seamlessly integrated and accessible directly from the main Sphinx documentation.
+- Documentation: While `nbsphinx` handles your Jupyter Notebooks, BasalCell uses [`pkgdown`](https://pkgdown.r-lib.org/) to automatically generate a dedicated reference website for your custom R functions. Simply document your functions using standard [`roxygen2`](https://roxygen2.r-lib.org/) comments, and this R API site is seamlessly integrated and accessible directly from the main Sphinx documentation. When creating R-related documentation, make sure to run `make docs` locally and commit the generated HTML files to the GitHub repository.
 - Test: use [`testthat`](https://testthat.r-lib.org/) package. `testthat.R` and test directory for R `testthat/` are all set in `tests` inside your project directory.
 - Linting: `pre-commit` automatically runs linting using [`lintr`](https://lintr.r-lib.org/) and [`styler`](https://styler.r-lib.org/).
 - CI/CD: GitHub Actions are also implemented for R language as well.
