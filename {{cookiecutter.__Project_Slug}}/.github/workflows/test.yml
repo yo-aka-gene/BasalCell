@@ -47,6 +47,15 @@ jobs:
 {%- endif %}
 
 {%- if cookiecutter.r_ver != "none" %}
+{% raw %}
+      - name: Cache renv packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/renv
+          key: renv-${{ runner.os }}-${{ hashFiles('renv.lock') }}
+          restore-keys: |
+            renv-${{ runner.os }}-
+{% endraw %}
       - name: Set up renv
         run: make setup-r
 {%- endif %}
