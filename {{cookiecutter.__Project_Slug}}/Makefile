@@ -19,7 +19,7 @@ init:
 		mamba env create -f environment.yml -y; \
 	else \
 		echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
-		mamba env update -f environment.yml --prune; \
+		mamba env update -f environment.yml --prune -y; \
 	fi
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
 	mamba run -n $(MAMBA_ENV) poetry install
