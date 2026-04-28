@@ -58,30 +58,28 @@ if __name__ == "__main__":
     if not create_package and os.path.exists("src"):
         shutil.rmtree("src")
 
-    has_conda = is_tool_installed("conda")
+    has_mamba = is_tool_installed("mamba")
     has_make = is_tool_installed("make")
 
-    if has_conda and has_make:
+    if has_mamba and has_make:
         try:
             print("Running 'make init'... This may take a few minutes.")
             subprocess.run(["make", "init"], check=True)
             print(
-                "Run 'conda activate conda_{{cookiecutter.__project_slug}}'"
-                "to access to conda_{{cookiecutter.__project_slug}} env from terminal."
+                "Run 'mamba activate mamba_{{cookiecutter.__project_slug}}'"
+                "to access to mamba_{{cookiecutter.__project_slug}} env from terminal."
             )
         except subprocess.CalledProcessError:
             print("\n[ERROR] 'make init' failed.")
             print(
                 "Please check your internet connection or "
-                "conda configuration and run 'make init' manually."
+                "mamba configuration and run 'make init' manually."
             )
             sys.exit(1)
     else:
         print("\n[NOTICE] Automatic environment setup was skipped.")
-        if not has_conda:
-            print(
-                "  - 'conda' command not found. Please install Miniconda or Anaconda."
-            )
+        if not has_mamba:
+            print("  - 'mamba' command not found. Please install Miniforge.")
         if not has_make:
             print(
                 "  - 'make' command not found. "

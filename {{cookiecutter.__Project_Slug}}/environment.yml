@@ -1,4 +1,4 @@
-name: conda_{{cookiecutter.__project_slug}}
+name: mamba_{{cookiecutter.__project_slug}}
 channels:
   - conda-forge
   - nodefaults

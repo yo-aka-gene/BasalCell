@@ -1,7 +1,7 @@
 .PHONY: test patch minor major
 
 test:
-	CONDA_PLUGINS_AUTO_ACCEPT_TOS=true poetry run pytest -s tests/*
+	poetry run pytest -s tests/*
 	rm -fr .pytest_cache
 
 

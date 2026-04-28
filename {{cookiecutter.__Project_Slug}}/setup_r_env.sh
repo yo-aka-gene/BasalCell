@@ -2,11 +2,11 @@
 set -e
 
 R_VERSION="{{ cookiecutter.r_ver }}"
-CONDA_ENV="conda_{{cookiecutter.__project_slug}}"
+MAMBA_ENV="mamba_{{cookiecutter.__project_slug}}"
 DIR_NAME=$(basename "$PWD")
 PROJECT_NAME="${DIR_NAME}_R"
 
-echo "Building R env for ${PROJECT_NAME} (in ${CONDA_ENV})"
+echo "Building R env for ${PROJECT_NAME} (in ${MAMBA_ENV})"
 echo "=================================================="
 if [ -f "renv.lock" ]; then
     echo "--> Restoring R env according to renv.lock ..."

@@ -12,9 +12,9 @@
 ## User Guide
 ### :warning: For Windows Users
 - Please make sure to access this directory via `WSL`
-- if `make` and `miniconda` is not available in your env, run:
+- if `make` and `miniforge` is not available in your env, run:
 ```bash
-sudo apt update && sudo apt install make miniconda
+sudo apt update && sudo apt install make miniforge
 ```
 
 {% set use_r = cookiecutter.r_ver != 'none' -%}
@@ -42,7 +42,7 @@ This project uses a unified interface to add dependencies:
     - overwrite `poetry.lock` with `make lock-py`
     - install dependencies listed in `poetry.lock` with `make install-py`
 - **R**: `make add-r PKG=name` (or `add-bioc` for Bioconductor)
-- **OS**: `make add-os PKG=name` (for conda/system libraries)
+- **OS**: `make add-os PKG=name` (for mamba/system libraries)
 
 ### Update Version Tags
 ```bash

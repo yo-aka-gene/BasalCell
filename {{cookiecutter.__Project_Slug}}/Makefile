@@ -4,28 +4,28 @@
 .PHONY: init launch docs clean test add-os add-py add-pydev bump-patch bump-minor bump-major lock-py install-py
 {%- endif %}
 
-CONDA_ENV := conda_{{cookiecutter.__project_slug}}
+MAMBA_ENV := mamba_{{cookiecutter.__project_slug}}
 DIR_NAME := $(shell basename $(CURDIR))
 PY_KERNEL := $(DIR_NAME)_py
 VERSION := $(shell grep '^version = ' pyproject.toml | cut -d '"' -f 2)
 
 init:
 	@echo "Starting project environment setup..."
-	@if ! command -v conda >/dev/null 2>&1; then \
-		echo "Miniconda is not installed. Please install it first."; \
+	@if ! command -v mamba >/dev/null 2>&1; then \
+		echo "mamba is not installed. Please install it first."; \
 		exit 1; \
 	fi
-	@if ! conda env list | grep -q $(CONDA_ENV); then \
-		conda env create -f environment.yml; \
+	@if ! mamba env list | grep -q $(MAMBA_ENV); then \
+		mamba env create -f environment.yml; \
 	else \
-		echo "Environment $(CONDA_ENV) already exists. Updating..."; \
-		conda env update -f environment.yml --prune; \
+		echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
+		mamba env update -f environment.yml --prune; \
 	fi
-	conda run -n $(CONDA_ENV) poetry config virtualenvs.create false
-	conda run -n $(CONDA_ENV) poetry install
-	conda run -n $(CONDA_ENV) git init
-	conda run -n $(CONDA_ENV) poetry run pre-commit install
-	conda run -n $(CONDA_ENV) \
+	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
+	mamba run -n $(MAMBA_ENV) poetry install
+	mamba run -n $(MAMBA_ENV) git init
+	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
+	mamba run -n $(MAMBA_ENV) \
 		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 {%- if cookiecutter.r_ver != "none" %}
 	@$(MAKE) setup-r
@@ -37,29 +37,29 @@ setup-r:
 	@if [ -f setup_r_env.sh ]; then \
 		echo "Found setup_r_env.sh. Setting up R environment..."; \
 		chmod +x setup_r_env.sh; \
-		conda run -n $(CONDA_ENV) ./setup_r_env.sh; \
+		mamba run -n $(MAMBA_ENV) ./setup_r_env.sh; \
 	fi
 
 test-py:
 	@echo "Running Python tests..."
-	conda run -n $(CONDA_ENV) poetry run pytest
+	mamba run -n $(MAMBA_ENV) poetry run pytest
 	@rm -fr .pytest_cache
 
 test-r:
 	@echo "Running R tests..."
-	conda run -n $(CONDA_ENV) \
+	mamba run -n $(MAMBA_ENV) \
 		Rscript -e "renv::load('$(CURDIR)'); devtools::test('{{cookiecutter.__project_slug}}_rtools')"
 
 test: test-py test-r
 
 add-r:
 	@echo "Adding R package(s): $(PKG)..."
-	conda run -n $(CONDA_ENV) \
+	mamba run -n $(MAMBA_ENV) \
 		Rscript -e "pkgs <- unlist(strsplit('$(PKG)', '[[:space:]]+')); renv::install(pkgs); renv::snapshot(prompt = FALSE)"
 
 add-bioc:
 	@echo "Adding Bioconductor package(s): $(PKG)..."
-	conda run -n $(CONDA_ENV) \
+	mamba run -n $(MAMBA_ENV) \
 		Rscript -e "pkgs <- unlist(strsplit('$(PKG)', '[[:space:]]+')); renv::install(paste0('bioc::', pkgs)); renv::snapshot(prompt = FALSE)"
 
 PROJECT_NAME := $(shell grep '^name = ' pyproject.toml | cut -d '"' -f 2)
@@ -76,53 +76,53 @@ sync-r:
 	fi
 
 bump-patch:
-	@conda run -n $(CONDA_ENV) poetry version patch
+	@mamba run -n $(MAMBA_ENV) poetry version patch
 	@$(MAKE) sync-r
 
 bump-minor:
-	@conda run -n $(CONDA_ENV) poetry version minor
+	@mamba run -n $(MAMBA_ENV) poetry version minor
 	@$(MAKE) sync-r
 
 bump-major:
-	@conda run -n $(CONDA_ENV) poetry version major
+	@mamba run -n $(MAMBA_ENV) poetry version major
 	@$(MAKE) sync-r
 
 docs-r: sync-r
 	@echo "Generating R documentation (roxygen2 & pkgdown)..."
 	export R_PROFILE_USER; \
-		conda run -n $(CONDA_ENV) \
+		mamba run -n $(MAMBA_ENV) \
 		Rscript -e "renv::load('$(CURDIR)'); devtools::document('{{cookiecutter.__project_slug}}_rtools')"; \
-		conda run -n $(CONDA_ENV) \
+		mamba run -n $(MAMBA_ENV) \
 		Rscript -e "renv::load('$(CURDIR)'); pkgdown::build_site(override = list(destination = '../docs/r_api'))"
 
 docs: docs-r
 {%- else %}
 
 test:
-	conda run -n $(CONDA_ENV) poetry run pytest
+	mamba run -n $(MAMBA_ENV) poetry run pytest
 	@rm -fr .pytest_cache
 
 bump-patch:
-	@conda run -n $(CONDA_ENV) poetry version patch
+	@mamba run -n $(MAMBA_ENV) poetry version patch
 
 bump-minor:
-	@conda run -n $(CONDA_ENV) poetry version minor
+	@mamba run -n $(MAMBA_ENV) poetry version minor
 
 bump-major:
-	@conda run -n $(CONDA_ENV) poetry version major
+	@mamba run -n $(MAMBA_ENV) poetry version major
 
 docs:
 {%- endif %}
 	@echo "Building Sphinx HTML documentation..."
-	@conda run -n $(CONDA_ENV) \
+	@mamba run -n $(MAMBA_ENV) \
 		poetry run sphinx-build -b html docs docs/_build/html
 	@echo "Opening documentation in browser..."
-	@conda run -n $(CONDA_ENV) \
+	@mamba run -n $(MAMBA_ENV) \
 		poetry run python -c \
 		"import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
 
 launch:
-	@conda run -n $(CONDA_ENV) \
+	@mamba run -n $(MAMBA_ENV) \
 		poetry run python launch_jupyter.py
 
 clean:
@@ -134,24 +134,24 @@ clean:
 
 add-os:
 	@echo "Adding Linux package(s): $(PKG)..."
-	conda run -n $(CONDA_ENV) \
+	mamba run -n $(MAMBA_ENV) \
 		yq -i '.dependencies |= (. + ("$(PKG)" | split(" ")) | unique)' environment.yml
-	conda env update -f environment.yml --prune
+	mamba env update -f environment.yml --prune
 
 add-py:
 	@echo "Adding Python package(s): $(PKG)..."
-	conda run -n $(CONDA_ENV) \
+	mamba run -n $(MAMBA_ENV) \
 		poetry add $(PKG)
 
 add-pydev:
 	@echo "Adding Python package(s) for development: $(PKG)..."
-	conda run -n $(CONDA_ENV) \
+	mamba run -n $(MAMBA_ENV) \
 		poetry add -D $(PKG)
 
 lock-py:
 	@echo "Updating poetry.lock without installing..."
-	conda run -n $(CONDA_ENV) poetry lock
+	mamba run -n $(MAMBA_ENV) poetry lock
 
 install-py:
 	@echo "Installing Python dependencies from lock file..."
-	conda run -n $(CONDA_ENV) poetry install
+	mamba run -n $(MAMBA_ENV) poetry install

@@ -23,14 +23,14 @@ BasalCell is a [cookiecutter](https://github.com/cookiecutter/cookiecutter) temp
 Before using BasalCell, ensure you have the following installed on your system:
 - `Python` (3.10–3.12)
 - `pip`
-- `miniconda`
+- `miniforge`
 - `make`
 
 **For macOS**
 
 Using [Homebrew](https://brew.sh/) is the easiest way:
 ```bash
-brew install miniconda make
+brew install miniforge make
 ```
 > :bulb: **Python Installation Tip**: We highly recommend using `pyenv` (`brew install pyenv`) to manage Python versions cleanly. Alternatively, for a quick setup, you can install Python directly `brew install` (e.g.,  `brew install python@3.12`).
 
@@ -38,7 +38,7 @@ brew install miniconda make
 
 Run the following command to install all the prerequisites at once:
 ```bash
-sudo apt update && sudo apt install -y miniconda make python3 python3-pip
+sudo apt update && sudo apt install -y miniforge make python3 python3-pip
 ```
 > :bulb: **Python Installation Tip**: While the command above installs the system Python, setting up `pyenv` is considered a best practice in bioinformatics to prevent conflicts with the OS environment.
 
@@ -100,7 +100,7 @@ make add-r PKG=ggplot2
 make add-bioc PKG="DESeq2 edgeR"
 
 # Sometimes R packages requires OS-level dependencies (e.g., perl)
-# If so, you can add them to the Conda env with add-os
+# If so, you can add them to the Mamba env with add-os
 make add-os PKG=perl
 ```
 

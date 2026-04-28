@@ -16,22 +16,20 @@ jobs:
         python-version: ["3.12"]
 
     runs-on: ${{ matrix.os }}
-    env:
-      CONDA_PLUGINS_AUTO_ACCEPT_TOS: "true"
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Conda
+      - name: Setup Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-update-conda: true
+          miniforge-version: latest
           python-version: ${{ matrix.python-version }}
           use-mamba: true
           environment-file: environment.yml
           cache-environment: true
-          cache-environment-key: conda-env-${{ runner.os }}-${{ hashFiles('environment.yml') }}
+          cache-environment-key: mamba-env-${{ runner.os }}-${{ hashFiles('environment.yml') }}
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -46,4 +44,4 @@ jobs:
         run: poetry run pre-commit run --all-files
 
       - name: Run Tests (Pytest)
-        run: poetry run pytest
+        run: make test
