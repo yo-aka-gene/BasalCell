@@ -31,7 +31,7 @@ else
         'IRkernel',
         'devtools', 
         'pkgdown', 
-        'roxygen2'
+        'roxygen2',
         'rmarkdown',
         'knitr'
     ))
