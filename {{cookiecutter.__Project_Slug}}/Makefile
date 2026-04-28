@@ -16,7 +16,7 @@ init:
 		exit 1; \
 	fi
 	@if ! mamba env list | grep -q $(MAMBA_ENV); then \
-		mamba env create -f environment.yml; \
+		mamba env create -f environment.yml -y; \
 	else \
 		echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
 		mamba env update -f environment.yml --prune; \
