@@ -67,19 +67,4 @@ testpaths = [
     "src",
 {%- endif %}
 ]
-norecursedirs = [
-    ".ipynb_checkpoints", 
-    "docs/_build",
-    "docs/_static",
-{%- if cookiecutter.r_ver != "none" %}
-    "docs/r_api",
-{%- endif %}
-    "docs/jupyternb/{{cookiecutter.__project_slug}}_rtools", 
-    "docs/jupyternb/{{cookiecutter.__project_slug}}_tools",
-    "docs/jupyternb/data,
-    "docs/jupyternb/output,
-    "renv", 
-    ".venv", 
-    ".git", 
-    ".github"
-]
+norecursedirs = [".ipynb_checkpoints", "docs", "renv", ".venv", ".git", ".github"]
