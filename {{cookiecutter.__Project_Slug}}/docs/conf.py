@@ -27,6 +27,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",     # NumPy/Google style docstrings
     "sphinx.ext.viewcode",
+    'sphinx.ext.mathjax',
     "nbsphinx",                # Jupyter Notebook support
     "sphinx_gallery.load_style",
     "myst_parser",             # Markdown support
@@ -82,6 +83,7 @@ sys.path.insert(0, os.path.abspath('./jupyternb'))
 
 # -- Options for nbsphinx -----------------------------------------
 nbsphinx_execute = 'never'
+nbsphinx_allow_errors = True
 
 nbsphinx_thumbnails = {
     "/".join(
