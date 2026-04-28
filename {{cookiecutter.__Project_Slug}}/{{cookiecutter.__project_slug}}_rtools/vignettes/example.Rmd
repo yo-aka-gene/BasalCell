@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 # This is a Mock Vignette
-- Manuscripts written within `{{cookiecutter.__project__slug}}_rtools` are converted to HTML 
+- Manuscripts written within `{{cookiecutter.__project_slug}}_rtools` are converted to HTML 
 using `pkgdown` and published at [https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/r_api/](https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/r_api/).
 - Because these files are somewhat isolated from the documentation built by Sphinx, 
 we do not actively recommend creating vignettes other than standard `.R` script documentation (e.g., using `roxygen2`). 
