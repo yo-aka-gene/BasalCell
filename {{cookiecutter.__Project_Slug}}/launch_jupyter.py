@@ -75,7 +75,7 @@ def start_jupyter():
 
 if __name__ == "__main__":
 {%- if cookiecutter.r_ver != "none" %}
-    project_root = Path(__file__).resolve().parent
+    project_root = Path.cwd()
     r_profile_proxy = project_root / ".Rprofile_proxy"
     r_profile_content = textwrap.dedent(f"""\
         old_wd <- getwd()
