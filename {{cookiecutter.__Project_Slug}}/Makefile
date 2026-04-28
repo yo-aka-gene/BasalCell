@@ -25,7 +25,7 @@ init:
 	conda run -n $(CONDA_ENV) poetry install
 	conda run -n $(CONDA_ENV) git init
 	conda run -n $(CONDA_ENV) poetry run pre-commit install
-	conda run -n $(CONDA_ENV); \
+	conda run -n $(CONDA_ENV) \
 		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 {%- if cookiecutter.r_ver != "none" %}
 	@$(MAKE) setup-r
@@ -47,19 +47,19 @@ test-py:
 
 test-r:
 	@echo "Running R tests..."
-	conda run -n $(CONDA_ENV); \
+	conda run -n $(CONDA_ENV) \
 		Rscript -e "renv::load('$(CURDIR)'); devtools::test('{{cookiecutter.__project_slug}}_rtools')"
 
 test: test-py test-r
 
 add-r:
 	@echo "Adding R package(s): $(PKG)..."
-	conda run -n $(CONDA_ENV); \
+	conda run -n $(CONDA_ENV) \
 		Rscript -e "pkgs <- unlist(strsplit('$(PKG)', '[[:space:]]+')); renv::install(pkgs); renv::snapshot(prompt = FALSE)"
 
 add-bioc:
 	@echo "Adding Bioconductor package(s): $(PKG)..."
-	conda run -n $(CONDA_ENV); \
+	conda run -n $(CONDA_ENV) \
 		Rscript -e "pkgs <- unlist(strsplit('$(PKG)', '[[:space:]]+')); renv::install(paste0('bioc::', pkgs)); renv::snapshot(prompt = FALSE)"
 
 PROJECT_NAME := $(shell grep '^name = ' pyproject.toml | cut -d '"' -f 2)
@@ -90,9 +90,9 @@ bump-major:
 docs-r: sync-r
 	@echo "Generating R documentation (roxygen2 & pkgdown)..."
 	export R_PROFILE_USER; \
-		conda run -n $(CONDA_ENV); \
+		conda run -n $(CONDA_ENV) \
 		Rscript -e "renv::load('$(CURDIR)'); devtools::document('{{cookiecutter.__project_slug}}_rtools')"; \
-		conda run -n $(CONDA_ENV); \
+		conda run -n $(CONDA_ENV) \
 		Rscript -e "renv::load('$(CURDIR)'); pkgdown::build_site(override = list(destination = '../docs/r_api'))"
 
 docs: docs-r
@@ -114,15 +114,15 @@ bump-major:
 docs:
 {%- endif %}
 	@echo "Building Sphinx HTML documentation..."
-	@conda run -n $(CONDA_ENV); \
+	@conda run -n $(CONDA_ENV) \
 		poetry run sphinx-build -b html docs docs/_build/html
 	@echo "Opening documentation in browser..."
-	@conda run -n $(CONDA_ENV); \
+	@conda run -n $(CONDA_ENV) \
 		poetry run python -c \
 		"import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
 
 launch:
-	@conda run -n $(CONDA_ENV); \
+	@conda run -n $(CONDA_ENV) \
 		poetry run python launch_jupyter.py
 
 clean:
@@ -134,18 +134,18 @@ clean:
 
 add-os:
 	@echo "Adding Linux package(s): $(PKG)..."
-	conda run -n $(CONDA_ENV); \
+	conda run -n $(CONDA_ENV) \
 		yq -i '.dependencies |= (. + ("$(PKG)" | split(" ")) | unique)' environment.yml
 	conda env update -f environment.yml --prune
 
 add-py:
 	@echo "Adding Python package(s): $(PKG)..."
-	conda run -n $(CONDA_ENV); \
+	conda run -n $(CONDA_ENV) \
 		poetry add $(PKG)
 
 add-pydev:
 	@echo "Adding Python package(s) for development: $(PKG)..."
-	conda run -n $(CONDA_ENV); \
+	conda run -n $(CONDA_ENV) \
 		poetry add -D $(PKG)
 
 lock-py:
