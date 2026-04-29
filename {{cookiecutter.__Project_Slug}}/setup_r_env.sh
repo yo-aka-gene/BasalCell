@@ -11,7 +11,9 @@ echo "=================================================="
 if [ -f "renv.lock" ]; then
     echo "--> Restoring R env according to renv.lock ..."
     Rscript -e "
-    if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')
+    Sys.setenv(RENV_CONFIG_PAK_ENABLED = 'true')
+    if (!requireNamespace('pak', quietly = TRUE)) install.packages('pak', repos = 'https://cloud.r-project.org')
+    if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv', repos = 'https://cloud.r-project.org')
     renv::restore(prompt = FALSE)
     "
 else
@@ -21,7 +23,9 @@ else
         RSPM = 'https://packagemanager.posit.co/cran/__linux__/noble/latest', 
         CRAN = 'https://cloud.r-project.org'
     ))
-    if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')
+    Sys.setenv(RENV_CONFIG_PAK_ENABLED = 'true')
+    if (!requireNamespace('pak', quietly = TRUE)) install.packages('pak', repos = 'https://cloud.r-project.org')
+    if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv', repos = 'https://cloud.r-project.org')
     renv::init(bare = TRUE, bioconductor = TRUE)
     renv::install(c(
         'testthat',
