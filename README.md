@@ -96,19 +96,22 @@ make add-py PKG='torch "scanpy<1.12"'
 make add-pydev PKG=tqdm
 ```
 
+:warning: Do not add packages via `pip install` or `poetry add`.
+These commands are invalid for adding designated packages in the BasalCell env.
+
 ### **[Optional]** Add new R packages
 To add new packages within the isolated `renv` env:
 ```bash
-# For R packages (e.g., ggplot2)
-make add-r PKG=ggplot2
-
-# For R packages from Bioconductor (e.g., DESeq2, edgeRp)
-make add-bioc PKG="DESeq2 edgeR"
+# For R packages (e.g., ggplot2, DESeq2, edgeR)
+make add-r PKG="ggplot2 DESeq2 edgeR"
 
 # Sometimes R packages requires OS-level dependencies (e.g., perl)
 # If so, you can add them to the Mamba env with add-os
 make add-os PKG=perl
 ```
+
+:warning: Do not add packages via `install.packages`, `renv::install`,  or `apt-get`.
+These commands are invalid for adding designated packages in the BasalCell env.
 
 ## Development Tips
 ### How to upload your project to GitHub

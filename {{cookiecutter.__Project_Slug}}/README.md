@@ -101,10 +101,9 @@ make launch
 ### Adding Packages
 This project uses a unified interface to add dependencies:
 - **Python**: `make add-py PKG=name` (or `add-pydev` for dev tools)
-    - overwrite `poetry.lock` with `make lock-py`
     - install dependencies listed in `poetry.lock` with `make install-py`
-- **R**: `make add-r PKG=name` (or `add-bioc` for Bioconductor)
-- **OS**: `make add-os PKG=name` (for mamba/system libraries)
+{% if cookiecutter.r_ver != "none" %}- **R**: `make add-r PKG=name`{% endif %}
+- **OS**: `make add-os PKG=name` (for Mamba/system libraries)
 
 ### Building Documentation
 - For a brief guide on how to write documentation across various file types, please refer to the README.md of the [`BasalCell`](https://github.com/yo-aka-gene/BasalCell) repository.
