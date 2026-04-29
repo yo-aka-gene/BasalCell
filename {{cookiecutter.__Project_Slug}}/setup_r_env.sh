@@ -44,7 +44,7 @@ perl -pi -e "s/- \"?r-base\"?$/- r-base=$RBASE_VER/; \
              s/- \"?r-irkernel\"?$/- r-irkernel=$IRKERNEL_VER/" environment.yml
 
 echo "--> Registering IRkernel..."
-poetrt run Rscript --vanilla -e "
+poetry run Rscript --vanilla -e "
     .libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library'))
     IRkernel::installspec(
         name='${PROJECT_NAME}_r', 
