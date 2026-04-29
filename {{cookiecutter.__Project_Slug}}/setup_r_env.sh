@@ -37,11 +37,13 @@ RBASE_VER=$(mamba list -n "$MAMBA_ENV" "^r-base$" | awk '/r-base/ {print $2}')
 RENV_VER=$(mamba list -n "$MAMBA_ENV" "^r-renv$" | awk '/r-renv/ {print $2}')
 IRKERNEL_VER=$(mamba list -n "$MAMBA_ENV" "^r-irkernel$" | awk '/r-irkernel/ {print $2}')
 
-echo "--> Locking Infra: r-base=${RBASE_VER}, r-renv=${RENV_VER}, r-irkernel=${IRKERNEL_VER}"
+echo "r-base ==${RBASE_VER}" > "$CONDA_PREFIX/conda-meta/pinned"
 
 perl -pi -e "s/- \"?r-base\"?$/- r-base=$RBASE_VER/; \
              s/- \"?r-renv\"?$/- r-renv=$RENV_VER/; \
              s/- \"?r-irkernel\"?$/- r-irkernel=$IRKERNEL_VER/" environment.yml
+
+mamba run -n "$MAMBA_ENV" bash -c "echo 'r-base ==${RBASE_VER}' > \"\$CONDA_PREFIX/conda-meta/pinned\""
 
 echo "--> Registering IRkernel..."
 poetry run Rscript --vanilla -e "
