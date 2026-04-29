@@ -26,8 +26,8 @@ if [ -f "renv.lock" ]; then
         cran_url <- 'https://packagemanager.posit.co/cran/latest'
     }
     options(repos = c(CRAN = cran_url), pkgType = 'source')
-    if (!requireNamespace('pak', quietly = TRUE)) install.packages('pak', repos = 'https://cloud.r-project.org', type = getOption('pkgType'))
-    if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv', repos = 'https://cloud.r-project.org', type = getOption('pkgType'))
+    if (!requireNamespace('pak', quietly = TRUE)) install.packages('pak', repos = 'https://cloud.r-project.org', type = 'source')
+    if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv', repos = 'https://cloud.r-project.org', type = 'source')
     renv::restore(prompt = FALSE)
     "
 else
@@ -45,8 +45,8 @@ else
         cran_url <- 'https://packagemanager.posit.co/cran/latest'
     }
     options(repos = c(CRAN = cran_url), pkgType = 'source')
-    if (!requireNamespace('pak', quietly = TRUE)) install.packages('pak', repos = 'https://cloud.r-project.org', type = getOption('pkgType'))
-    if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv', repos = 'https://cloud.r-project.org', type = getOption('pkgType'))
+    if (!requireNamespace('pak', quietly = TRUE)) install.packages('pak', repos = 'https://cloud.r-project.org', type = 'source')
+    if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv', repos = 'https://cloud.r-project.org', type = 'source')
     renv::init(bare = TRUE, bioconductor = TRUE)
     "
     Rscript -e "
