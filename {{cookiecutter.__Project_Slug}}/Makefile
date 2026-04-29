@@ -209,9 +209,15 @@ init:
 		echo "mamba is not installed. Please install it first."; \
 	exit 1; \
 	fi
-	@mamba run -n base bash -c "command -v yq >/dev/null 2>&1 || mamba install -y -c conda-forge yq"
-	@mamba run -n base \
-		yq -y -i '.dependencies |= (. + ("$(R_CORE_LIST)" | split(" ")) | unique)' environment.yml
+	@mamba run -n base python3 -c "import yaml; \
+	f_path = 'environment.yml'; \
+	with open(f_path) as f: data = yaml.safe_load(f); \
+	deps = data.get('dependencies', []); \
+	new_deps = '$(R_CORE_LIST)'.split(); \
+	updated = sorted(list(set([d for d in deps if isinstance(d, str)]) | set(new_deps))); \
+	other_deps = [d for d in deps if not isinstance(d, str)]; \
+	data['dependencies'] = updated + other_deps; \
+	with open(f_path, 'w') as f: yaml.dump(data, f, sort_keys=False, default_flow_style=False)"
 	@if ! mamba env list | grep -q $(MAMBA_ENV); then \
 		mamba env create -f environment.yml -y; \
 	else \
