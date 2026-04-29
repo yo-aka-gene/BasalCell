@@ -75,15 +75,25 @@ def start_jupyter():
 
 if __name__ == "__main__":
 {%- if cookiecutter.r_ver != "none" %}
+{% raw %}
     project_root = Path.cwd()
+    mamba_r_lib = Path(sys.prefix) / "lib" / "R" / "library"
     r_profile_proxy = project_root / ".Rprofile_proxy"
     r_profile_content = textwrap.dedent(f"""\
         old_wd <- getwd()
         setwd('{project_root.as_posix()}')
+
         source('renv/activate.R')
+
+        mamba_lib <- '{mamba_r_lib.as_posix()}'
+        if (dir.exists(mamba_lib)) {{
+            .libPaths(c(.libPaths(), mamba_lib))
+        }}
+
         setwd(old_wd)
     """)
     r_profile_proxy.write_text(r_profile_content)
     os.environ["R_PROFILE_USER"] = str(r_profile_proxy)
+{% endraw %}
 {%- endif %}
     start_jupyter()
