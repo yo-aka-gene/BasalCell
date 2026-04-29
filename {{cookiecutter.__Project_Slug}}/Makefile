@@ -83,7 +83,7 @@ install-py:
 # ==========================================
 # Advanced Project Management (Python)
 # ==========================================
-.PHONY: init docs test
+.PHONY: init docs test terminate
 
 init:
 	@echo "Starting project environment setup..."
@@ -121,6 +121,9 @@ docs:
 	@mamba run -n $(MAMBA_ENV) \
 		poetry run python -c \
 		"import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
+
+terminate:
+	mamba env remove -n mamba_basalcelldemodev -y
 
 {%- else %}
 # ==========================================
@@ -191,7 +194,13 @@ sync-r:
 # ==========================================
 # Advanced Project Management (Python & R)
 # ==========================================
-.PHONY: init test-py test-r test docs-r docs-py docs 
+.PHONY: init test-py test-r test docs-r docs-py docs terminate
+
+R_CORE_LIST := r-testthat r-styler r-lintr r-devtools r-pkgdown r-roxygen2 r-rmarkdown r-knitr \
+			   r-tidyverse r-arrow r-dplyr r-data.table r-matrix \
+			   r-s7 r-r6 r-rlang r-future r-furrr \
+               r-fs r-checkmate r-glue r-unglue \
+               r-codetools r-mass r-biocmanager bioconductor-biocversion
 
 init:
 	@echo "Starting project environment setup..."
@@ -199,6 +208,8 @@ init:
 		echo "mamba is not installed. Please install it first."; \
 	exit 1; \
 	fi
+	@mamba run -n $(MAMBA_ENV) \
+		yq -y -i '.dependencies |= (. + ("$(R_CORE_LIST)" | split(" ")) | unique)' environment.yml
 	@if ! mamba env list | grep -q $(MAMBA_ENV); then \
 		mamba env create -f environment.yml -y; \
 	else \
@@ -248,4 +259,10 @@ docs-py:
 		"import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
 
 docs: docs-r docs-py
+
+terminate:
+	mamba env remove -n mamba_basalcelldemodev -y
+	rm -rf renv/library
+	rm -f renv.lock
+
 {%- endif %}
