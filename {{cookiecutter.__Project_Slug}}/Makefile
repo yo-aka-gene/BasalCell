@@ -148,7 +148,7 @@ clean:
 
 add-os:
 	mamba run -n $(MAMBA_ENV) \
-		yq -i '.dependencies |= (. + ("$(PKG)" | split(" ")) | unique)' environment.yml
+		yq -y -i '.dependencies |= (. + ("$(PKG)" | split(" ")) | unique)' environment.yml
 	mamba env update -f environment.yml --prune
 
 add-py:
