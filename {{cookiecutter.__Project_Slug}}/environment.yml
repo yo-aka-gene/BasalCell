@@ -34,6 +34,9 @@ dependencies:
   - r-checkmate
   - r-glue
   - r-unglue
+  - r-codetools
+  - r-mass
+  - r-matrix
   - r-biocmanager
   - bioconductor-biocversion
   - c-compiler
