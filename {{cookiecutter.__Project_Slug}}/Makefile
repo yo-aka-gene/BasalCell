@@ -124,7 +124,7 @@ docs:
 # ==========================================
 # R
 # ==========================================
-.PHONY: setup-r add-r restore-r sync-r
+.PHONY: setup-r add-r add-bioc restore-r sync-r
 
 PROJECT_NAME := $(shell grep '^name = ' pyproject.toml | cut -d '"' -f 2)
 DESCRIPTION_STR := $(shell grep '^description = ' pyproject.toml | cut -d '"' -f 2)
@@ -147,6 +147,23 @@ add-r:
 		if mamba search "^r-$$pkg_lower$$" >/dev/null 2>&1; then \
 			mamba install -y "r-$$pkg_lower"; \
 		elif mamba search "^bioconductor-$$pkg_lower$$" >/dev/null 2>&1; then \
+			mamba install -y "bioconductor-$$pkg_lower"; \
+		else \
+			echo "$$pkg not found in Conda. Falling back to Bioconductor/CRAN via renv..."; \
+			Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); options(repos = BiocManager::repositories()); renv::install(\"$$pkg\")"; \
+		fi; \
+	done; \
+	Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); renv::snapshot(prompt=FALSE, type=\"all\", force=TRUE)" \
+	'
+
+add-bioc:
+	@mamba run -n $(MAMBA_ENV) bash -c '\
+	conda_lib="$$CONDA_PREFIX/lib/R/library"; \
+	export RENV_CONFIG_SANDBOX_ENABLED="false"; \
+	CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
+	for pkg in $$CLEAN_PKG; do \
+		pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]"); \
+		if mamba search "^bioconductor-$$pkg_lower$$" >/dev/null 2>&1; then \
 			mamba install -y "bioconductor-$$pkg_lower"; \
 		else \
 			echo "$$pkg not found in Conda. Falling back to Bioconductor/CRAN via renv..."; \
