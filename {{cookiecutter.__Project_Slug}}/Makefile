@@ -97,6 +97,8 @@ init:
 		echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
 		mamba env update -f environment.yml --prune -y; \
 	fi
+	mamba run -n $(MAMBA_ENV) conda config --env --add channels conda-forge
+	mamba run -n $(MAMBA_ENV) conda config --env --add channels bioconda
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
 	mamba run -n $(MAMBA_ENV) poetry install
 	mamba run -n $(MAMBA_ENV) git init
@@ -144,9 +146,9 @@ add-r:
 	CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
 	for pkg in $$CLEAN_PKG; do \
 		pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]"); \
-		if mamba search "^r-$$pkg_lower$$" >/dev/null 2>&1; then \
+		if mamba search -c conda-forge "^r-$$pkg_lower$$" >/dev/null 2>&1; then \
 			mamba install -y "r-$$pkg_lower"; \
-		elif mamba search "^bioconductor-$$pkg_lower$$" >/dev/null 2>&1; then \
+		elif mamba search -c bioconda "^bioconductor-$$pkg_lower$$" >/dev/null 2>&1; then \
 			mamba install -y "bioconductor-$$pkg_lower"; \
 		else \
 			echo "$$pkg not found in Conda. Falling back to Bioconductor/CRAN via renv..."; \
@@ -163,7 +165,7 @@ add-bioc:
 	CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
 	for pkg in $$CLEAN_PKG; do \
 		pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]"); \
-		if mamba search "^bioconductor-$$pkg_lower$$" >/dev/null 2>&1; then \
+		if mamba search -c bioconda "^bioconductor-$$pkg_lower$$" >/dev/null 2>&1; then \
 			mamba install -y "bioconductor-$$pkg_lower"; \
 		else \
 			echo "$$pkg not found in Conda. Falling back to Bioconductor/CRAN via renv..."; \
@@ -203,6 +205,8 @@ init:
 		echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
 		mamba env update -f environment.yml --prune -y; \
 	fi
+	mamba run -n $(MAMBA_ENV) conda config --env --add channels conda-forge
+	mamba run -n $(MAMBA_ENV) conda config --env --add channels bioconda
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
 	mamba run -n $(MAMBA_ENV) poetry install
 	mamba run -n $(MAMBA_ENV) git init
