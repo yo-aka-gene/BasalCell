@@ -164,7 +164,7 @@ dmypy.json
 *.knit.md
 
 # R Environment Variables
-{%- endif %}{%- if cookiecutter.r_ver != "none" %}.Renviron
+.Renviron
 
 # translation temp files
 po/*~
