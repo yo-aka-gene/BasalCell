@@ -5,10 +5,9 @@
 <img src="./docs/_static/default_logo.png" alt="graphical abstract" width="300" height="300" title="graphical abstract">
 </div>
 
-{%- if cookiecutter.description != "" %}
+{% if cookiecutter.description != "" -%}
 {{cookiecutter.description}}
-{%- endif %}
-
+{% endif -%}
 ## Project Summary
 1. Write
 2. Down
@@ -30,15 +29,17 @@
     │   ├── workflows/
     │   │   └── test.yml                        # write CI/CD configuration here
     │   └── pull_request_template.md
-{%- if cookiecutter.r_ver != "none" -%}    ├── {{cookiecutter.__project_slug}}_rtools/{%- endif -%}
-{%- if cookiecutter.r_ver != "none" -%}    │   ├── R/                                 # write your R scripts here{%- endif -%}
-{%- if cookiecutter.r_ver != "none" -%}    │   ├── tests/{%- endif -%}
-{%- if cookiecutter.r_ver != "none" -%}    │   │   ├── testthat/                      # write your R test code here{%- endif -%}
-{%- if cookiecutter.r_ver != "none" -%}    │   │   └── testthat.R{%- endif -%}
-{%- if cookiecutter.r_ver != "none" -%}    │   └── vignettes/                         # write your R vignettes here (not actively recommended){%- endif -%}
-{%- if cookiecutter.r_ver != "none" -%}    │   │   └── example.Rmd{%- endif -%}
-{%- if cookiecutter.r_ver != "none" -%}    │   ├── _pkgdown.yml                       # write R documentation configuration here{%- endif -%}
-{%- if cookiecutter.r_ver != "none" -%}    │   └── DESCRIPTION                        # write R API info (semi-auto generated){%- endif -%}
+{% if cookiecutter.r_ver != "none" -%}
+    ├── {{cookiecutter.__project_slug}}_rtools/
+    │   ├── R/                                  # write your R scripts here
+    │   ├── tests/
+    │   │   ├── testthat/                       # write your R test code here
+    │   │   └── testthat.R
+    │   └── vignettes/                          # write your R vignettes here (not actively recommended)
+    │   │   └── example.Rmd
+    │   ├── _pkgdown.yml                        # write R documentation configuration here
+    │   └── DESCRIPTION                         # write R API info (semi-auto generated)
+{% endif -%}
     ├── {{cookiecutter.__project_slug}}_tools/
     │   └── __init__.py                         # init file for your Python utility scripts for analysis                     
     ├── data/                                   # store your data here
@@ -51,10 +52,14 @@
     │   │   └── tools                           # symbolic link to ../../tools
     │   ├── conf.py                             # documentation configuration
     │   └── index.md                            # draft for index page
-{%- if cookiecutter.r_ver != "none" -%}    ├── renv/                                   # R env configuration{%- endif -%}
-{%- if cookiecutter.create_package == "true" -%}    ├── src/{%- endif -%}
-{%- if cookiecutter.create_package == "true" -%}    │   └── {{cookiecutter.__project_slug}}/{%- endif -%}
-{%- if cookiecutter.create_package == "true" -%}    │       └── __init__.py                     # init file for your Python package{%- endif -%}
+{% if cookiecutter.r_ver != "none" -%}
+    ├── renv/                                   # R env configuration
+{% endif -%}
+{% if cookiecutter.create_package == "true" -%}
+    ├── src/
+    │   └── {{cookiecutter.__project_slug}}/
+    │       └── __init__.py                     # init file for your Python package
+{% endif -%}
     ├── test/                                   # write your Python test code here
     ├── .gitignore
     ├── .pre-commit-config.yaml                 # configuration for linting and tests
@@ -62,9 +67,11 @@
     ├── launch_jupyter.py                       # helper func for starting Jupyter
     ├── poetry.lock                             # detailed Python env configuration
     ├── pyproject.toml                          # declarative Python env configuration
-{%- if cookiecutter.r_ver != "none" -%}    ├── renv.lock                               # detailed R env configuration{%- endif -%}
-{%- if cookiecutter.r_ver != "none" -%}    ├── restore_r_env.py                        # helper func to interact with renv{%- endif -%}
-{%- if cookiecutter.r_ver != "none" -%}    ├── setup_r_env.sh                          # helper func for R env setup{%- endif -%}
+{% if cookiecutter.r_ver != "none" -%}
+    ├── renv.lock                               # detailed R env configuration
+    ├── restore_r_env.py                        # helper func to interact with renv
+    ├── setup_r_env.sh                          # helper func for R env setup
+{% endif -%}
     └── README.md                               # this file
 ```
 
@@ -85,12 +92,12 @@
 ```bash
 make init
 ```
-{%- set use_r = cookiecutter.r_ver != 'none' -%}
-{%- if use_r -%}
+{% set use_r = cookiecutter.r_ver != 'none' -%}
+{% if use_r -%}
 (This command will automatically install Python dependencies, register the Jupyter kernel, and build the R virtual environment).
-{%- else -%}
+{% else -%}
 (This command will automatically install Python dependencies and register the Jupyter kernel).
-{%- endif -%}
+{% endif -%}
 
 ### Launching Jupyter Lab
 Run:
@@ -102,12 +109,14 @@ make launch
 This project uses a unified interface to add dependencies:
 - **Python**: `make add-py PKG=name` (or `add-pydev` for dev tools)
     - install dependencies listed in `poetry.lock` with `make install-py`
-{%- if cookiecutter.r_ver != "none" %}- **R**: `make add-r PKG=name`{%- endif -%}
+{% if cookiecutter.r_ver != "none" -%}
+- **R**: `make add-r PKG=name`
+{% endif -%}
 - **OS**: `make add-os PKG=name` (for Mamba/system libraries)
 
 ### Building Documentation
 - For a brief guide on how to write documentation across various file types, please refer to the README.md of the [`BasalCell`](https://github.com/yo-aka-gene/BasalCell) repository.
-{%- if cookiecutter.r_ver != "none" -%}- When creating R-related documentation, make sure to run `make docs` locally and commit the generated HTML files to the GitHub repository.{%- endif -%}
+{% if cookiecutter.r_ver != "none" -%}- When creating R-related documentation, make sure to run `make docs` locally and commit the generated HTML files to the GitHub repository.{% endif -%}
 
 
 ### Update Version Tags
