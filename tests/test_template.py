@@ -51,6 +51,7 @@ def rlang_files():
         "restore_r_env.py",
         "setup_r_env.sh",
         "renv.lock",
+        ".Renviron",
         ".Rprofile",
         "REPLACETHIS_rtools/DESCRIPTION",
         "REPLACETHIS_rtools/_pkgdown.yml",

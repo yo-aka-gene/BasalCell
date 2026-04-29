@@ -136,6 +136,7 @@ DESCRIPTION_STR := $(shell grep '^description = ' pyproject.toml | cut -d '"' -f
 R_PROFILE_USER := $(DIR_NAME)/.Rprofile
 
 setup-r:
+	@echo 'R_LIBS_SITE="$${CONDA_PREFIX}/lib/R/library"' > .Renviron
 	@if [ -f setup_r_env.sh ]; then \
 		echo "Found setup_r_env.sh. Setting up R environment..."; \
 		chmod +x setup_r_env.sh; \
