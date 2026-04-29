@@ -90,7 +90,7 @@ e.g., `Your Project Name` -> `your_project_name`
 ```bash
 # For main analysis (e.g., polars, torch, scanpy)
 make add-py PKG=polars
-make add-py PKG='torch "scanpy<1.12"'
+make add-py PKG="torch scanpy<1.12"
 
 # For development tools (e.g., tqdm)
 make add-pydev PKG=tqdm
