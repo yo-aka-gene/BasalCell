@@ -210,14 +210,14 @@ init:
 	exit 1; \
 	fi
 	@mamba run -n base python3 -c "import yaml; \
-	f_path = 'environment.yml'; \
-	with open(f_path) as f: data = yaml.safe_load(f); \
+	f = 'environment.yml'; \
+	data = yaml.safe_load(open(f).read()); \
 	deps = data.get('dependencies', []); \
 	new_deps = '$(R_CORE_LIST)'.split(); \
 	updated = sorted(list(set([d for d in deps if isinstance(d, str)]) | set(new_deps))); \
 	other_deps = [d for d in deps if not isinstance(d, str)]; \
 	data['dependencies'] = updated + other_deps; \
-	with open(f_path, 'w') as f: yaml.dump(data, f, sort_keys=False, default_flow_style=False)"
+	open(f, 'w').write(yaml.dump(data, sort_keys=False, default_flow_style=False))"
 	@if ! mamba env list | grep -q $(MAMBA_ENV); then \
 		mamba env create -f environment.yml -y; \
 	else \
