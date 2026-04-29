@@ -8,6 +8,9 @@ PROJECT_NAME="${DIR_NAME}_R"
 
 echo "Building R env for ${PROJECT_NAME} (in ${MAMBA_ENV})"
 echo "=================================================="
+
+export R_LIBS_USER=""
+
 if [ -f "renv.lock" ]; then
     echo "--> Restoring R env according to renv.lock ..."
     Rscript -e "
