@@ -34,9 +34,10 @@ bump-major:
 .PHONY: add-os sync-os 
 
 add-os:
+	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
 	mamba run -n $(MAMBA_ENV) \
-		yq -y -i '.dependencies |= (. + ("$(PKG)" | split(" ")) | unique)' environment.yml
-	mamba env update -f environment.yml --prune
+		yq -y -i '.dependencies |= (. + ("'"$$CLEAN_PKG"'" | split(" ")) | unique)' environment.yml
+	mamba env update -n $(MAMBA_ENV) -f environment.yml --prune
 
 sync-os:
 	mamba env update -n $(MAMBA_ENV) -f environment.yml --prune
@@ -46,23 +47,27 @@ sync-os:
 # ==========================================
 .PHONY: add-py add-pydev remove-py remove-pydev lock-py install-py
 add-py:
+	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
 	mamba run -n $(MAMBA_ENV) \
-		poetry add $(PKG)
+		poetry add $$CLEAN_PKG
 	@$(MAKE) lock-py
 
 add-pydev:
+	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
 	mamba run -n $(MAMBA_ENV) \
-		poetry add -D $(PKG)
+		poetry add --group dev $$CLEAN_PKG
 	@$(MAKE) lock-py
 
 remove-py:
+	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
 	mamba run -n $(MAMBA_ENV) \
-		poetry remove $(PKG)
+		poetry remove $$CLEAN_PKG
 	@$(MAKE) lock-py
 
 remove-pydev:
+	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
 	mamba run -n $(MAMBA_ENV) \
-		poetry remove -D $(PKG)
+		poetry remove --group dev $$CLEAN_PKG
 	@$(MAKE) lock-py
 
 lock-py:
@@ -136,7 +141,8 @@ add-r:
 	@mamba run -n $(MAMBA_ENV) bash -c '\
 	conda_lib="$$CONDA_PREFIX/lib/R/library"; \
 	export RENV_CONFIG_SANDBOX_ENABLED="false"; \
-	for pkg in $(PKG); do \
+	CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
+	for pkg in $$CLEAN_PKG; do \
 		pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]"); \
 		if mamba search "^r-$$pkg_lower$$" >/dev/null 2>&1; then \
 			mamba install -y "r-$$pkg_lower"; \
