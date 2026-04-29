@@ -34,7 +34,7 @@ Rscript --vanilla -e "
 "
 
 echo "--> Registering IRkernel..."
-poetry run Rscript --vanilla -e ".libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); IRkernel::installspec(name='${PROJECT_NAME}', displayname='R ${R_VERSION}', user=TRUE)"
+poetry run Rscript --vanilla -e ".libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); IRkernel::installspec(name='${PROJECT_NAME}', displayname='R ${R_VERSION} (${PROJECT_NAME})', user=TRUE)"
 
 echo "=== R env setup: Done! ==="
 poetry run yq -y -i '.dependencies |= map(select(
