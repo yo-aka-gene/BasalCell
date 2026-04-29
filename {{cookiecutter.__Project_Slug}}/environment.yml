@@ -10,6 +10,17 @@ dependencies:
   - yq
 {%- if cookiecutter.r_ver != "none" %}
   - r-base={{cookiecutter.r_ver}}
+  - r-renv
+  - r-testthat
+  - r-styler
+  - r-lintr
+  - r-biocmanager
+  - r-irkernel
+  - r-devtools
+  - r-pkgdown
+  - r-roxygen2
+  - r-rmarkdown
+  - r-knitr
   - c-compiler
   - cxx-compiler
   - cmake
