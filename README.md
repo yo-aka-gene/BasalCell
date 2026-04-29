@@ -102,10 +102,13 @@ These commands are invalid for adding designated packages in the BasalCell env.
 ### **[Optional]** Add new R packages
 To add new packages within the isolated `renv` env:
 ```bash
-# For R packages (e.g., ggplot2, DESeq2, edgeR)
-make add-r PKG="ggplot2 DESeq2 edgeR"
+# For standard CRAN packages (e.g., ggplot2, dplyr, Seurat)
+make add-r PKG="ggplot2 dplyr Seurat"
 
-# Sometimes R packages requires OS-level dependencies (e.g., perl)
+# For Bioconductor packages (e.g., DESeq2, clusterProfiler, org.Hs.eg.db)
+make add-bioc PKG="DESeq2 clusterProfiler org.Hs.eg.db"
+
+# Sometimes R packages require OS-level dependencies (e.g., perl)
 # If so, you can add them to the Mamba env with add-os
 make add-os PKG=perl
 ```
