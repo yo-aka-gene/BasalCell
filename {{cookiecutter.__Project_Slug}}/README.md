@@ -63,8 +63,10 @@
     ├── test/                                   # write your Python test code here
     ├── .gitignore
     ├── .pre-commit-config.yaml                 # configuration for linting and tests
-    ├── Makefile                                # shortcut commands
+    ├── .readthedocs-config.yaml                # configuration for documentaion
+    ├── environment.yml                         # detailed OS env configuration
     ├── launch_jupyter.py                       # helper func for starting Jupyter
+    ├── Makefile                                # shortcut commands
     ├── poetry.lock                             # detailed Python env configuration
     ├── pyproject.toml                          # declarative Python env configuration
 {% if cookiecutter.r_ver != "none" -%}
