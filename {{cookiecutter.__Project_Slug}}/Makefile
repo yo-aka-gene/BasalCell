@@ -138,9 +138,9 @@ add-r:
 	export RENV_CONFIG_SANDBOX_ENABLED="false"; \
 	for pkg in $(PKG); do \
 		pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]"); \
-		if mamba search -f "r-$$pkg_lower" >/dev/null 2>&1; then \
+		if mamba search "^r-$$pkg_lower$$" >/dev/null 2>&1; then \
 			mamba install -y "r-$$pkg_lower"; \
-		elif mamba search -f "bioconductor-$$pkg_lower" >/dev/null 2>&1; then \
+		elif mamba search "^bioconductor-$$pkg_lower$$" >/dev/null 2>&1; then \
 			mamba install -y "bioconductor-$$pkg_lower"; \
 		else \
 			echo "$$pkg not found in Conda. Falling back to Bioconductor/CRAN via renv..."; \
