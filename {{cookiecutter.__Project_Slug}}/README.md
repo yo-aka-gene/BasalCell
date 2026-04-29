@@ -63,6 +63,7 @@
     ├── poetry.lock                             # detailed Python env configuration
     ├── pyproject.toml                          # declarative Python env configuration
 {% if cookiecutter.r_ver != "none" %}    ├── renv.lock                               # detailed R env configuration{% endif %}
+{% if cookiecutter.r_ver != "none" %}    ├── restore_r_env.py                        # helper func to interact with renv{% endif %}
 {% if cookiecutter.r_ver != "none" %}    ├── setup_r_env.sh                          # helper func for R env setup{% endif %}
     └── README.md                               # this file
 ```
