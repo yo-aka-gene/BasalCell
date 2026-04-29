@@ -1,5 +1,5 @@
 {%- if cookiecutter.r_ver != "none" %}
-.PHONY: init setup-r launch docs clean test-py test-r test sync-r docs-r add-os add-py add-pydev add-r add-bioc bump-patch bump-minor bump-major lock-py install-py
+.PHONY: init setup-r launch docs clean test-py test-r test sync-r docs-r add-os add-py add-pydev add-r restore-r bump-patch bump-minor bump-major lock-py install-py
 {%- else %}
 .PHONY: init launch docs clean test add-os add-py add-pydev bump-patch bump-minor bump-major lock-py install-py
 {%- endif %}
@@ -54,13 +54,26 @@ test: test-py test-r
 
 add-r:
 	@echo "Adding R package(s): $(PKG)..."
-	mamba run -n $(MAMBA_ENV) \
-		Rscript -e "pkgs <- unlist(strsplit('$(PKG)', '[[:space:]]+')); renv::install(pkgs); renv::snapshot(prompt = FALSE)"
+	@mamba run -n $(MAMBA_ENV) bash -c '\
+	conda_lib="$$CONDA_PREFIX/lib/R/library"; \
+	export RENV_CONFIG_SANDBOX_ENABLED="false"; \
+	for pkg in $(PKG); do \
+		pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]"); \
+		if mamba search -f "r-$$pkg_lower" >/dev/null 2>&1; then \
+			mamba install -y "r-$$pkg_lower"; \
+		elif mamba search -f "bioconductor-$$pkg_lower" >/dev/null 2>&1; then \
+			mamba install -y "bioconductor-$$pkg_lower"; \
+		else \
+			echo "$$pkg not found in Conda. Falling back to renv::install..."; \
+			Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); renv::install(\"$$pkg\", type=\"source\")"; \
+		fi; \
+	done; \
+	Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); renv::snapshot(prompt=FALSE, type=\"all\")" \
+	'
 
-add-bioc:
-	@echo "Adding Bioconductor package(s): $(PKG)..."
-	mamba run -n $(MAMBA_ENV) \
-		Rscript -e "pkgs <- unlist(strsplit('$(PKG)', '[[:space:]]+')); renv::install(paste0('bioc::', pkgs)); renv::snapshot(prompt = FALSE)"
+restore-r:
+	@echo "Restoring R environment from renv.lock..."
+	mamba run -n $(MAMBA_ENV) python restore_r_env.py
 
 PROJECT_NAME := $(shell grep '^name = ' pyproject.toml | cut -d '"' -f 2)
 DESCRIPTION_STR := $(shell grep '^description = ' pyproject.toml | cut -d '"' -f 2)
