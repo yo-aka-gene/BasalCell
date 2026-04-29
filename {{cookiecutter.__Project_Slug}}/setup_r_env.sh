@@ -21,10 +21,13 @@ else
     sysname <- Sys.info()[['sysname']]
     if (sysname == 'Linux') {
         cran_url <- 'https://packagemanager.posit.co/cran/__linux__/jammy/latest'
+        pkg_type <- 'binary'
     } else {
         cran_url <- 'https://packagemanager.posit.co/cran/latest'
+        pkg_type <- 'source'
     }
     options(repos = c(CRAN = cran_url))
+    options(pkgType = pkg_type)
     if (!requireNamespace('pak', quietly = TRUE)) install.packages('pak', repos = 'https://cloud.r-project.org')
     if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv', repos = 'https://cloud.r-project.org')
     renv::init(bare = TRUE, bioconductor = TRUE)
