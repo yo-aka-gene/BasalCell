@@ -209,15 +209,18 @@ init:
 		echo "mamba is not installed. Please install it first."; \
 	exit 1; \
 	fi
-	@mamba run -n base python3 -c "import yaml; \
-	f = 'environment.yml'; \
-	data = yaml.safe_load(open(f).read()); \
-	deps = data.get('dependencies', []); \
-	new_deps = '$(R_CORE_LIST)'.split(); \
-	updated = sorted(list(set([d for d in deps if isinstance(d, str)]) | set(new_deps))); \
-	other_deps = [d for d in deps if not isinstance(d, str)]; \
-	data['dependencies'] = updated + other_deps; \
-	open(f, 'w').write(yaml.dump(data, sort_keys=False, default_flow_style=False))"
+	@mamba run -n base python3 -c "import os; \
+	f_path = 'environment.yml'; \
+	lines = open(f_path).readlines(); \
+	try: \
+	    idx = [i for i, l in enumerate(lines) if l.strip().startswith('dependencies:')][0]; \
+	except IndexError: \
+	    print('Error: dependencies section not found'); exit(1); \
+	new_pkgs = set('$(R_CORE_LIST)'.split()); \
+	existing_pkgs = {l.strip().split('- ')[1].split('=')[0] for l in lines if l.strip().startswith('- ')}; \
+	to_add = [f'  - {p}\n' for p in sorted(list(new_pkgs)) if p.split('=')[0] not in existing_pkgs]; \
+	new_lines = lines[:idx+1] + to_add + lines[idx+1:]; \
+	with open(f_path, 'w') as f: f.writelines(new_lines)"
 	@if ! mamba env list | grep -q $(MAMBA_ENV); then \
 		mamba env create -f environment.yml -y; \
 	else \
