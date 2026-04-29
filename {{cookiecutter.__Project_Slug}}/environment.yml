@@ -1,6 +1,7 @@
 name: mamba_{{cookiecutter.__project_slug}}
 channels:
   - conda-forge
+  - bioconda
   - nodefaults
 dependencies:
   - python={{cookiecutter.python_ver}}
