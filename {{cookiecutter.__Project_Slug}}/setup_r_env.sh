@@ -21,13 +21,11 @@ if [ -f "renv.lock" ]; then
         Sys.setenv(LDFLAGS = paste0('-L', conda_prefix, '/lib -Wl,-rpath,', conda_prefix, '/lib'))
         Sys.setenv(CPPFLAGS = paste0('-I', conda_prefix, '/include'))
         Sys.setenv(PKG_CONFIG_PATH = paste0(conda_prefix, '/lib/pkgconfig'))
-        options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/__linux__/jammy/latest'))
-        options(pkgType = 'binary')
+        cran_url <- 'https://packagemanager.posit.co/cran/__linux__/jammy/latest'
     } else {
-        options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/latest'))
-        options(pkgType = 'source')
+        cran_url <- 'https://packagemanager.posit.co/cran/latest'
     }
-
+    options(repos = c(CRAN = cran_url), pkgType = 'source')
     if (!requireNamespace('pak', quietly = TRUE)) install.packages('pak', repos = 'https://cloud.r-project.org', type = getOption('pkgType'))
     if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv', repos = 'https://cloud.r-project.org', type = getOption('pkgType'))
     renv::restore(prompt = FALSE)
@@ -43,18 +41,16 @@ else
         Sys.setenv(CPPFLAGS = paste0('-I', conda_prefix, '/include'))
         Sys.setenv(PKG_CONFIG_PATH = paste0(conda_prefix, '/lib/pkgconfig'))
         cran_url <- 'https://packagemanager.posit.co/cran/__linux__/jammy/latest'
-        pkg_type <- 'binary'
     } else {
         cran_url <- 'https://packagemanager.posit.co/cran/latest'
-        pkg_type <- 'source'
     }
-    options(repos = c(CRAN = cran_url))
-    options(pkgType = pkg_type)
+    options(repos = c(CRAN = cran_url), pkgType = 'source')
     if (!requireNamespace('pak', quietly = TRUE)) install.packages('pak', repos = 'https://cloud.r-project.org', type = getOption('pkgType'))
     if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv', repos = 'https://cloud.r-project.org', type = getOption('pkgType'))
     renv::init(bare = TRUE, bioconductor = TRUE)
     "
     Rscript -e "
+    options(renv.config.pak.enabled = TRUE)
     renv::install(c(
         'testthat',
         'styler',
