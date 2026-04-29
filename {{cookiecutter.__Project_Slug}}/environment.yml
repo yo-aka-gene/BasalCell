@@ -35,6 +35,7 @@ dependencies:
   - r-glue
   - r-unglue
   - r-biocmanager
+  - bioconductor-biocversion
   - c-compiler
   - cxx-compiler
   - cmake
