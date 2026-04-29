@@ -5,6 +5,7 @@ Test for BasalCell template generation
 import subprocess
 
 import pytest
+import yaml
 
 
 @pytest.fixture
@@ -189,7 +190,29 @@ def test_correct_template_with_rlang(
             file_path.exists()
         ), f"FAILED in #10-{i + 1}! {file} is not found in {path}"
 
-    print("===== #11. Checking R Kernel =====")
+    print("===== #11–12. Checking environment.yml =====")
+    env_file = result.project_path / "environment.yml"
+    with open(env_file, "r") as f:
+        env_data = yaml.safe_load(f)
+    dependencies = env_data.get("dependencies", [])
+
+    assert any(
+        isinstance(dep, str) and dep.startswith("r-base=") for dep in dependencies
+    ), f"FAILED in #11! r-base not found in dependencies: {dependencies}"
+
+    unpinned_r_pkgs = [
+        dep
+        for dep in dependencies
+        if isinstance(dep, str)
+        and (dep.startswith("r-") or dep.startswith("bioconductor-"))
+        and "=" not in dep
+    ]
+
+    assert (
+        len(unpinned_r_pkgs) == 0
+    ), f"FAILED in #12! Unpinned R packages found: {unpinned_r_pkgs}"
+
+    print("===== #13. Checking R Kernel =====")
     kernel_name = f"{path.lower()}_r"
     try:
         check_cmd = ["poetry", "run", "jupyter", "kernelspec", "list"]
@@ -198,6 +221,6 @@ def test_correct_template_with_rlang(
         )
         assert (
             kernel_name in res.stdout.lower()
-        ), f"FAILED in #11! '{kernel_name}' not found in:\n{res.stdout}"
+        ), f"FAILED in #13! '{kernel_name}' not found in:\n{res.stdout}"
     finally:
         uninstall_kernel(kernel_name, result.project_path)
