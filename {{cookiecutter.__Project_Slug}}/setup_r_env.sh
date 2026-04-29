@@ -37,7 +37,7 @@ echo "--> Registering IRkernel..."
 poetry run Rscript --vanilla -e ".libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); IRkernel::installspec(name='${PROJECT_NAME}', displayname='R ${R_VERSION}', user=TRUE)"
 
 echo "=== R env setup: Done! ==="
-poetry run yq -i '.dependencies |= map(select(
+poetry run yq -y -i '.dependencies |= map(select(
     type == "!!map" or 
     test("=") or 
     (test("^(r-|bioconductor-)") | not)
