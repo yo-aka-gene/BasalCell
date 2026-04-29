@@ -57,8 +57,8 @@ jobs:
           restore-keys: |
             renv-${{ runner.os }}-
 {% endraw %}
-      - name: Set up renv
-        run: make setup-r
+      - name: Restore R environment via Mamba & renv
+        run: mamba run -n mamba_{{cookiecutter.__project_slug}} make restore-r
 {%- endif %}
 
       - name: Run pre-commit hooks
