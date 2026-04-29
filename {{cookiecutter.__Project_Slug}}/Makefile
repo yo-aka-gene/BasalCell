@@ -197,30 +197,12 @@ sync-r:
 # ==========================================
 .PHONY: init test-py test-r test docs-r docs-py docs terminate
 
-R_CORE_LIST := r-testthat r-styler r-lintr r-devtools r-pkgdown r-roxygen2 r-rmarkdown r-knitr \
-			   r-tidyverse r-arrow r-dplyr r-data.table r-matrix \
-			   r-s7 r-r6 r-rlang r-future r-furrr \
-               r-fs r-checkmate r-glue r-unglue \
-               r-codetools r-mass r-biocmanager bioconductor-biocversion
-
 init:
 	@echo "Starting project environment setup..."
 	@if ! command -v mamba >/dev/null 2>&1; then \
 		echo "mamba is not installed. Please install it first."; \
 	exit 1; \
 	fi
-	@mamba run -n base python3 -c "import os; \
-	f_path = 'environment.yml'; \
-	lines = open(f_path).readlines(); \
-	try: \
-	    idx = [i for i, l in enumerate(lines) if l.strip().startswith('dependencies:')][0]; \
-	except IndexError: \
-	    print('Error: dependencies section not found'); exit(1); \
-	new_pkgs = set('$(R_CORE_LIST)'.split()); \
-	existing_pkgs = {l.strip().split('- ')[1].split('=')[0] for l in lines if l.strip().startswith('- ')}; \
-	to_add = [f'  - {p}\n' for p in sorted(list(new_pkgs)) if p.split('=')[0] not in existing_pkgs]; \
-	new_lines = lines[:idx+1] + to_add + lines[idx+1:]; \
-	with open(f_path, 'w') as f: f.writelines(new_lines)"
 	@if ! mamba env list | grep -q $(MAMBA_ENV); then \
 		mamba env create -f environment.yml -y; \
 	else \
@@ -274,6 +256,5 @@ docs: docs-r docs-py
 terminate:
 	mamba env remove -n mamba_basalcelldemodev -y
 	rm -rf renv/library
-	rm -f renv.lock
 
 {%- endif %}
