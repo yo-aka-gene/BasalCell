@@ -208,7 +208,8 @@ init:
 		echo "mamba is not installed. Please install it first."; \
 	exit 1; \
 	fi
-	@mamba run -n $(MAMBA_ENV) \
+	@mamba run -n base bash -c "command -v yq >/dev/null 2>&1 || mamba install -y -c conda-forge yq"
+	@mamba run -n base \
 		yq -y -i '.dependencies |= (. + ("$(R_CORE_LIST)" | split(" ")) | unique)' environment.yml
 	@if ! mamba env list | grep -q $(MAMBA_ENV); then \
 		mamba env create -f environment.yml -y; \
