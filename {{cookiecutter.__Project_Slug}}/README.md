@@ -29,7 +29,7 @@
     │   ├── workflows/
     │   │   └── test.yml                        # write CI/CD configuration here
     │   └── pull_request_template.md
-{%-- if cookiecutter.r_ver != "none" %}
+{%- if cookiecutter.r_ver != "none" %}
     ├── {{cookiecutter.__project_slug}}_rtools/
     │   ├── R/                                  # write your R scripts here
     │   ├── tests/
@@ -39,7 +39,7 @@
     │   │   └── example.Rmd
     │   ├── _pkgdown.yml                        # write R documentation configuration here
     │   └── DESCRIPTION                         # write R API info (semi-auto generated)
-{%-- endif %}
+{%- endif %}
     ├── {{cookiecutter.__project_slug}}_tools/
     │   └── __init__.py                         # init file for your Python utility scripts for analysis                     
     ├── data/                                   # store your data here
