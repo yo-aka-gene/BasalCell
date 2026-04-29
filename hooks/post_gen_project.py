@@ -48,7 +48,7 @@ if __name__ == "__main__":
     setup_symbolic_links()
     use_r = "{{ cookiecutter.r_ver }}".lower() != "none"
     if not use_r:
-        r_files = ["setup_r_env.sh", ".lintr"]
+        r_files = ["setup_r_env.sh", ".lintr", ".Renviron"]
         for f in r_files:
             if os.path.exists(f):
                 os.remove(f)

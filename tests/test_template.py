@@ -47,6 +47,7 @@ def symbolic_links():
 def rlang_files():
     return [
         ".lintr",
+        ".Renviron",
         "setup_r_env.sh",
         "renv.lock",
         ".Rprofile",
