@@ -10,6 +10,8 @@ dependencies:
   - yq
 {%- if cookiecutter.r_ver != "none" %}
   - r-base={{cookiecutter.r_ver}}
+  - c-compiler
+  - cxx-compiler
   - cmake
   - pkg-config
   - libxml2
