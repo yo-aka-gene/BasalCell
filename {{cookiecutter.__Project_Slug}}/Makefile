@@ -44,7 +44,7 @@ sync-os:
 # ==========================================
 # Python
 # ==========================================
-.PHONY add-py add-pydev remove-py remove-pydev lock-py install-py
+.PHONY: add-py add-pydev remove-py remove-pydev lock-py install-py
 add-py:
 	mamba run -n $(MAMBA_ENV) \
 		poetry add $(PKG)
@@ -119,7 +119,7 @@ docs:
 # ==========================================
 # R
 # ==========================================
-.PHONY setup-r add-r restore-r sync-r
+.PHONY: setup-r add-r restore-r sync-r
 
 PROJECT_NAME := $(shell grep '^name = ' pyproject.toml | cut -d '"' -f 2)
 DESCRIPTION_STR := $(shell grep '^description = ' pyproject.toml | cut -d '"' -f 2)
@@ -166,13 +166,13 @@ sync-r:
 # ==========================================
 # Advanced Project Management (Python & R)
 # ==========================================
-.PHONY: init test-py test-r test docs-r docs-py docs 
+.PHONY: init init-r test-py test-r test docs-r docs-py docs 
 
 init:
 	@echo "Starting project environment setup..."
 	@if ! command -v mamba >/dev/null 2>&1; then \
 		echo "mamba is not installed. Please install it first."; \
-		exit 1; \
+	exit 1; \
 	fi
 	@if ! mamba env list | grep -q $(MAMBA_ENV); then \
 		mamba env create -f environment.yml -y; \
@@ -188,6 +188,14 @@ init:
 		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 	@$(MAKE) setup-r
 	@echo "All done! You are ready to start coding."
+
+init-r: 
+	@$(MAKE) add PKG="r-renv r-irkernel r-biocmanager r-devtools r-testthat r-styler r-lintr r-pkgdown r-roxygen2 r-rmarkdown r-knitr"
+	@$(MAKE) sync-os
+	mamba run -n $(ENV_NAME) \
+		Rscript -e "IRkernel::installspec(name='${PROJECT_NAME}', displayname='R ${R_VERSION} (${PROJECT_NAME})', user=TRUE)"
+	mamba run -n $(ENV_NAME) \
+		yq -y -i '.dependencies |= map(select(type == "!!map" or test("=") or (test("^(r-|bioconductor-)") | not)))' environment.yml
 
 test-py:
 	@echo "Running Python tests..."
