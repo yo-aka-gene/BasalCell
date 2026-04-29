@@ -1,5 +1,5 @@
 {%- if cookiecutter.r_ver != "none" %}
-.PHONY: init setup-r launch docs clean test-py test-r test sync-r docs-r add-os add-py add-pydev add-r restore-r bump-patch bump-minor bump-major lock-py install-py
+.PHONY: init setup-r launch docs clean test-py test-r test sync-r docs-r add-os add-py add-pydev remove-py remove-pydev add-r restore-r bump-patch bump-minor bump-major lock-py install-py
 {%- else %}
 .PHONY: init launch docs clean test add-os add-py add-pydev bump-patch bump-minor bump-major lock-py install-py
 {%- endif %}
@@ -159,6 +159,16 @@ add-py:
 add-pydev:
 	mamba run -n $(MAMBA_ENV) \
 		poetry add -D $(PKG)
+	@$(MAKE) lock-py
+
+remove-py:
+	mamba run -n $(MAMBA_ENV) \
+		poetry remove $(PKG)
+	@$(MAKE) lock-py
+
+remove-pydev:
+	mamba run -n $(MAMBA_ENV) \
+		poetry remove -D $(PKG)
 	@$(MAKE) lock-py
 
 lock-py:
