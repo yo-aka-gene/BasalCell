@@ -18,10 +18,13 @@ if [ -f "renv.lock" ]; then
 else
     echo "--> renv.lock is not found. Creating a new env"
     Rscript -e "
-    options(repos = c(
-        RSPM = 'https://packagemanager.posit.co/cran/latest', 
-        CRAN = 'https://cloud.r-project.org'
-    ))
+    sysname <- Sys.info()[['sysname']]
+    if (sysname == 'Linux') {
+        cran_url <- 'https://packagemanager.posit.co/cran/__linux__/jammy/latest'
+    } else {
+        cran_url <- 'https://packagemanager.posit.co/cran/latest'
+    }
+    options(repos = c(CRAN = cran_url))
     if (!requireNamespace('pak', quietly = TRUE)) install.packages('pak', repos = 'https://cloud.r-project.org')
     if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv', repos = 'https://cloud.r-project.org')
     renv::init(bare = TRUE, bioconductor = TRUE)
