@@ -166,7 +166,7 @@ sync-r:
 # ==========================================
 # Advanced Project Management (Python & R)
 # ==========================================
-.PHONY: init init-r test-py test-r test docs-r docs-py docs 
+.PHONY: init test-py test-r test docs-r docs-py docs 
 
 init:
 	@echo "Starting project environment setup..."
@@ -188,14 +188,6 @@ init:
 		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 	@$(MAKE) setup-r
 	@echo "All done! You are ready to start coding."
-
-init-r: 
-	@$(MAKE) add PKG="r-renv r-irkernel r-biocmanager r-devtools r-testthat r-styler r-lintr r-pkgdown r-roxygen2 r-rmarkdown r-knitr"
-	@$(MAKE) sync-os
-	mamba run -n $(ENV_NAME) \
-		Rscript -e "IRkernel::installspec(name='${PROJECT_NAME}', displayname='R ${R_VERSION} (${PROJECT_NAME})', user=TRUE)"
-	mamba run -n $(ENV_NAME) \
-		yq -y -i '.dependencies |= map(select(type == "!!map" or test("=") or (test("^(r-|bioconductor-)") | not)))' environment.yml
 
 test-py:
 	@echo "Running Python tests..."
