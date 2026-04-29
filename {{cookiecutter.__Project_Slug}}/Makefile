@@ -53,7 +53,6 @@ test-r:
 test: test-py test-r
 
 add-r:
-	@echo "Adding R package(s): $(PKG)..."
 	@mamba run -n $(MAMBA_ENV) bash -c '\
 	conda_lib="$$CONDA_PREFIX/lib/R/library"; \
 	export RENV_CONFIG_SANDBOX_ENABLED="false"; \
@@ -148,19 +147,16 @@ clean:
 	@echo "Clean up complete."
 
 add-os:
-	@echo "Adding Linux package(s): $(PKG)..."
 	mamba run -n $(MAMBA_ENV) \
 		yq -i '.dependencies |= (. + ("$(PKG)" | split(" ")) | unique)' environment.yml
 	mamba env update -f environment.yml --prune
 
 add-py:
-	@echo "Adding Python package(s): $(PKG)..."
 	mamba run -n $(MAMBA_ENV) \
 		poetry add $(PKG)
 	@$(MAKE) lock-py
 
 add-pydev:
-	@echo "Adding Python package(s) for development: $(PKG)..."
 	mamba run -n $(MAMBA_ENV) \
 		poetry add -D $(PKG)
 	@$(MAKE) lock-py
