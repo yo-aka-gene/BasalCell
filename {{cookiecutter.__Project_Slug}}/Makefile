@@ -85,10 +85,10 @@ install-py:
 # ==========================================
 .PHONY: init docs test terminate
 
-PY_CORE := poalrs pyarrow
 PYDEV_CORE := ipykernel ipywidgets jupyterlab jupyter-resource-usage \
 			  pytest mypy ruff pre-commit \
-			  sphinx sphinx-rtd-theme sphinx-gallery nbsphinx numpydoc myst-parser pandoc
+			  sphinx sphinx-rtd-theme sphinx-gallery nbsphinx numpydoc myst-parser pandoc \
+			  poalrs pyarrow PyYAML
 
 init:
 	@echo "Starting project environment setup..."
@@ -103,10 +103,9 @@ init:
 		mamba env update -f environment.yml --prune -y; \
 	fi
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
-	@$(MAKE) add-py $(PY_CORE)
 	@$(MAKE) add-pydev $(PYDEV_CORE)
 	mamba run -n $(MAMBA_ENV) poetry install
-	mamba run -n $(MAMBA_ENV) git init
+	mamba run -n $(MAMBA_ENV) git init -b main
 	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
 	mamba run -n $(MAMBA_ENV) \
 		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"

@@ -7,7 +7,7 @@ dependencies:
   - python={{cookiecutter.python_ver}}
   - poetry
   - make
-  - git
+  - git >=2.30.0
   - yq
 {%- if cookiecutter.r_ver != "none" %}
   - r-base={{cookiecutter.r_ver}}
