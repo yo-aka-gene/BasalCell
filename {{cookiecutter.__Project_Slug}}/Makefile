@@ -97,8 +97,6 @@ init:
 		echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
 		mamba env update -f environment.yml --prune -y; \
 	fi
-	mamba run -n $(MAMBA_ENV) conda config --env --add channels conda-forge
-	mamba run -n $(MAMBA_ENV) conda config --env --add channels bioconda
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
 	mamba run -n $(MAMBA_ENV) poetry install
 	mamba run -n $(MAMBA_ENV) git init
@@ -263,8 +261,6 @@ init:
 		echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
 		mamba env update -f environment.yml --prune -y; \
 	fi
-	mamba run -n $(MAMBA_ENV) conda config --env --add channels conda-forge
-	mamba run -n $(MAMBA_ENV) conda config --env --add channels bioconda
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
 	mamba run -n $(MAMBA_ENV) poetry install
 	mamba run -n $(MAMBA_ENV) git init
