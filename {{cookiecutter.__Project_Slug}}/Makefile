@@ -148,7 +148,7 @@ if (!file.exists("renv.lock")) {
     renv::snapshot(prompt = FALSE, type = "all")
 } else {
     message("--> Restoring from renv.lock...")
-    renv::restore(prompt = FALSE)
+    @$(MAKE) restore-r
 }
 endef
 export R_SETUP_LOGIC
