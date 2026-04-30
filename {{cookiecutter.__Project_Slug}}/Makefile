@@ -183,7 +183,7 @@ setup-r:
 				 s/- \"?r-rmarkdown\"?$$/- r-rmarkdown=$$RMARKDOWN_VER/; \
 	             s/- \"?r-knitr\"?$$/- r-knitr=$$KNITR_VER/" environment.yml; \
 	echo "--> Registering IRkernel..."; \
-	mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "\
+	mamba run -n $(MAMBA_ENV) poetry run Rscript --vanilla -e "\
 	    .libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); \
 	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $$RBASE_VER ($(R_KERNEL_NAME))', user=TRUE)"
 	@mamba run -n $(MAMBA_ENV) yq -y -i \
