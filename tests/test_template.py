@@ -153,7 +153,7 @@ def test_correct_template_for_package_mode(
             "project_name": "Test Project-CI/CD-2",
             "author_name": "John Smith",
             "email": "example@example.com",
-            "python_ver": "3.11",
+            "python_ver": "3.13",
             "create_package": "true",
         }
     )
@@ -174,7 +174,6 @@ def test_correct_template_with_rlang(
     result = cookies.bake(
         extra_context={
             "project_name": "Test Project-CI/CD-3",
-            "python_ver": "3.12",
             "r_ver": "4.4",
         }
     )

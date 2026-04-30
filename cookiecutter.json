@@ -6,9 +6,9 @@
     "author_name": "",
     "email": "",
     "github_username": "",
-    "python_ver": ["3.10", "3.11", "3.12"],
+    "python_ver": ["3.12", "3.13"],
     "__pyver": "{{ 'py' + cookiecutter.python_ver.replace('.', '') }}",
-    "r_ver": ["none", "4.2", "4.3", "4.4", "4.5"],
+    "r_ver": ["none", "4.3", "4.4"],
     "create_package": ["false", "true"],
     "__version": "0.3.1"
 }
