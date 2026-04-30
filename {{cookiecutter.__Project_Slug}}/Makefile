@@ -161,7 +161,7 @@ setup-r:
 		mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "$$R_SETUP_INIT_LOGIC"; \
 	else \
 		echo "--> renv.lock found. Delegating to 'make restore-r'..."; \
-		$(MAKE) restore-r;
+		$(MAKE) restore-r; \
 	fi
 	@RBASE_VER=$$(mamba list -n $(MAMBA_ENV) "^r-base$$" | awk '/r-base/ {print $$2}'); \
 	RENV_VER=$$(mamba list -n $(MAMBA_ENV) "^r-renv$$" | awk '/r-renv/ {print $$2}'); \
