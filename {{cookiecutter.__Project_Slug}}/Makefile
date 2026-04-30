@@ -29,9 +29,9 @@ bump-major:
 	@mamba run -n $(MAMBA_ENV) poetry version major
 
 # ==========================================
-# OS-level Sofwares
+# Mamba
 # ==========================================
-.PHONY: add-os sync-os 
+.PHONY: add-os sync-os
 
 add-os:
 	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
@@ -85,6 +85,11 @@ install-py:
 # ==========================================
 .PHONY: init docs test terminate
 
+PY_CORE := poalrs pyarrow
+PYDEV_CORE := ipykernel ipywidgets jupyterlab jupyter-resource-usage \
+			  pytest mypy ruff pre-commit \
+			  sphinx sphinx-rtd-theme sphinx-gallery nbsphinx numpydoc myst-parser pandoc
+
 init:
 	@echo "Starting project environment setup..."
 	@if ! command -v mamba >/dev/null 2>&1; then \
@@ -98,6 +103,8 @@ init:
 		mamba env update -f environment.yml --prune -y; \
 	fi
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
+	@$(MAKE) add-py $(PY_CORE)
+	@$(MAKE) add-pydev $(PYDEV_CORE)
 	mamba run -n $(MAMBA_ENV) poetry install
 	mamba run -n $(MAMBA_ENV) git init
 	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
@@ -127,7 +134,7 @@ terminate:
 # ==========================================
 # R
 # ==========================================
-.PHONY: setup-r add-r add-bioc restore-r sync-r
+.PHONY: setup-r add-r add-bioc pin-r restore-r sync-r
 
 R_VERSION := {{ cookiecutter.r_ver }}
 R_KERNEL_NAME := {{ cookiecutter.__Project_Slug }}
@@ -166,33 +173,13 @@ setup-r:
 	@RBASE_VER=$$(mamba list -n $(MAMBA_ENV) "^r-base$$" | awk '/r-base/ {print $$2}'); \
 	RENV_VER=$$(mamba list -n $(MAMBA_ENV) "^r-renv$$" | awk '/r-renv/ {print $$2}'); \
 	IRKERNEL_VER=$$(mamba list -n $(MAMBA_ENV) "^r-irkernel$$" | awk '/r-irkernel/ {print $$2}'); \
-	TESTTHAT_VER=$$(mamba list -n $(MAMBA_ENV) "^r-testthat$$" | awk '/r-testthat/ {print $$2}'); \
-	STYLER_VER=$$(mamba list -n $(MAMBA_ENV) "^r-styler$$" | awk '/r-styler/ {print $$2}'); \
-	LINTR_VER=$$(mamba list -n $(MAMBA_ENV) "^r-lintr$$" | awk '/r-lintr/ {print $$2}'); \
-	DEVTOOLS_VER=$$(mamba list -n $(MAMBA_ENV) "^r-devtools$$" | awk '/r-devtools/ {print $$2}'); \
-	PKGDOWN_VER=$$(mamba list -n $(MAMBA_ENV) "^r-pkgdown$$" | awk '/r-pkgdown/ {print $$2}'); \
-	ROXYGEN_VER=$$(mamba list -n $(MAMBA_ENV) "^r-roxygen2$$" | awk '/r-roxygen2/ {print $$2}'); \
-	RMARKDOWN_VER=$$(mamba list -n $(MAMBA_ENV) "^r-rmarkdown$$" | awk '/r-rmarkdown/ {print $$2}'); \
-	KNITR_VER=$$(mamba list -n $(MAMBA_ENV) "^r-knitr$$" | awk '/r-knitr/ {print $$2}'); \
 	mamba run -n $(MAMBA_ENV) bash -c "echo 'r-base =='$$RBASE_VER > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
 	perl -pi -e "s/- \"?r-base\"?$$/- r-base=$$RBASE_VER/; \
 	             s/- \"?r-renv\"?$$/- r-renv=$$RENV_VER/; \
-				 s/- \"?r-irkernel\"?$$/- r-irkernel=$$IRKERNEL_VER/; \
-				 s/- \"?r-testthat\"?$$/- r-testthat=$$TESTTHAT_VER/; \
-				 s/- \"?r-styler\"?$$/- r-styler=$$STYLER_VER/; \
-				 s/- \"?r-lintr\"?$$/- r-lintr=$$LINTR_VER/; \
-				 s/- \"?r-devtools\"?$$/- r-devtools=$$DEVTOOLS_VER/; \
-				 s/- \"?r-pkgdown\"?$$/- r-pkgdown=$$PKGDOWN_VER/; \
-				 s/- \"?r-roxygen2\"?$$/- r-roxygen2=$$ROXYGEN2_VER/; \
-				 s/- \"?r-rmarkdown\"?$$/- r-rmarkdown=$$RMARKDOWN_VER/; \
-	             s/- \"?r-knitr\"?$$/- r-knitr=$$KNITR_VER/" environment.yml; \
-	echo "--> Registering IRkernel..."; \
+				 s/- \"?r-irkernel\"?$$/- r-irkernel=$$IRKERNEL_VER/" environment.yml; \
 	mamba run -n $(MAMBA_ENV) poetry run Rscript --vanilla -e "\
 	    .libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); \
 	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $$RBASE_VER ($(R_KERNEL_NAME))', user=TRUE)"
-	@mamba run -n $(MAMBA_ENV) yq -y -i \
-	'.dependencies |= map(select(type == "object" or (type == "string" and (test("=") or (test("^(r-|bioconductor-)") | not)))))' \
-	environment.yml
     @echo "=== R env setup: Done! ==="
 
 add-r:
@@ -230,6 +217,62 @@ add-bioc:
 	done; \
 	Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); renv::snapshot(prompt=FALSE, type=\"all\", force=TRUE)" \
 	'
+
+define PIN_R_LOGIC
+#!/bin/bash
+set -e
+CLEAN_PKG=$$(echo "$$PKG" | tr "," " " | tr -s " ")
+
+for pkg in $$CLEAN_PKG; do
+    pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]")
+
+    if mamba search -c conda-forge "^r-$$pkg_lower$$" >/dev/null 2>&1; then
+        echo "--> Found $$pkg in conda-forge. Installing and pinning..."
+        mamba install -y -c conda-forge "r-$$pkg_lower"
+        PKG_VER=$$(mamba list -n "$$MAMBA_ENV" "^r-$$pkg_lower$$" | tail -n 1 | awk '{print $$2}')
+
+        if grep -q -- "- r-$$pkg_lower" environment.yml; then
+            perl -pi -e "s/-\s*\"?r-$$pkg_lower\"?.*$$/- r-$$pkg_lower=$$PKG_VER/" environment.yml
+        else
+            yq -y -i ".dependencies += [\"r-$$pkg_lower=$$PKG_VER\"]" environment.yml
+        fi
+        if ! grep -q "^r-$$pkg_lower[ =]" "$$CONDA_PREFIX/conda-meta/pinned" 2>/dev/null; then
+            echo "r-$$pkg_lower ==$$PKG_VER" >> "$$CONDA_PREFIX/conda-meta/pinned"
+        fi
+
+    elif mamba search -c bioconda "^bioconductor-$$pkg_lower$$" >/dev/null 2>&1; then
+        echo "--> Found $$pkg in bioconda. Installing and pinning..."
+        mamba install -y -c bioconda "bioconductor-$$pkg_lower"
+        PKG_VER=$$(mamba list -n "$$MAMBA_ENV" "^bioconductor-$$pkg_lower$$" | tail -n 1 | awk '{print $$2}')
+        
+        if grep -q -- "- bioconductor-$$pkg_lower" environment.yml; then
+            perl -pi -e "s/-\s*\"?bioconductor-$$pkg_lower\"?.*$$/- bioconductor-$$pkg_lower=$$PKG_VER/" environment.yml
+        else
+            yq -y -i ".dependencies += [\"bioconductor-$$pkg_lower=$$PKG_VER\"]" environment.yml
+        fi
+        if ! grep -q "^bioconductor-$$pkg_lower[ =]" "$$CONDA_PREFIX/conda-meta/pinned" 2>/dev/null; then
+            echo "bioconductor-$$pkg_lower ==$$PKG_VER" >> "$$CONDA_PREFIX/conda-meta/pinned"
+        fi
+    else
+        echo "--> WARNING: $$pkg is not supported in conda-forge or bioconda. Skipping Mamba pin."
+    fi
+done
+
+echo "--> Updating renv.lock..."
+Rscript --vanilla -e " \
+    conda_lib <- file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library'); \
+    .libPaths(conda_lib); \
+    renv::snapshot(prompt=FALSE, type='all', force=TRUE) \
+"
+endef
+export PIN_R_LOGIC
+
+pin-r:
+	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified. Usage: make pin PKG=seurat"; exit 1; fi
+	@export PKG="$(PKG)"; export MAMBA_ENV="$(MAMBA_ENV)"; \
+	mamba run -n $(MAMBA_ENV) bash -c "$$PIN_R_LOGIC"
+	@echo "=== Pinning complete! ==="
+
 
 define RESTORE_R_LOGIC
 import json
@@ -336,10 +379,9 @@ sync-r:
 .PHONY: init test-py test-r test docs-r docs-py docs terminate
 
 init:
-	@echo "Starting project environment setup..."
 	@if ! command -v mamba >/dev/null 2>&1; then \
 		echo "mamba is not installed. Please install it first."; \
-	exit 1; \
+		exit 1; \
 	fi
 	@if ! mamba env list | grep -q $(MAMBA_ENV); then \
 		mamba env create -f environment.yml -y; \
@@ -348,6 +390,8 @@ init:
 		mamba env update -f environment.yml --prune -y; \
 	fi
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
+	@$(MAKE) add-py $(PY_CORE)
+	@$(MAKE) add-pydev $(PYDEV_CORE)
 	mamba run -n $(MAMBA_ENV) poetry install
 	mamba run -n $(MAMBA_ENV) git init
 	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
