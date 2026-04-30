@@ -132,8 +132,7 @@ terminate:
 R_VERSION := {{ cookiecutter.r_ver }}
 R_KERNEL_NAME := {{ cookiecutter.__Project_Slug }}
 
-
-define R_SETUP_LOGIC
+define R_SETUP_COMMON_LOGIC
 conda_lib <- file.path(Sys.getenv("CONDA_PREFIX"), "lib", "R", "library")
 .libPaths(conda_lib)
 sysname <- Sys.info()[["sysname"]]
@@ -142,23 +141,28 @@ if (sysname == "Linux") {
 } else {
     options(repos = c(CRAN = "https://cloud.r-project.org"), pkgType = "source")
 }
-if (!file.exists("renv.lock")) {
-    message("--> Initializing new renv environment...")
-    renv::init(bare = TRUE, bioconductor = TRUE, restart = FALSE)
-    renv::snapshot(prompt = FALSE, type = "all")
-} else {
-    message("--> Restoring from renv.lock...")
-    @$(MAKE) restore-r
-}
 endef
-export R_SETUP_LOGIC
+export R_SETUP_COMMON_LOGIC
+
+define R_SETUP_INIT_LOGIC
+message("--> Initializing new renv environment...")
+renv::init(bare = TRUE, bioconductor = TRUE, restart = FALSE)
+renv::snapshot(prompt = FALSE, type = "all")
+endef
+export R_SETUP_INIT_LOGIC
 
 setup-r:
 	@echo "Building R env for $(R_KERNEL_NAME)..."
 	@echo "=================================================="
 	@echo 'R_LIBS_SITE="$${CONDA_PREFIX}/lib/R/library"' > .Renviron
 	@export R_LIBS_USER=""; export R_LIBS_SITE=""; \
-	mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "$$R_SETUP_LOGIC"
+	mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "$$R_SETUP_COMMON_LOGIC"
+	@if [ ! -f renv.lock ]; then \
+		mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "$$R_SETUP_INIT_LOGIC"; \
+	else \
+		echo "--> renv.lock found. Delegating to 'make restore-r'..."; \
+		$(MAKE) restore-r;
+	fi
 	@RBASE_VER=$$(mamba list -n $(MAMBA_ENV) "^r-base$$" | awk '/r-base/ {print $$2}'); \
 	RENV_VER=$$(mamba list -n $(MAMBA_ENV) "^r-renv$$" | awk '/r-renv/ {print $$2}'); \
 	IRKERNEL_VER=$$(mamba list -n $(MAMBA_ENV) "^r-irkernel$$" | awk '/r-irkernel/ {print $$2}'); \
