@@ -400,7 +400,6 @@ init:
 		mamba env update -f environment.yml --prune -y; \
 	fi
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
-	@$(MAKE) add-py $(PY_CORE)
 	@$(MAKE) add-pydev $(PYDEV_CORE)
 	mamba run -n $(MAMBA_ENV) poetry install
 	mamba run -n $(MAMBA_ENV) git init
