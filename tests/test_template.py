@@ -2,6 +2,7 @@
 Test for BasalCell template generation
 """
 
+import json
 import subprocess
 
 import pytest
@@ -90,14 +91,26 @@ def minimal_tests(result, fixture_essential_files, fixture_symbolic_links, slug,
         result.exception is None
     ), f"FAILED in #2! Invalid exception; expected None, got {result.exception}"
 
-    print("===== #3. Checking project path name =====")
+    print("===== #3. Checking project directory path =====")
     path = result.project_path.name
     assert (
         path == f"Test_Project_CI_CD_{idx}"
-    ), f"FAILED in #3! Invalid path; expected `Test_Project_CI_CD_{idx}`, got {path}"
+    ), f"FAILED in #3-1! Invalid path; expected `Test_Project_CI_CD_{idx}`, got {path}"
 
-    print("===== #4. Checking project path is a directory =====")
-    assert result.project_path.is_dir(), f"FAILED in #4! {path} is not a directory"
+    assert result.project_path.is_dir(), f"FAILED in #3-2! {path} is not a directory"
+
+    print("===== #4. Checking Mamba environment =====")
+    expected_env_name = f"mamba_{result.project_path.name.lower()}"
+    mamba_proc = subprocess.run(
+        ["mamba", "env", "list", "--json"], capture_output=True, text=True, check=True
+    )
+    env_paths = json.loads(mamba_proc.stdout).get("envs", [])
+    env_exists = any(
+        path.endswith(f"/{expected_env_name}")
+        or path.endswith(f"\\{expected_env_name}")
+        for path in env_paths
+    )
+    assert env_exists, f"FAILED in #4! {expected_env_name} is not found in {env_paths}"
 
     print("===== #5. Checking essential files =====")
     for i, file in enumerate(fixture_essential_files):
@@ -142,7 +155,16 @@ def minimal_tests(result, fixture_essential_files, fixture_symbolic_links, slug,
 
 def test_correct_template(cookies, essential_files, symbolic_links, prj_slug):
     result = cookies.bake(extra_context={"project_name": "Test Project-CI/CD-1"})
-    minimal_tests(result, essential_files, symbolic_links, prj_slug, 1)
+    env_name = f"mamba_{result.project_path.name.lower()}"
+    try:
+        minimal_tests(result, essential_files, symbolic_links, prj_slug, 1)
+    finally:
+        subprocess.run(
+            ["mamba", "env", "remove", "-n", env_name, "-y"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
 
 
 def test_correct_template_for_package_mode(
@@ -157,15 +179,24 @@ def test_correct_template_for_package_mode(
             "create_package": "true",
         }
     )
+    env_name = f"mamba_{result.project_path.name.lower()}"
+    try:
+        minimal_tests(result, essential_files, symbolic_links, prj_slug, 2)
 
-    minimal_tests(result, essential_files, symbolic_links, prj_slug, 2)
+        print("===== #10. Checking Package files =====")
+        path = result.project_path.name
+        project_slug = path.lower()
+        file = f"src/{project_slug}/__init__.py"
+        file_path = result.project_path / file
+        assert file_path.exists(), f"FAILED in #10! {file} is not found in {path}"
 
-    print("===== #10. Checking Package files =====")
-    path = result.project_path.name
-    project_slug = path.lower()
-    file = f"src/{project_slug}/__init__.py"
-    file_path = result.project_path / file
-    assert file_path.exists(), f"FAILED in #10! {file} is not found in {path}"
+    finally:
+        subprocess.run(
+            ["mamba", "env", "remove", "-n", env_name, "-y"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
 
 
 def test_correct_template_with_rlang(
@@ -177,49 +208,57 @@ def test_correct_template_with_rlang(
             "r_ver": "4.4",
         }
     )
-
-    minimal_tests(result, essential_files, rlang_symbolic_links, prj_slug, 3)
-
-    print("===== #10. Checking R files =====")
-    path = result.project_path.name
-    for i, file in enumerate(rlang_files):
-        file = (file).replace(prj_slug, path.lower())
-        file_path = result.project_path / file
-        assert (
-            file_path.exists()
-        ), f"FAILED in #10-{i + 1}! {file} is not found in {path}"
-
-    print("===== #11–12. Checking environment.yml =====")
-    env_file = result.project_path / "environment.yml"
-    with open(env_file, "r") as f:
-        env_data = yaml.safe_load(f)
-    dependencies = env_data.get("dependencies", [])
-
-    assert any(
-        isinstance(dep, str) and dep.startswith("r-base=") for dep in dependencies
-    ), f"FAILED in #11! r-base not found in dependencies: {dependencies}"
-
-    unpinned_r_pkgs = [
-        dep
-        for dep in dependencies
-        if isinstance(dep, str)
-        and (dep.startswith("r-") or dep.startswith("bioconductor-"))
-        and "=" not in dep
-    ]
-
-    assert (
-        len(unpinned_r_pkgs) == 0
-    ), f"FAILED in #12! Unpinned R packages found: {unpinned_r_pkgs}"
-
-    print("===== #13. Checking R Kernel =====")
-    kernel_name = f"{path.lower()}_r"
+    env_name = f"mamba_{result.project_path.name.lower()}"
     try:
-        check_cmd = ["poetry", "run", "jupyter", "kernelspec", "list"]
-        res = subprocess.run(
-            check_cmd, cwd=result.project_path, capture_output=True, text=True
-        )
+        minimal_tests(result, essential_files, rlang_symbolic_links, prj_slug, 3)
+
+        print("===== #10. Checking R files =====")
+        path = result.project_path.name
+        for i, file in enumerate(rlang_files):
+            file = (file).replace(prj_slug, path.lower())
+            file_path = result.project_path / file
+            assert (
+                file_path.exists()
+            ), f"FAILED in #10-{i + 1}! {file} is not found in {path}"
+
+        print("===== #11–12. Checking environment.yml =====")
+        env_file = result.project_path / "environment.yml"
+        with open(env_file, "r") as f:
+            env_data = yaml.safe_load(f)
+        dependencies = env_data.get("dependencies", [])
+
+        assert any(
+            isinstance(dep, str) and dep.startswith("r-base=") for dep in dependencies
+        ), f"FAILED in #11! r-base not found in dependencies: {dependencies}"
+
+        unpinned_r_pkgs = [
+            dep
+            for dep in dependencies
+            if isinstance(dep, str)
+            and (dep.startswith("r-") or dep.startswith("bioconductor-"))
+            and "=" not in dep
+        ]
+
         assert (
-            kernel_name in res.stdout.lower()
-        ), f"FAILED in #13! '{kernel_name}' not found in:\n{res.stdout}"
+            len(unpinned_r_pkgs) == 0
+        ), f"FAILED in #12! Unpinned R packages found: {unpinned_r_pkgs}"
+
+        print("===== #13. Checking R Kernel =====")
+        kernel_name = f"{path.lower()}_r"
+        try:
+            check_cmd = ["poetry", "run", "jupyter", "kernelspec", "list"]
+            res = subprocess.run(
+                check_cmd, cwd=result.project_path, capture_output=True, text=True
+            )
+            assert (
+                kernel_name in res.stdout.lower()
+            ), f"FAILED in #13! '{kernel_name}' not found in:\n{res.stdout}"
+        finally:
+            uninstall_kernel(kernel_name, result.project_path)
     finally:
-        uninstall_kernel(kernel_name, result.project_path)
+        subprocess.run(
+            ["mamba", "env", "remove", "-n", env_name, "-y"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
