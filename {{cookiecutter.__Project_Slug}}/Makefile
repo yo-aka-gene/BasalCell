@@ -191,11 +191,9 @@ setup-r:
 	    .libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); \
 	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $$RBASE_VER ($(R_KERNEL_NAME))', user=TRUE)"
 	@mamba run -n $(MAMBA_ENV) yq -y -i \
-	'.dependencies |= map(select( \
-		type == "object" or \
-		(type == "string" and (test("=") or (test("^(r-|bioconductor-)") | not))) \
-	))' environment.yml
-	@echo "=== R env setup: Done! ==="
+	'.dependencies |= map(select(type == "object" or (type == "string" and (test("=") or (test("^(r-|bioconductor-)") | not)))))' \
+	environment.yml
+    @echo "=== R env setup: Done! ==="
 
 add-r:
 	@mamba run -n $(MAMBA_ENV) bash -c '\
