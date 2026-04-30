@@ -72,7 +72,6 @@
 {%- if cookiecutter.r_ver != "none" %}
     ├── renv.lock                               # detailed R env configuration
     ├── restore_r_env.py                        # helper func to interact with renv
-    ├── setup_r_env.sh                          # helper func for R env setup
 {%- endif %}
     └── README.md                               # this file
 ```
