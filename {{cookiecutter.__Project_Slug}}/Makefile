@@ -46,28 +46,28 @@ sync-os:
 # Python
 # ==========================================
 .PHONY: add-py add-pydev remove-py remove-pydev lock-py install-py
+
+COMMA := ,
+CLEAN_PKG_VAL = $(strip $(subst $(COMMA), ,$(PKG)))
+
 add-py:
-	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
-	mamba run -n $(MAMBA_ENV) \
-		poetry add $$CLEAN_PKG
+	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
+	@mamba run -n $(MAMBA_ENV) poetry add $(CLEAN_PKG_VAL)
 	@$(MAKE) lock-py
 
 add-pydev:
-	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
-	mamba run -n $(MAMBA_ENV) \
-		poetry add --group dev $$CLEAN_PKG
+	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
+	@mamba run -n $(MAMBA_ENV) poetry add --group dev $(CLEAN_PKG_VAL)
 	@$(MAKE) lock-py
 
 remove-py:
-	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
-	mamba run -n $(MAMBA_ENV) \
-		poetry remove $$CLEAN_PKG
+	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
+	@mamba run -n $(MAMBA_ENV) poetry remove $(CLEAN_PKG_VAL)
 	@$(MAKE) lock-py
 
 remove-pydev:
-	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
-	mamba run -n $(MAMBA_ENV) \
-		poetry remove --group dev $$CLEAN_PKG
+	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
+	@mamba run -n $(MAMBA_ENV) poetry remove --group dev $(CLEAN_PKG_VAL)
 	@$(MAKE) lock-py
 
 lock-py:
@@ -134,7 +134,7 @@ terminate:
 # ==========================================
 # R
 # ==========================================
-.PHONY: setup-r add-r add-bioc pin-r restore-r sync-r
+.PHONY: setup-r add-r pin-r restore-r sync-r
 
 R_VERSION := {{ cookiecutter.r_ver }}
 R_KERNEL_NAME := {{ cookiecutter.__Project_Slug }}
@@ -182,41 +182,54 @@ setup-r:
 	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $$RBASE_VER ($(R_KERNEL_NAME))', user=TRUE)"
     @echo "=== R env setup: Done! ==="
 
-add-r:
-	@mamba run -n $(MAMBA_ENV) bash -c '\
-	conda_lib="$$CONDA_PREFIX/lib/R/library"; \
-	export RENV_CONFIG_SANDBOX_ENABLED="false"; \
-	CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
-	for pkg in $$CLEAN_PKG; do \
-		pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]"); \
-		if mamba search -c conda-forge "^r-$$pkg_lower$$" >/dev/null 2>&1; then \
-			mamba install -y "r-$$pkg_lower"; \
-		elif mamba search -c bioconda "^bioconductor-$$pkg_lower$$" >/dev/null 2>&1; then \
-			mamba install -y "bioconductor-$$pkg_lower"; \
-		else \
-			echo "$$pkg not found in Conda. Falling back to Bioconductor/CRAN via renv..."; \
-			Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); options(repos = BiocManager::repositories()); renv::install(\"$$pkg\")"; \
-		fi; \
-	done; \
-	Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); renv::snapshot(prompt=FALSE, type=\"all\", force=TRUE)" \
-	'
 
-add-bioc:
-	@mamba run -n $(MAMBA_ENV) bash -c '\
-	conda_lib="$$CONDA_PREFIX/lib/R/library"; \
-	export RENV_CONFIG_SANDBOX_ENABLED="false"; \
-	CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
-	for pkg in $$CLEAN_PKG; do \
-		pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]"); \
-		if mamba search -c bioconda "^bioconductor-$$pkg_lower$$" >/dev/null 2>&1; then \
-			mamba install -y "bioconductor-$$pkg_lower"; \
-		else \
-			echo "$$pkg not found in Conda. Falling back to Bioconductor/CRAN via renv..."; \
-			Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); options(repos = BiocManager::repositories()); renv::install(\"$$pkg\")"; \
-		fi; \
-	done; \
-	Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); renv::snapshot(prompt=FALSE, type=\"all\", force=TRUE)" \
-	'
+define ADD_R_LOGIC
+#!/bin/bash
+set -e
+conda_lib="$$CONDA_PREFIX/lib/R/library"
+export RENV_CONFIG_SANDBOX_ENABLED="false"
+
+try_mamba_install() {
+    local channel=$$1
+    local prefix=$$2
+    local target_pkg="$${prefix}$$3"
+
+    if mamba search -c "$$channel" "^$${target_pkg}$$" >/dev/null 2>&1; then
+        echo "--> Found $$3 in $$channel. Installing..."
+        mamba install -y -c "$$channel" "$$target_pkg"
+        
+        if ! grep -q -- "- $$target_pkg" environment.yml; then
+            yq -y -i ".dependencies += [\"$$target_pkg\"]" environment.yml
+        fi
+        return 0
+    fi
+    return 1
+}
+
+for pkg in $$CLEAN_PKG; do
+    pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]")
+
+    if try_mamba_install "conda-forge" "r-" "$$pkg_lower"; then
+        continue
+    elif try_mamba_install "bioconda" "bioconductor-" "$$pkg_lower"; then
+        continue
+    else
+        echo "--> $$pkg not found in Conda. Falling back to Bioconductor/CRAN via renv..."
+        Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); options(repos = BiocManager::repositories()); renv::install(\"$$pkg\")"
+    fi
+done
+
+echo "--> Updating renv.lock..."
+Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); renv::snapshot(prompt=FALSE, type='all', force=TRUE)"
+endef
+export ADD_R_LOGIC
+
+aadd-r:
+	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified. Usage: make add-r PKG=seurat"; exit 1; fi
+	@export CLEAN_PKG="$(CLEAN_PKG_VAL)"; export MAMBA_ENV="$(MAMBA_ENV)"; \
+	mamba run -n $(MAMBA_ENV) bash -c "$$ADD_R_LOGIC"
+	@echo "=== Successfully added $(PKG)! ==="
+
 
 define PIN_R_LOGIC
 #!/bin/bash
@@ -231,12 +244,11 @@ for pkg in $$CLEAN_PKG; do
         mamba install -y -c conda-forge "r-$$pkg_lower"
         PKG_VER=$$(mamba list -n "$$MAMBA_ENV" "^r-$$pkg_lower$$" | tail -n 1 | awk '{print $$2}')
 
-        if grep -q -- "- r-$$pkg_lower" environment.yml; then
-            perl -pi -e "s/-\s*\"?r-$$pkg_lower\"?.*$$/- r-$$pkg_lower=$$PKG_VER/" environment.yml
-        else
-            yq -y -i ".dependencies += [\"r-$$pkg_lower=$$PKG_VER\"]" environment.yml
-        fi
-        if ! grep -q "^r-$$pkg_lower[ =]" "$$CONDA_PREFIX/conda-meta/pinned" 2>/dev/null; then
+        if ! grep -q -- "- r-$$pkg_lower" environment.yml; then
+			yq -y -i ".dependencies += [\"r-$$pkg_lower=$$PKG_VER\"]" environment.yml
+			echo "r-$$pkg_lower ==$$PKG_VER" >> "$$CONDA_PREFIX/conda-meta/pinned"
+        elif ! grep -q "^r-$$pkg_lower[ =]" "$$CONDA_PREFIX/conda-meta/pinned" 2>/dev/null; then
+			perl -pi -e "s/-\s*\"?r-$$pkg_lower\"?.*$$/- r-$$pkg_lower=$$PKG_VER/" environment.yml
             echo "r-$$pkg_lower ==$$PKG_VER" >> "$$CONDA_PREFIX/conda-meta/pinned"
         fi
 
@@ -245,12 +257,11 @@ for pkg in $$CLEAN_PKG; do
         mamba install -y -c bioconda "bioconductor-$$pkg_lower"
         PKG_VER=$$(mamba list -n "$$MAMBA_ENV" "^bioconductor-$$pkg_lower$$" | tail -n 1 | awk '{print $$2}')
         
-        if grep -q -- "- bioconductor-$$pkg_lower" environment.yml; then
+        if ! grep -q -- "- bioconductor-$$pkg_lower" environment.yml; then
+			yq -y -i ".dependencies += [\"bioconductor-$$pkg_lower=$$PKG_VER\"]" environment.yml
+			echo "bioconductor-$$pkg_lower ==$$PKG_VER" >> "$$CONDA_PREFIX/conda-meta/pinned"
+        elif ! grep -q "^bioconductor-$$pkg_lower[ =]" "$$CONDA_PREFIX/conda-meta/pinned" 2>/dev/null; then
             perl -pi -e "s/-\s*\"?bioconductor-$$pkg_lower\"?.*$$/- bioconductor-$$pkg_lower=$$PKG_VER/" environment.yml
-        else
-            yq -y -i ".dependencies += [\"bioconductor-$$pkg_lower=$$PKG_VER\"]" environment.yml
-        fi
-        if ! grep -q "^bioconductor-$$pkg_lower[ =]" "$$CONDA_PREFIX/conda-meta/pinned" 2>/dev/null; then
             echo "bioconductor-$$pkg_lower ==$$PKG_VER" >> "$$CONDA_PREFIX/conda-meta/pinned"
         fi
     else
