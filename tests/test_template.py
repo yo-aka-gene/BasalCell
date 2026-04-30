@@ -49,7 +49,6 @@ def rlang_files():
     return [
         ".lintr",
         "restore_r_env.py",
-        "setup_r_env.sh",
         "renv.lock",
         ".Renviron",
         ".Rprofile",

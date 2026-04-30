@@ -131,17 +131,68 @@ terminate:
 # ==========================================
 .PHONY: setup-r add-r add-bioc restore-r sync-r
 
-PROJECT_NAME := $(shell grep '^name = ' pyproject.toml | cut -d '"' -f 2)
-DESCRIPTION_STR := $(shell grep '^description = ' pyproject.toml | cut -d '"' -f 2)
-R_PROFILE_USER := $(DIR_NAME)/.Rprofile
+R_VERSION := {{ cookiecutter.r_ver }}
+R_KERNEL_NAME := {{ cookiecutter.__Project_Slug }}
+
+
+define R_SETUP_LOGIC
+conda_lib <- file.path(Sys.getenv("CONDA_PREFIX"), "lib", "R", "library")
+.libPaths(conda_lib)
+sysname <- Sys.info()[["sysname"]]
+if (sysname == "Linux") {
+    options(repos = c(CRAN = "https://packagemanager.posit.co/cran/__linux__/jammy/latest"), pkgType = "source")
+} else {
+    options(repos = c(CRAN = "https://cloud.r-project.org"), pkgType = "source")
+}
+if (!file.exists("renv.lock")) {
+    message("--> Initializing new renv environment...")
+    renv::init(bare = TRUE, bioconductor = TRUE, restart = FALSE)
+    renv::snapshot(prompt = FALSE, type = "all")
+} else {
+    message("--> Restoring from renv.lock...")
+    renv::restore(prompt = FALSE)
+}
+endef
+export R_SETUP_LOGIC
 
 setup-r:
+	@echo "Building R env for $(R_KERNEL_NAME)..."
+	@echo "=================================================="
 	@echo 'R_LIBS_SITE="$${CONDA_PREFIX}/lib/R/library"' > .Renviron
-	@if [ -f setup_r_env.sh ]; then \
-		echo "Found setup_r_env.sh. Setting up R environment..."; \
-		chmod +x setup_r_env.sh; \
-		mamba run -n $(MAMBA_ENV) ./setup_r_env.sh; \
-	fi
+	@export R_LIBS_USER=""; export R_LIBS_SITE=""; \
+	mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "$$R_SETUP_LOGIC"
+	@RBASE_VER=$$(mamba list -n $(MAMBA_ENV) "^r-base$$" | awk '/r-base/ {print $$2}'); \
+	RENV_VER=$$(mamba list -n $(MAMBA_ENV) "^r-renv$$" | awk '/r-renv/ {print $$2}'); \
+	IRKERNEL_VER=$$(mamba list -n $(MAMBA_ENV) "^r-irkernel$$" | awk '/r-irkernel/ {print $$2}'); \
+	TESTTHAT_VER=$$(mamba list -n $(MAMBA_ENV) "^r-testthat$$" | awk '/r-testthat/ {print $$2}'); \
+	STYLER_VER=$$(mamba list -n $(MAMBA_ENV) "^r-styler$$" | awk '/r-styler/ {print $$2}'); \
+	LINTR_VER=$$(mamba list -n $(MAMBA_ENV) "^r-lintr$$" | awk '/r-lintr/ {print $$2}'); \
+	DEVTOOLS_VER=$$(mamba list -n $(MAMBA_ENV) "^r-devtools$$" | awk '/r-devtools/ {print $$2}'); \
+	PKGDOWN_VER=$$(mamba list -n $(MAMBA_ENV) "^r-pkgdown$$" | awk '/r-pkgdown/ {print $$2}'); \
+	ROXYGEN_VER=$$(mamba list -n $(MAMBA_ENV) "^r-roxygen2$$" | awk '/r-roxygen2/ {print $$2}'); \
+	RMARKDOWN_VER=$$(mamba list -n $(MAMBA_ENV) "^r-rmarkdown$$" | awk '/r-rmarkdown/ {print $$2}'); \
+	KNITR_VER=$$(mamba list -n $(MAMBA_ENV) "^r-knitr$$" | awk '/r-knitr/ {print $$2}'); \
+	mamba run -n $(MAMBA_ENV) bash -c "echo 'r-base =='$$RBASE_VER > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
+	perl -pi -e "s/- \"?r-base\"?$$/- r-base=$$RBASE_VER/; \
+	             s/- \"?r-renv\"?$$/- r-renv=$$RENV_VER/; \
+				 s/- \"?r-irkernel\"?$$/- r-irkernel=$$IRKERNEL_VER/; \
+				 s/- \"?r-testthat\"?$$/- r-testthat=$$TESTTHAT_VER/; \
+				 s/- \"?r-styler\"?$$/- r-styler=$$STYLER_VER/; \
+				 s/- \"?r-lintr\"?$$/- r-lintr=$$LINTR_VER/; \
+				 s/- \"?r-devtools\"?$$/- r-devtools=$$DEVTOOLS_VER/; \
+				 s/- \"?r-pkgdown\"?$$/- r-pkgdown=$$PKGDOWN_VER/; \
+				 s/- \"?r-roxygen2\"?$$/- r-roxygen2=$$ROXYGEN2_VER/; \
+				 s/- \"?r-rmarkdown\"?$$/- r-rmarkdown=$$RMARKDOWN_VER/; \
+	             s/- \"?r-knitr\"?$$/- r-knitr=$$KNITR_VER/" environment.yml; \
+	echo "--> Registering IRkernel..."; \
+	mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "\
+	    .libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); \
+	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $$RBASE_VER ($(R_KERNEL_NAME))', user=TRUE)"
+	@mamba run -n $(MAMBA_ENV) yq -y -i \
+	'.dependencies |= map(select( \
+	    type == "!!map" or test("=") or (test("^(r-|bioconductor-)") | not) \
+	))' environment.yml
+	@echo "=== R env setup: Done! ==="
 
 add-r:
 	@mamba run -n $(MAMBA_ENV) bash -c '\
@@ -182,6 +233,9 @@ add-bioc:
 restore-r:
 	@echo "Restoring R environment from renv.lock..."
 	mamba run -n $(MAMBA_ENV) python restore_r_env.py
+
+PROJECT_NAME := $(shell grep '^name = ' pyproject.toml | cut -d '"' -f 2)
+DESCRIPTION_STR := $(shell grep '^description = ' pyproject.toml | cut -d '"' -f 2)
 
 sync-r:
 	@echo "Syncing package metadata to DESCRIPTION..."
@@ -231,6 +285,8 @@ test-r:
 		Rscript -e "renv::load('$(CURDIR)'); devtools::test('{{cookiecutter.__project_slug}}_rtools')"
 
 test: test-py test-r
+
+R_PROFILE_USER := $(DIR_NAME)/.Rprofile
 
 docs-r: sync-r
 	@echo "Generating R documentation (roxygen2 & pkgdown)..."
