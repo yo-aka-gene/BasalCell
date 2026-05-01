@@ -7,7 +7,7 @@ MAMBA_ENV := mamba_{{cookiecutter.__project_slug}}
 DIR_NAME := $(shell basename $(CURDIR))
 PY_KERNEL := $(DIR_NAME)_py
 VERSION := $(shell grep '^version = ' pyproject.toml | cut -d '"' -f 2)
-
+PYTHON_VERSION := {{cookiecutter.python_ve}}
 
 define LAUNCH_JUPYTER_LOGIC
 import os
@@ -210,6 +210,7 @@ init:
 		mamba env update -f environment.yml --prune -y; \
 	fi
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
+	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VER > \"\$$CONDA_PREFIX/conda-meta/pinned\""
 	@$(MAKE) add-pydev PKG="$(PYDEV_CORE)"
 	mamba run -n $(MAMBA_ENV) poetry install
 	mamba run -n $(MAMBA_ENV) git init -b main
@@ -507,6 +508,7 @@ init:
 		mamba env update -f environment.yml --prune -y; \
 	fi
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
+	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VER > \"\$$CONDA_PREFIX/conda-meta/pinned\""
 	@$(MAKE) add-pydev PKG="$(PYDEV_CORE)"
 	mamba run -n $(MAMBA_ENV) poetry install
 	mamba run -n $(MAMBA_ENV) git init -b main
