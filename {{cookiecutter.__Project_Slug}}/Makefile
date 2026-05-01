@@ -78,17 +78,16 @@ install-py:
 	@echo "Installing Python dependencies from lock file..."
 	mamba run -n $(MAMBA_ENV) poetry install
 
+PYDEV_CORE := ipykernel ipywidgets jupyterlab jupyter-resource-usage \
+			  pytest mypy ruff pre-commit \
+			  sphinx sphinx-rtd-theme sphinx-gallery nbsphinx numpydoc myst-parser pandoc \
+			  polars pyarrow PyYAML
 
 {%- if cookiecutter.r_ver == "none" %}
 # ==========================================
 # Advanced Project Management (Python)
 # ==========================================
 .PHONY: init docs test terminate
-
-PYDEV_CORE := ipykernel ipywidgets jupyterlab jupyter-resource-usage \
-			  pytest mypy ruff pre-commit \
-			  sphinx sphinx-rtd-theme sphinx-gallery nbsphinx numpydoc myst-parser pandoc \
-			  polars pyarrow PyYAML
 
 init:
 	@echo "Starting project environment setup..."
@@ -400,9 +399,9 @@ init:
 		mamba env update -f environment.yml --prune -y; \
 	fi
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
-	@$(MAKE) add-pydev $(PYDEV_CORE)
+	@$(MAKE) add-pydev PKG="$(PYDEV_CORE)"
 	mamba run -n $(MAMBA_ENV) poetry install
-	mamba run -n $(MAMBA_ENV) git init
+	mamba run -n $(MAMBA_ENV) git init -b main
 	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
 	mamba run -n $(MAMBA_ENV) \
 		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
