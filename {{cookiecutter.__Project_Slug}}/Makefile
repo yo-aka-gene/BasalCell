@@ -296,19 +296,25 @@ set -e
 conda_lib="$$CONDA_PREFIX/lib/R/library"
 export RENV_CONFIG_SANDBOX_ENABLED="false"
 
+SUCCESS_PKGS=""
+
 try_mamba_install() {
     local channel=$$1
     local prefix=$$2
     local target_pkg="$${prefix}$$3"
 
-    if mamba search -c "$$channel" "^$${target_pkg}$$" >/dev/null 2>&1; then
-        echo "--> Found $$3 in $$channel. Installing..."
-        mamba install -y -c "$$channel" "$$target_pkg"
-        
-        if ! grep -q -- "- $$target_pkg" environment.yml; then
-            yq -y -i ".dependencies += [\"$$target_pkg\"]" environment.yml
+    local search_res
+    search_res=$$(mamba search -c "$$channel" "^$${target_pkg}$$" 2>/dev/null | grep -v -i "No match" | grep "$${target_pkg}" || true)
+
+    if mamba install --dry-run -q -y -c "$$channel" "$$target_pkg" >/dev/null 2>&1; then
+        echo "--> Found $$3 in $$channel. Attempting to install..."
+
+        if mamba install -y -c "$$channel" "$$target_pkg"; then
+            if ! grep -q -- "- $$target_pkg" environment.yml; then
+                yq -y -i ".dependencies += [\"$$target_pkg\"]" environment.yml
+            fi
+            return 0
         fi
-        return 0
     fi
     return 1
 }
@@ -317,17 +323,27 @@ for pkg in $$CLEAN_PKG; do
     pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]")
 
     if try_mamba_install "conda-forge" "r-" "$$pkg_lower"; then
-        continue
+        SUCCESS_PKGS="$$SUCCESS_PKGS $$pkg"
     elif try_mamba_install "bioconda" "bioconductor-" "$$pkg_lower"; then
-        continue
+        SUCCESS_PKGS="$$SUCCESS_PKGS $$pkg"
     else
-        echo "--> $$pkg not found in Conda. Falling back to Bioconductor/CRAN via renv..."
-        Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); options(repos = BiocManager::repositories()); renv::install(\"$$pkg\")"
+        echo "--> $$pkg not found or failed in Conda. Falling back to Bioconductor/CRAN via renv..."
+        if Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); options(repos = BiocManager::repositories()); renv::install(\"$$pkg\")"; then
+            SUCCESS_PKGS="$$SUCCESS_PKGS $$pkg"
+        else
+            echo "--> [Error] Completely failed to install $$pkg via all methods. Skipping."
+        fi
     fi
 done
 
 echo "--> Updating renv.lock..."
 Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); renv::snapshot(prompt=FALSE, type='all', force=TRUE)"
+
+if [ -n "$$SUCCESS_PKGS" ]; then
+    echo "Successfully added:$$SUCCESS_PKGS"
+else
+    echo "No packages were successfully installed."
+fi
 endef
 export ADD_R_LOGIC
 
@@ -335,7 +351,6 @@ add-r:
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified. Usage: make add-r PKG=seurat"; exit 1; fi
 	@export CLEAN_PKG="$(CLEAN_PKG_VAL)"; export MAMBA_ENV="$(MAMBA_ENV)"; \
 	mamba run -n $(MAMBA_ENV) bash -c "$$ADD_R_LOGIC"
-	@echo "=== Successfully added $(PKG)! ==="
 
 
 define PIN_R_LOGIC
