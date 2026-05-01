@@ -1,8 +1,11 @@
-.PHONY: test patch minor major
+.PHONY: test demo patch minor major
 
 test:
 	poetry run pytest -s tests/*
 	rm -fr .pytest_cache
+
+demo:
+	cd /tmp && cookiecutter $(CURDIR)
 
 
 patch:
