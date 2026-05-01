@@ -35,6 +35,7 @@ def essential_files():
         "Makefile",
         "pyproject.toml",
         "README.md",
+        ".basalcell/.gitkeep",
         ".github/workflows/test.yml",
         ".github/pull_request_template.md",
         "REPLACETHIS_tools/__init__.py",
