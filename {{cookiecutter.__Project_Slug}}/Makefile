@@ -330,7 +330,7 @@ Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); renv::snapshot(prompt=FALSE, t
 endef
 export ADD_R_LOGIC
 
-aadd-r:
+add-r:
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified. Usage: make add-r PKG=seurat"; exit 1; fi
 	@export CLEAN_PKG="$(CLEAN_PKG_VAL)"; export MAMBA_ENV="$(MAMBA_ENV)"; \
 	mamba run -n $(MAMBA_ENV) bash -c "$$ADD_R_LOGIC"
