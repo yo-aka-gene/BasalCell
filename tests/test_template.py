@@ -15,6 +15,16 @@ def prj_slug():
 
 
 @pytest.fixture
+def essential_chs():
+    return ["conda-forge", "bioconda", "nodefaults"]
+
+
+@pytest.fixture
+def essential_deps():
+    return ["python", "poetry", "make", "git", "yq"]
+
+
+@pytest.fixture
 def essential_files():
     return [
         ".gitignore",
@@ -42,6 +52,25 @@ def symbolic_links():
     return [
         "docs/jupyternb/data",
         "docs/jupyternb/REPLACETHIS_tools",
+    ]
+
+
+@pytest.fixture
+def rlang_deps():
+    return [
+        "r-base",
+        "r-renv",
+        "r-irkernel",
+        "r-testthat",
+        "r-styler",
+        "r-lintr",
+        "r-devtools",
+        "r-pkgdown",
+        "r-roxygen2",
+        "r-rmarkdown",
+        "r-knitr",
+        "r-biocmanager",
+        "bioconductor-biocversion",
     ]
 
 
@@ -78,7 +107,15 @@ def uninstall_kernel(name, cwd):
     subprocess.run(uninstall_cmd, cwd=cwd, capture_output=True, text=True)
 
 
-def minimal_tests(result, fixture_essential_files, fixture_symbolic_links, slug, idx):
+def minimal_tests(
+    result,
+    fixture_essential_chs,
+    fixture_essential_deps,
+    fixture_essential_files,
+    fixture_symbolic_links,
+    slug,
+    idx,
+):
     print("===== #1. Checking exit code =====")
     if result.exit_code != 0:
         raise result.exception
@@ -110,7 +147,26 @@ def minimal_tests(result, fixture_essential_files, fixture_symbolic_links, slug,
         or path.endswith(f"\\{expected_env_name}")
         for path in env_paths
     )
-    assert env_exists, f"FAILED in #4! {expected_env_name} is not found in {env_paths}"
+    assert (
+        env_exists
+    ), f"FAILED in #4-1! {expected_env_name} is not found in {env_paths}"
+
+    env_file = result.project_path / "environment.yml"
+    with open(env_file, "r") as f:
+        env_data = yaml.safe_load(f)
+    channels = env_data.get("channels", [])
+    dependencies = env_data.get("dependencies", [])
+
+    for i, ch in enumerate(fixture_essential_chs):
+        assert any(
+            isinstance(dep, str) and dep.startswith(f"{ch}") for dep in channels
+        ), f"FAILED in #4-{i + 2}! {ch} not found in channels: {channels}"
+
+    for i, pkg in enumerate(fixture_essential_deps):
+        assert any(
+            isinstance(dep, str) and dep.startswith(f"{pkg}") for dep in dependencies
+        ), f"FAILED in #12-{i + 2 + len(fixture_essential_chs)}! {pkg} not found"
+        " in dependencies: {dependencies}"
 
     print("===== #5. Checking essential files =====")
     for i, file in enumerate(fixture_essential_files):
@@ -153,11 +209,21 @@ def minimal_tests(result, fixture_essential_files, fixture_symbolic_links, slug,
         uninstall_kernel(kernel_name, result.project_path)
 
 
-def test_correct_template(cookies, essential_files, symbolic_links, prj_slug):
+def test_correct_template(
+    cookies, essential_chs, essential_deps, essential_files, symbolic_links, prj_slug
+):
     result = cookies.bake(extra_context={"project_name": "Test Project-CI/CD-1"})
     env_name = f"mamba_{result.project_path.name.lower()}"
     try:
-        minimal_tests(result, essential_files, symbolic_links, prj_slug, 1)
+        minimal_tests(
+            result,
+            essential_chs,
+            essential_deps,
+            essential_files,
+            symbolic_links,
+            prj_slug,
+            1,
+        )
     finally:
         subprocess.run(
             ["mamba", "env", "remove", "-n", env_name, "-y"],
@@ -168,7 +234,7 @@ def test_correct_template(cookies, essential_files, symbolic_links, prj_slug):
 
 
 def test_correct_template_for_package_mode(
-    cookies, essential_files, symbolic_links, prj_slug
+    cookies, essential_chs, essential_deps, essential_files, symbolic_links, prj_slug
 ):
     result = cookies.bake(
         extra_context={
@@ -181,7 +247,15 @@ def test_correct_template_for_package_mode(
     )
     env_name = f"mamba_{result.project_path.name.lower()}"
     try:
-        minimal_tests(result, essential_files, symbolic_links, prj_slug, 2)
+        minimal_tests(
+            result,
+            essential_chs,
+            essential_deps,
+            essential_files,
+            symbolic_links,
+            prj_slug,
+            2,
+        )
 
         print("===== #10. Checking Package files =====")
         path = result.project_path.name
@@ -200,7 +274,14 @@ def test_correct_template_for_package_mode(
 
 
 def test_correct_template_with_rlang(
-    cookies, essential_files, rlang_symbolic_links, rlang_files, prj_slug
+    cookies,
+    essential_chs,
+    essential_deps,
+    essential_files,
+    rlang_symbolic_links,
+    rlang_files,
+    prj_slug,
+    rlang_deps,
 ):
     result = cookies.bake(
         extra_context={
@@ -210,40 +291,18 @@ def test_correct_template_with_rlang(
     )
     env_name = f"mamba_{result.project_path.name.lower()}"
     try:
-        minimal_tests(result, essential_files, rlang_symbolic_links, prj_slug, 3)
+        minimal_tests(
+            result,
+            essential_chs,
+            essential_deps + rlang_deps,
+            essential_files + rlang_files,
+            rlang_symbolic_links,
+            prj_slug,
+            3,
+        )
 
-        print("===== #10. Checking R files =====")
+        print("===== #10. Checking R Kernel =====")
         path = result.project_path.name
-        for i, file in enumerate(rlang_files):
-            file = (file).replace(prj_slug, path.lower())
-            file_path = result.project_path / file
-            assert (
-                file_path.exists()
-            ), f"FAILED in #10-{i + 1}! {file} is not found in {path}"
-
-        print("===== #11–12. Checking environment.yml =====")
-        env_file = result.project_path / "environment.yml"
-        with open(env_file, "r") as f:
-            env_data = yaml.safe_load(f)
-        dependencies = env_data.get("dependencies", [])
-
-        assert any(
-            isinstance(dep, str) and dep.startswith("r-base=") for dep in dependencies
-        ), f"FAILED in #11! r-base not found in dependencies: {dependencies}"
-
-        unpinned_r_pkgs = [
-            dep
-            for dep in dependencies
-            if isinstance(dep, str)
-            and (dep.startswith("r-") or dep.startswith("bioconductor-"))
-            and "=" not in dep
-        ]
-
-        assert (
-            len(unpinned_r_pkgs) == 0
-        ), f"FAILED in #12! Unpinned R packages found: {unpinned_r_pkgs}"
-
-        print("===== #13. Checking R Kernel =====")
         kernel_name = f"{path.lower()}_r"
         try:
             check_cmd = ["poetry", "run", "jupyter", "kernelspec", "list"]
@@ -252,7 +311,7 @@ def test_correct_template_with_rlang(
             )
             assert (
                 kernel_name in res.stdout.lower()
-            ), f"FAILED in #13! '{kernel_name}' not found in:\n{res.stdout}"
+            ), f"FAILED in #10! '{kernel_name}' not found in:\n{res.stdout}"
         finally:
             uninstall_kernel(kernel_name, result.project_path)
     finally:
