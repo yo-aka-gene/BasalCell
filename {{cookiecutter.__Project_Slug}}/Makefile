@@ -520,6 +520,8 @@ sync-r:
 # ==========================================
 .PHONY: init test-py test-r test docs-r docs-py docs terminate
 
+R_PKG_DIR := {{cookiecutter.__project_slug}}_rtools
+
 init:
 	@if ! command -v mamba >/dev/null 2>&1; then \
 		echo "mamba is not installed. Please install it first."; \
@@ -549,23 +551,25 @@ test-py:
 
 test-r:
 	@echo "Running R tests..."
-	mamba run -n $(MAMBA_ENV) \
-		Rscript -e "\
+	@mamba run -n $(MAMBA_ENV) \
+		Rscript -e " \
+		Sys.setenv(RENV_CONFIG_SYNCHRONIZED_CHECK='false'); \
 		renv::load('$(CURDIR)'); \
 		.libPaths(c(.libPaths(), file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library'))); \
-		devtools::test('{{cookiecutter.__project_slug}}_rtools')"
+		Sys.setenv(R_LIBS = paste(.libPaths(), collapse = .Platform[['path.sep']])); \
+		devtools::test('$(R_PKG_DIR)')"
 
 test: test-py test-r
 
-R_PROFILE_USER := $(DIR_NAME)/.Rprofile
-
 docs-r: sync-r
 	@echo "Generating R documentation (roxygen2 & pkgdown)..."
-	export R_PROFILE_USER; \
-		mamba run -n $(MAMBA_ENV) \
-		Rscript -e "renv::load('$(CURDIR)'); devtools::document('{{cookiecutter.__project_slug}}_rtools')"; \
-		mamba run -n $(MAMBA_ENV) \
-		Rscript -e "renv::load('$(CURDIR)'); pkgdown::build_site(override = list(destination = '../docs/r_api'))"
+	@mamba run -n $(MAMBA_ENV) \
+		Rscript -e " \
+		Sys.setenv(RENV_CONFIG_SYNCHRONIZED_CHECK='false'); \
+		renv::load('$(CURDIR)'); \
+		.libPaths(c(.libPaths(), file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library'))); \
+		devtools::document('$(R_PKG_DIR)'); \
+		pkgdown::build_site(pkg = '$(R_PKG_DIR)', override = list(destination = '../docs/r_api'), new_process = FALSE, install = FALSE)"
 
 docs-py:
 	@echo "Building Sphinx HTML documentation..."
