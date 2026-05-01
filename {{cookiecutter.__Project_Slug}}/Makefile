@@ -550,7 +550,10 @@ test-py:
 test-r:
 	@echo "Running R tests..."
 	mamba run -n $(MAMBA_ENV) \
-		Rscript -e "renv::load('$(CURDIR)'); devtools::test('{{cookiecutter.__project_slug}}_rtools')"
+		Rscript -e "\
+		renv::load('$(CURDIR)'); \
+		.libPaths(c(.libPaths(), file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library'))); \
+		devtools::test('{{cookiecutter.__project_slug}}_rtools')"
 
 test: test-py test-r
 
