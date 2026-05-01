@@ -356,55 +356,64 @@ add-r:
 define PIN_R_LOGIC
 #!/bin/bash
 set -e
-CLEAN_PKG=$$(echo "$$PKG" | tr "," " " | tr -s " ")
 
-for pkg in $$CLEAN_PKG; do
-    pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]")
+search_and_pin() {
+    local prefix=$$1
+    local pkg_name="$${prefix}$$2"
 
-    if mamba search -c conda-forge "^r-$$pkg_lower$$" >/dev/null 2>&1; then
-        echo "--> Found $$pkg in conda-forge. Installing and pinning..."
-        mamba install -y -c conda-forge "r-$$pkg_lower"
-        PKG_VER=$$(mamba list -n "$$MAMBA_ENV" "^r-$$pkg_lower$$" | tail -n 1 | awk '{print $$2}')
+    local version
+    version=$$(mamba list -n "$$MAMBA_ENV" "^$${pkg_name}$$" | grep -v '^#' | grep "$${pkg_name}" | awk '{print $$2}')
 
-        if ! grep -q -- "- r-$$pkg_lower" environment.yml; then
-			yq -y -i ".dependencies += [\"r-$$pkg_lower=$$PKG_VER\"]" environment.yml
-			echo "r-$$pkg_lower ==$$PKG_VER" >> "$$CONDA_PREFIX/conda-meta/pinned"
-        elif ! grep -q "^r-$$pkg_lower[ =]" "$$CONDA_PREFIX/conda-meta/pinned" 2>/dev/null; then
-			perl -pi -e "s/-\s*\"?r-$$pkg_lower\"?.*$$/- r-$$pkg_lower=$$PKG_VER/" environment.yml
-            echo "r-$$pkg_lower ==$$PKG_VER" >> "$$CONDA_PREFIX/conda-meta/pinned"
+    if [ -n "$$version" ]; then
+        echo "--> Successfully pinned: $$pkg_name == $$version!"
+
+        if ! grep -q "^ *- $${pkg_name}" environment.yml; then
+            yq -y -i ".dependencies += [\"$${pkg_name}=$$version\"]" environment.yml
+        else
+            perl -pi -e "s/^(\s*-\s*\"?)$${pkg_name}(\"?[=>~]?.*)$$/\1$${pkg_name}=$$version/" environment.yml
         fi
 
-    elif mamba search -c bioconda "^bioconductor-$$pkg_lower$$" >/dev/null 2>&1; then
-        echo "--> Found $$pkg in bioconda. Installing and pinning..."
-        mamba install -y -c bioconda "bioconductor-$$pkg_lower"
-        PKG_VER=$$(mamba list -n "$$MAMBA_ENV" "^bioconductor-$$pkg_lower$$" | tail -n 1 | awk '{print $$2}')
-        
-        if ! grep -q -- "- bioconductor-$$pkg_lower" environment.yml; then
-			yq -y -i ".dependencies += [\"bioconductor-$$pkg_lower=$$PKG_VER\"]" environment.yml
-			echo "bioconductor-$$pkg_lower ==$$PKG_VER" >> "$$CONDA_PREFIX/conda-meta/pinned"
-        elif ! grep -q "^bioconductor-$$pkg_lower[ =]" "$$CONDA_PREFIX/conda-meta/pinned" 2>/dev/null; then
-            perl -pi -e "s/-\s*\"?bioconductor-$$pkg_lower\"?.*$$/- bioconductor-$$pkg_lower=$$PKG_VER/" environment.yml
-            echo "bioconductor-$$pkg_lower ==$$PKG_VER" >> "$$CONDA_PREFIX/conda-meta/pinned"
+        mkdir -p "$$CONDA_PREFIX/conda-meta"
+        if ! grep -q "^$${pkg_name}[ =]" "$$CONDA_PREFIX/conda-meta/pinned" 2>/dev/null; then
+            echo "$${pkg_name} ==$$version" >> "$$CONDA_PREFIX/conda-meta/pinned"
+        else
+            perl -pi -e "s/^$${pkg_name}[ =].*$$/$${pkg_name} ==$$version/" "$$CONDA_PREFIX/conda-meta/pinned"
         fi
-    else
-        echo "--> WARNING: $$pkg is not supported in conda-forge or bioconda. Skipping Mamba pin."
+
+        return 0
     fi
-done
+    return 1
+}
 
-echo "--> Updating renv.lock..."
-Rscript --vanilla -e " \
-    conda_lib <- file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library'); \
-    .libPaths(conda_lib); \
-    renv::snapshot(prompt=FALSE, type='all', force=TRUE) \
-"
+PKG_LOWER=$$1
+
+if search_and_pin "r-" "$$PKG_LOWER"; then
+    exit 0
+elif search_and_pin "bioconductor-" "$$PKG_LOWER"; then
+    exit 0
+else
+    exit 1
+fi
 endef
 export PIN_R_LOGIC
 
 pin-r:
-	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified. Usage: make pin PKG=seurat"; exit 1; fi
-	@export PKG="$(PKG)"; export MAMBA_ENV="$(MAMBA_ENV)"; \
-	mamba run -n $(MAMBA_ENV) bash -c "$$PIN_R_LOGIC"
-	@echo "=== Pinning complete! ==="
+	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified. Usage: make pin-r PKG=seurat"; exit 1; fi
+	@for pkg in $(CLEAN_PKG_VAL); do \
+		pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]"); \
+		echo "------------------------------------------------------------"; \
+		echo "Processing $$pkg..."; \
+		if mamba run -n $(MAMBA_ENV) bash -c "$$PIN_R_LOGIC" _ "$$pkg_lower"; then \
+			continue; \
+		else \
+			echo "--> $$pkg is not installed yet. Calling add-r to install it first..."; \
+			$(MAKE) add-r PKG="$$pkg"; \
+			mamba run -n $(MAMBA_ENV) bash -c "$$PIN_R_LOGIC" _ "$$pkg_lower" || true; \
+		fi; \
+	done
+	@echo "Pinning complete!"
+	@echo "Packages that were never installed were automatically added."
+	@echo "Note: Packages falling back to renv (CRAN/Bioc) are not managed by Mamba and cannot be pinned..."
 
 
 define RESTORE_R_LOGIC
