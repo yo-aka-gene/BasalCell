@@ -31,6 +31,7 @@ minor:
 	git push origin main; \
 	git push origin --tags
 
+
 major:
 	@OLD_VER=$$(poetry version -s); \
 	poetry version major; \
