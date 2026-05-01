@@ -21,7 +21,19 @@ def essential_chs():
 
 @pytest.fixture
 def essential_deps():
-    return ["python", "poetry", "make", "git", "yq"]
+    return [
+        "python",
+        "poetry",
+        "make",
+        "git",
+        "yq",
+        "cmake",
+        "c-compiler",
+        "cxx-compiler",
+        "llvmdev",
+        "llvmlite",
+        "numba",
+    ]
 
 
 @pytest.fixture

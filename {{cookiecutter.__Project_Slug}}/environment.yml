@@ -9,6 +9,12 @@ dependencies:
   - make
   - git >=2.30.0
   - yq
+  - cmake
+  - c-compiler
+  - cxx-compiler
+  - llvmdev
+  - llvmlite
+  - numba
 {%- if cookiecutter.r_ver != "none" %}
   - r-base={{cookiecutter.r_ver}}
   - r-renv
