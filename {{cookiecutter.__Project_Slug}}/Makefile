@@ -95,7 +95,7 @@ init:
 		echo "mamba is not installed. Please install it first."; \
 		exit 1; \
 	fi
-	@if ! mamba env list | grep -q $(MAMBA_ENV); then \
+	@if [ ! -d "$$(mamba info --base)/envs/$(MAMBA_ENV)" ]; then \
 		mamba env create -f environment.yml -y; \
 	else \
 		echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
