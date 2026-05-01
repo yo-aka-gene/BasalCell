@@ -43,7 +43,6 @@ def essential_files():
         ".pre-commit-config.yaml",
         ".readthedocs.yaml",
         "environment.yml",
-        "launch_jupyter.py",
         "Makefile",
         "pyproject.toml",
         "README.md",
