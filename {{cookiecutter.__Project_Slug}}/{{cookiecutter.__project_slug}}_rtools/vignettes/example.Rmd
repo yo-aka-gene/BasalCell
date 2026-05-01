@@ -31,7 +31,7 @@ and including the following YAML header tags:
         %\VignetteEncoding{UTF-8}
     ---
 
-    ```{r setup, include=FALSE}
+    ```{r example_setup, include=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -64,6 +64,10 @@ f1 <- function(x) {
 
 f2 <- function(x) {
   x^2
+}
+
+f3 <- function(x) {
+  x^3
 }
 
 v <- 1234
