@@ -6,6 +6,7 @@ channels:
 dependencies:
   - python={{cookiecutter.python_ver}}
   - poetry
+  - poetry-plugin-export
   - make
   - git >=2.30.0
   - yq

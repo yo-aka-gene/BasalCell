@@ -574,7 +574,7 @@ docs-r: sync-r
 docs-py:
 	@echo "Building Sphinx HTML documentation..."
 	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with docs --without-hashes --format=requirements.txt > docs/requirements.txt
+		poetry export --with dev --without-hashes --format=requirements.txt > docs/requirements.txt
 	@mamba run -n $(MAMBA_ENV) \
 		poetry run sphinx-build -b html docs docs/_build/html
 	@echo "Opening documentation in browser..."
@@ -583,6 +583,7 @@ docs-py:
 		"import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
 
 docs: docs-r docs-py
+	@cp -r docs/r_api docs/_build/html/r_api
 
 terminate:
 	mamba env remove -n mamba_basalcelldemodev -y

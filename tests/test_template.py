@@ -24,6 +24,7 @@ def essential_deps():
     return [
         "python",
         "poetry",
+        "poetry-plugin-export",
         "make",
         "git",
         "yq",
