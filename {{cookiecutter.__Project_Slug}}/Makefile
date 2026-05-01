@@ -7,7 +7,7 @@ MAMBA_ENV := mamba_{{cookiecutter.__project_slug}}
 DIR_NAME := $(shell basename $(CURDIR))
 PY_KERNEL := $(DIR_NAME)_py
 VERSION := $(shell grep '^version = ' pyproject.toml | cut -d '"' -f 2)
-PYTHON_VERSION := {{cookiecutter.python_ve}}
+PYTHON_VERSION := {{cookiecutter.python_ver}}
 
 define LAUNCH_JUPYTER_LOGIC
 import os
@@ -210,7 +210,7 @@ init:
 		mamba env update -f environment.yml --prune -y; \
 	fi
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
-	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VER > \"\$$CONDA_PREFIX/conda-meta/pinned\""
+	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""
 	@$(MAKE) add-pydev PKG="$(PYDEV_CORE)"
 	mamba run -n $(MAMBA_ENV) poetry install
 	mamba run -n $(MAMBA_ENV) git init -b main
@@ -287,7 +287,7 @@ setup-r:
 	mamba run -n $(MAMBA_ENV) poetry run Rscript --vanilla -e "\
 	    .libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); \
 	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $$RBASE_VER ($(R_KERNEL_NAME))', user=TRUE)"
-    @echo "=== R env setup: Done! ==="
+	@echo "=== R env setup: Done! ==="
 
 
 define ADD_R_LOGIC
@@ -299,50 +299,50 @@ export RENV_CONFIG_SANDBOX_ENABLED="false"
 SUCCESS_PKGS=""
 
 try_mamba_install() {
-    local channel=$$1
-    local prefix=$$2
-    local target_pkg="$${prefix}$$3"
+	local channel=$$1
+	local prefix=$$2
+	local target_pkg="$${prefix}$$3"
 
-    local search_res
-    search_res=$$(mamba search -c "$$channel" "^$${target_pkg}$$" 2>/dev/null | grep -v -i "No match" | grep "$${target_pkg}" || true)
+	local search_res
+	search_res=$$(mamba search -c "$$channel" "^$${target_pkg}$$" 2>/dev/null | grep -v -i "No match" | grep "$${target_pkg}" || true)
 
-    if mamba install --dry-run -q -y -c "$$channel" "$$target_pkg" >/dev/null 2>&1; then
-        echo "--> Found $$3 in $$channel. Attempting to install..."
+	if mamba install --dry-run -q -y -c "$$channel" "$$target_pkg" >/dev/null 2>&1; then
+		echo "--> Found $$3 in $$channel. Attempting to install..."
 
-        if mamba install -y -c "$$channel" "$$target_pkg"; then
-            if ! grep -q -- "- $$target_pkg" environment.yml; then
-                yq -y -i ".dependencies += [\"$$target_pkg\"]" environment.yml
-            fi
-            return 0
-        fi
-    fi
-    return 1
+		if mamba install -y -c "$$channel" "$$target_pkg"; then
+			if ! grep -q -- "- $$target_pkg" environment.yml; then
+				yq -y -i ".dependencies += [\"$$target_pkg\"]" environment.yml
+			fi
+			return 0
+		fi
+	fi
+	return 1
 }
 
 for pkg in $$CLEAN_PKG; do
-    pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]")
+	pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]")
 
-    if try_mamba_install "conda-forge" "r-" "$$pkg_lower"; then
-        SUCCESS_PKGS="$$SUCCESS_PKGS $$pkg"
-    elif try_mamba_install "bioconda" "bioconductor-" "$$pkg_lower"; then
-        SUCCESS_PKGS="$$SUCCESS_PKGS $$pkg"
-    else
-        echo "--> $$pkg not found or failed in Conda. Falling back to Bioconductor/CRAN via renv..."
-        if Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); options(repos = BiocManager::repositories()); renv::install(\"$$pkg\")"; then
-            SUCCESS_PKGS="$$SUCCESS_PKGS $$pkg"
-        else
-            echo "--> [Error] Completely failed to install $$pkg via all methods. Skipping."
-        fi
-    fi
+	if try_mamba_install "conda-forge" "r-" "$$pkg_lower"; then
+		SUCCESS_PKGS="$$SUCCESS_PKGS $$pkg"
+	elif try_mamba_install "bioconda" "bioconductor-" "$$pkg_lower"; then
+		SUCCESS_PKGS="$$SUCCESS_PKGS $$pkg"
+	else
+		echo "--> $$pkg not found or failed in Conda. Falling back to Bioconductor/CRAN via renv..."
+		if Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); options(repos = BiocManager::repositories()); renv::install(\"$$pkg\")"; then
+			SUCCESS_PKGS="$$SUCCESS_PKGS $$pkg"
+		else
+			echo "--> [Error] Completely failed to install $$pkg via all methods. Skipping."
+		fi
+	fi
 done
 
 echo "--> Updating renv.lock..."
 Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); renv::snapshot(prompt=FALSE, type='all', force=TRUE)"
 
 if [ -n "$$SUCCESS_PKGS" ]; then
-    echo "Successfully added:$$SUCCESS_PKGS"
+	echo "Successfully added:$$SUCCESS_PKGS"
 else
-    echo "No packages were successfully installed."
+	echo "No packages were successfully installed."
 fi
 endef
 export ADD_R_LOGIC
@@ -358,41 +358,41 @@ define PIN_R_LOGIC
 set -e
 
 search_and_pin() {
-    local prefix=$$1
-    local pkg_name="$${prefix}$$2"
+	local prefix=$$1
+	local pkg_name="$${prefix}$$2"
 
-    local version
-    version=$$(mamba list -n "$$MAMBA_ENV" "^$${pkg_name}$$" | grep -v '^#' | grep "$${pkg_name}" | awk '{print $$2}')
+	local version
+	version=$$(mamba list -n "$$MAMBA_ENV" "^$${pkg_name}$$" | grep -v '^#' | grep "$${pkg_name}" | awk '{print $$2}')
 
-    if [ -n "$$version" ]; then
-        echo "--> Successfully pinned: $$pkg_name == $$version!"
+	if [ -n "$$version" ]; then
+		echo "--> Successfully pinned: $$pkg_name == $$version!"
 
-        if ! grep -q "^ *- $${pkg_name}" environment.yml; then
-            yq -y -i ".dependencies += [\"$${pkg_name}=$$version\"]" environment.yml
-        else
-            perl -pi -e "s/^(\s*-\s*\"?)$${pkg_name}(\"?[=>~]?.*)$$/\1$${pkg_name}=$$version/" environment.yml
-        fi
+		if ! grep -q "^ *- $${pkg_name}" environment.yml; then
+			yq -y -i ".dependencies += [\"$${pkg_name}=$$version\"]" environment.yml
+		else
+			perl -pi -e "s/^(\s*-\s*\"?)$${pkg_name}(\"?[=>~]?.*)$$/\1$${pkg_name}=$$version/" environment.yml
+		fi
 
-        mkdir -p "$$CONDA_PREFIX/conda-meta"
-        if ! grep -q "^$${pkg_name}[ =]" "$$CONDA_PREFIX/conda-meta/pinned" 2>/dev/null; then
-            echo "$${pkg_name} ==$$version" >> "$$CONDA_PREFIX/conda-meta/pinned"
-        else
-            perl -pi -e "s/^$${pkg_name}[ =].*$$/$${pkg_name} ==$$version/" "$$CONDA_PREFIX/conda-meta/pinned"
-        fi
+		mkdir -p "$$CONDA_PREFIX/conda-meta"
+		if ! grep -q "^$${pkg_name}[ =]" "$$CONDA_PREFIX/conda-meta/pinned" 2>/dev/null; then
+			echo "$${pkg_name} ==$$version" >> "$$CONDA_PREFIX/conda-meta/pinned"
+		else
+			perl -pi -e "s/^$${pkg_name}[ =].*$$/$${pkg_name} ==$$version/" "$$CONDA_PREFIX/conda-meta/pinned"
+		fi
 
-        return 0
-    fi
-    return 1
+		return 0
+	fi
+	return 1
 }
 
 PKG_LOWER=$$1
 
 if search_and_pin "r-" "$$PKG_LOWER"; then
-    exit 0
+	exit 0
 elif search_and_pin "bioconductor-" "$$PKG_LOWER"; then
-    exit 0
+	exit 0
 else
-    exit 1
+	exit 1
 fi
 endef
 export PIN_R_LOGIC
@@ -532,7 +532,7 @@ init:
 		mamba env update -f environment.yml --prune -y; \
 	fi
 	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
-	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VER > \"\$$CONDA_PREFIX/conda-meta/pinned\""
+	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""
 	@$(MAKE) add-pydev PKG="$(PYDEV_CORE)"
 	mamba run -n $(MAMBA_ENV) poetry install
 	mamba run -n $(MAMBA_ENV) git init -b main
