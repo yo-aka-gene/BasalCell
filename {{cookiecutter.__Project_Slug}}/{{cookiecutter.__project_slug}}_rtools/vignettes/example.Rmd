@@ -77,8 +77,8 @@ w <- 5678
 ### Scalar Multiplication
 - Closure
 ```{r}
-typeof(add_(f1, f2)(v))
-typeof(add_(f1, f2)(w))
+typeof(sca_(f1, f2)(v))
+typeof(sca_(f1, f2)(w))
 ```
 
 ### Summation
