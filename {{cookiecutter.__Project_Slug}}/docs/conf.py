@@ -85,18 +85,8 @@ sys.path.insert(0, os.path.abspath('./jupyternb'))
 nbsphinx_execute = 'never'
 nbsphinx_allow_errors = True
 
-nbsphinx_thumbnails = {
-    "/".join(
-        v.split(".")[:-1]
-    ): v.replace(
-        "jupyternb", "_static"
-    ).replace(
-        "ipynb", "png"
-    ) if os.path.exists(
-        v.replace(
-            "jupyternb", "_static"
-        ).replace(
-            "ipynb", "png"
-        )
-    ) else "_static/default_logo.png" for v in glob.glob("jupyternb/*")
-}
+# nbsphinx_thumbnails = {
+#     # assign your nbsphinx gallery thumbnails if you need them
+#     # e.g,)
+#     # "jupyternb/your_ipynb_name_without_file_extension": "_static/your_custum_thumbnail.png",
+# }
