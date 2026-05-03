@@ -5,7 +5,7 @@
 
 setup-mamba:
 	@echo "Installing 'conda-lock' to 'base' environment..."
-	mamba install -n base -c conda-forge conda-lock -y
+	mamba install -n base -c conda-forge conda-lock yq -y
 
 # ==========================================
 # Basic Project Management
