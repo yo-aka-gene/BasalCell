@@ -1,4 +1,13 @@
 # ==========================================
+# Mamba Setup for BasalCell
+# ==========================================
+.PHONY: setup-mamba
+
+setup-mamba:
+	@echo "Installing 'conda-lock' to 'base' environment..."
+	mamba install -n base -c conda-forge conda-lock -y
+
+# ==========================================
 # Basic Project Management
 # ==========================================
 .PHONY: launch clean bump-patch bump-minor bump-major
@@ -139,7 +148,7 @@ bump-major:
 # ==========================================
 # Mamba
 # ==========================================
-.PHONY: add-os sync-os
+.PHONY: add-os sync-os lock-conda install-conda
 
 add-os:
 	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
@@ -149,6 +158,14 @@ add-os:
 
 sync-os:
 	mamba env update -n $(MAMBA_ENV) -f environment.yml --prune
+
+lock-conda:
+	@echo "Generating conda-lock.yml..."
+	conda-lock -f environment.yml -p osx-arm64 -p linux-64
+
+install-conda:
+	@echo "Reproducing Mamba environment based on the 'conda-lock.yml' file..."
+	conda-lock install -n $(MAMBA_ENV) conda-lock.yml
 
 # ==========================================
 # Python
@@ -162,25 +179,35 @@ add-py:
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
 	@mamba run -n $(MAMBA_ENV) poetry add $(CLEAN_PKG_VAL)
 	@$(MAKE) lock-py
+	@mamba run -n $(MAMBA_ENV) \
+		poetry export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
 add-pydev:
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
 	@mamba run -n $(MAMBA_ENV) poetry add --group dev $(CLEAN_PKG_VAL)
 	@$(MAKE) lock-py
+	@mamba run -n $(MAMBA_ENV) \
+		poetry export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
 remove-py:
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
 	@mamba run -n $(MAMBA_ENV) poetry remove $(CLEAN_PKG_VAL)
 	@$(MAKE) lock-py
+	@mamba run -n $(MAMBA_ENV) \
+		poetry export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
 remove-pydev:
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
 	@mamba run -n $(MAMBA_ENV) poetry remove --group dev $(CLEAN_PKG_VAL)
 	@$(MAKE) lock-py
+	@mamba run -n $(MAMBA_ENV) \
+		poetry export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
 lock-py:
 	@echo "Updating poetry.lock without installing..."
 	mamba run -n $(MAMBA_ENV) poetry lock
+	@mamba run -n $(MAMBA_ENV) \
+		poetry export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
 install-py:
 	@echo "Installing Python dependencies from lock file..."
