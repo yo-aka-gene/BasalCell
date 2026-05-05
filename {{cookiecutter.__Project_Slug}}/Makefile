@@ -10,7 +10,7 @@ setup-mamba:
 # ==========================================
 # Basic Project Management
 # ==========================================
-.PHONY: launch clean bump-patch bump-minor bump-major
+.PHONY: launch clean bump-patch bump-minor bump-major dump-all dump-core dump report
 
 MAMBA_ENV := mamba_{{cookiecutter.__project_slug}}
 DIR_NAME := $(shell basename $(CURDIR))
@@ -151,6 +151,23 @@ define CALL_PY_FUNC
 	args = [arg for arg in '$(2)'.split() if arg]; \
 	$(1)(*args)"
 endef
+export CALL_PY_FUNC
+
+dump-all:
+	@echo "Exporting all dependencies..."
+	@$(call CALL_PY_FUNC,export_all_dependencies,$(EXT))
+
+dump-core:
+	@echo "Exporting essential packages..."
+	@$(call CALL_PY_FUNC,export_essentials,$(EXT))
+
+dump:
+	@echo "Exporting queried packages..."
+	@$(call CALL_PY_FUNC,export,$(KEYS) $(EXT))
+
+report:
+	@echo "Generating human-readable dependency report..."
+	@$(call CALL_PY_FUNC,report,$(KEY))
 
 # ==========================================
 # Mamba
@@ -229,7 +246,7 @@ PYDEV_CORE := ipykernel ipywidgets jupyterlab jupyter-resource-usage \
 # ==========================================
 # Advanced Project Management (Python)
 # ==========================================
-.PHONY: init docs test terminate
+.PHONY: init test docs lock terminate
 
 init:
 	@echo "Starting project environment setup..."
@@ -267,6 +284,8 @@ docs:
 	@mamba run -n $(MAMBA_ENV) \
 		poetry run python -c \
 		"import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
+
+lock: lock-conda lock-py
 
 terminate:
 	mamba env remove -n mamba_basalcelldemodev -y
@@ -476,7 +495,7 @@ sync-r:
 # ==========================================
 # Advanced Project Management (Python & R)
 # ==========================================
-.PHONY: init test-py test-r test docs-r docs-py docs terminate
+.PHONY: init test-py test-r test docs-r docs-py docs lock terminate
 
 R_PKG_DIR := {{cookiecutter.__project_slug}}_rtools
 
@@ -542,6 +561,8 @@ docs-py:
 
 docs: docs-r docs-py
 	@cp -r docs/r_api docs/_build/html/r_api
+
+lock: lock-conda lock-py lock-r
 
 terminate:
 	mamba env remove -n mamba_basalcelldemodev -y
