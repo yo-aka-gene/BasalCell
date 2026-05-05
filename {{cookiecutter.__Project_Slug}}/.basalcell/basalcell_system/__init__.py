@@ -1,4 +1,4 @@
-{%- if cookiecutter.r_ver != "none"}
+{%- if cookiecutter.r_ver != "none" %}
 from ._query import print_renv_targets, query, query_essentials
 from ._read import read_database, read_lookup
 
