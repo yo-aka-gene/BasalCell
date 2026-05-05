@@ -88,19 +88,19 @@ typeof(add_(f1, f2)(v))
 typeof(add_(f1, f2)(w))
 ```
 
-- Commutativity
+#### Commutativity
 ```{r}
 add_(f1, f2)(v) == add_(f2, f1)(v)
 add_(f1, f2)(w) == add_(f2, f1)(w)
 ```
 
-- Associativity
+#### Associativity
 ```{r}
 add_(add_(f1, f2), f3)(v) == add_(f1, add_(f2, f3))(v)
 add_(add_(f1, f2), f3)(w) == add_(f1, add_(f2, f3))(w)
 ```
 
-- Identity Element
+#### Identity Element
 ```{r}
 fis <- function(x) {
   0
@@ -111,7 +111,7 @@ add_(f2, fis)(v) == f2(v)
 add_(f2, fis)(w) == f2(w)
 ```
 
-- Inverse Element
+#### Inverse Element
 ```{r}
 get_inverse <- function(f) {
   sca_(-1, f)
@@ -129,19 +129,19 @@ typeof(mul_(f1, f2)(v))
 typeof(mul_(f1, f2)(w))
 ```
 
-- Commutativity
+#### Commutativity
 ```{r}
 mul_(f1, f2)(v) == mul_(f2, f1)(v)
 mul_(f1, f2)(w) == mul_(f2, f1)(w)
 ```
 
-- Associativity
+#### Associativity
 ```{r}
 mul_(mul_(f1, f2), f3)(v) == mul_(f1, mul_(f2, f3))(v)
 mul_(mul_(f1, f2), f3)(w) == mul_(f1, mul_(f2, f3))(w)
 ```
 
-- Identity Element
+#### Identity Element
 ```{r}
 fim <- function(x) {
   1
