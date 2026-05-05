@@ -121,8 +121,9 @@ for pkg in conda_lock.get("package", []):
     )
 df_conda_lock = pl.DataFrame(lock_pkgs)
 valid_mamba_names = df_conda_lock["name"].to_list()
-
 {%- if cookiecutter.r_ver != "none" %}
+
+
 # renv
 with open(RENV_LOCK, "r") as f:
     renv_lock = json.load(f)
@@ -198,9 +199,9 @@ def read_database() -> pl.LazyFrame:
     return pl.concat([read_poetry_df(), read_renv_df(), read_mamba_df()]).sort(
         ["language", "alias"]
     )
-
-
 {%- else %}
+
+
 df_poetry = read_poetry_df().collect()
 
 

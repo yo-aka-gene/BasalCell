@@ -12,6 +12,7 @@ POETRY_REQUIREMENTS_TXT = SYSTEM_ROOT / "requirements.txt"
 ENVIRONMENT_YML = PROJECT_ROOT / "environment.yml"
 CONDA_LOCK_YML = SYSTEM_ROOT / "conda-lock.yml"
 {%- if cookiecutter.r_ver != "none" %}
+
 # renv
 RENV_LOCK = PROJECT_ROOT / "renv.lock"
 {%- endif %}
