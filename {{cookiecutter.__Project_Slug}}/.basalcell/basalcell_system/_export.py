@@ -55,7 +55,7 @@ def report(*args) -> None:
     else:
         df = query(key=list(args)).collect()
 
-    now_str = datetime.now().strftime("%H:%M:%S, %m/%d/%Y")
+    now_str = datetime.now().strftime("%H:%M:%S, %b %d, %Y")
     lines = [
         "# {{cookiecutter.project_name}}",
         "## Dependency Info",
