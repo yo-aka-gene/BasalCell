@@ -26,3 +26,15 @@ def query_essentials() -> pl.LazyFrame:
         & (~pl.col("name").is_in(devs))
         & (pl.col("language") != "System")
     )
+{%- if cookiecutter.r_ver != "none" %}
+
+
+def print_renv_targets() -> None:
+    pkgs = (
+        read_database()
+        .filter(pl.col("installation") == "renv")
+        .collect()["name"]
+        .to_list()
+    )
+    print(" ".join(pkgs))
+{%- endif %}
