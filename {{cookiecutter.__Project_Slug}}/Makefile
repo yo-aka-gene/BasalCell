@@ -145,6 +145,13 @@ bump-minor:
 bump-major:
 	@mamba run -n $(MAMBA_ENV) poetry version major
 
+define CALL_PY_FUNC
+	mamba run -n $(MAMBA_ENV) python -c "import sys; sys.path.append('./.basalcell'); \
+	from basalcell_system import $(1); \
+	args = [arg for arg in '$(2)'.split() if arg]; \
+	$(1)(*args)"
+endef
+
 # ==========================================
 # Mamba
 # ==========================================
@@ -161,11 +168,11 @@ sync-os:
 
 lock-conda:
 	@echo "Generating conda-lock.yml..."
-	conda-lock -f environment.yml -p osx-arm64 -p linux-64
+	conda-lock -f environment.yml -p osx-arm64 -p linux-64 --lockfile .basalcell/conda-lock.yml
 
 install-conda:
 	@echo "Reproducing Mamba environment based on the 'conda-lock.yml' file..."
-	conda-lock install -n $(MAMBA_ENV) conda-lock.yml
+	conda-lock install -n $(MAMBA_ENV) .basalcell/conda-lock.yml
 
 # ==========================================
 # Python
