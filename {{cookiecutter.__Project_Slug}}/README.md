@@ -110,6 +110,9 @@ Run:
 ```bash
 make launch
 ```
+Then `Jupyter Lab` will pop up in your default browser.
+**Note**: Sometimes, token is required to login to Jupyter Lab for the first time. 
+The default token is `{{cookiecutter.__project_slug}}`.
 
 ### Adding Packages
 This project uses a unified interface to add dependencies:
