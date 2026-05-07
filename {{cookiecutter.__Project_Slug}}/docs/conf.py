@@ -88,5 +88,5 @@ nbsphinx_allow_errors = True
 # nbsphinx_thumbnails = {
 #     # assign your nbsphinx gallery thumbnails if you need them
 #     # e.g,)
-#     # "jupyternb/your_ipynb_name_without_file_extension": "_static/your_custum_thumbnail.png",
+#     # "jupyternb/ipynb_name_without_file_extension": "_static/custum_thumbnail.png",
 # }
