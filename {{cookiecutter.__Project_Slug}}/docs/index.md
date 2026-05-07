@@ -16,7 +16,7 @@ notebooks
 
 notebooks
 ```
-## Add API reference headder for your auxiliary created in `{{cookiecutter.__project_slug}}_tools` as follows:
+## Add API reference headder for your auxiliary code created in `{{cookiecutter.__project_slug}}_tools` as follows:
 <!-- ```{toctree}
 :maxdepth: 2
 :caption: Auxiliary Python Scripts 
