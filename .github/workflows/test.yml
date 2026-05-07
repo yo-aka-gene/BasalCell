@@ -32,7 +32,7 @@ jobs:
 
       - name: Install conda-lock for CI
         shell: bash -el {0}
-        run: mamba install -c conda-forge conda-lock -y
+        run: mamba install -c conda-forge conda-lock micromamba -y
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
