@@ -46,9 +46,12 @@ def test_make_dump_all(cookies, ext):
     path = str(result.project_path)
     ext, extension = ext
 
+    ext_cmd = f"EXT={ext}" if ext != "" else ""
+
     dump_all = subprocess.run(
-        ["make", "dump-all", *([f"EXT={ext}"] if ext != "" else [])],
+        f"make dump-all {ext_cmd}",
         cwd=path,
+        shell=True,
         capture_output=True,
         text=True,
         check=True,
@@ -92,18 +95,12 @@ def test_make_dump_core(cookies, ext):
     path = str(result.project_path)
     ext, extension = ext
 
+    ext_cmd = f"EXT={ext}" if ext != "" else ""
+
     dump_core = subprocess.run(
-        [
-            "make",
-            "add-py",
-            "PKG=numpy;",
-            "make",
-            "lock;",
-            "make",
-            "dump-core",
-            *([f"EXT={ext}"] if ext != "" else []),
-        ],
+        "make add-py PKG=numpy && " "make lock && " f"make dump-core {ext_cmd}",
         cwd=path,
+        shell=True,
         capture_output=True,
         text=True,
         check=True,
@@ -152,19 +149,12 @@ def test_make_dump(cookies, ext):
     path = str(result.project_path)
     ext, extension = ext
 
+    ext_cmd = f"EXT={ext}" if ext != "" else ""
+
     dump = subprocess.run(
-        [
-            "make",
-            "add-py",
-            "PKG=numpy;",
-            "make",
-            "lock;",
-            "make",
-            "dump",
-            "KEYS=numpy",
-            *([f"EXT={ext}"] if ext != "" else []),
-        ],
+        "make add-py PKG=numpy && " "make lock && " f"make dump KEYS=numpy {ext_cmd}",
         cwd=path,
+        shell=True,
         capture_output=True,
         text=True,
         check=True,
@@ -207,8 +197,9 @@ def test_make_report_all(cookies):
     path = str(result.project_path)
 
     dump_all = subprocess.run(
-        ["make", "report", "KEYS=all"],
+        "make report KEYS=all",
         cwd=path,
+        shell=True,
         capture_output=True,
         text=True,
         check=True,
@@ -250,17 +241,9 @@ def test_make_report_core(cookies):
     path = str(result.project_path)
 
     dump_all = subprocess.run(
-        [
-            "make",
-            "add-py",
-            "PKG=numpy;",
-            "make",
-            "lock;",
-            "make",
-            "report",
-            "KEYS=core",
-        ],
+        "make add-py PKG=numpy && " "make lock && " "make report KEYS=core",
         cwd=path,
+        shell=True,
         capture_output=True,
         text=True,
         check=True,
@@ -307,17 +290,9 @@ def test_make_report_query(cookies):
     path = str(result.project_path)
 
     dump_all = subprocess.run(
-        [
-            "make",
-            "add-py",
-            "PKG=numpy;",
-            "make",
-            "lock;",
-            "make",
-            "report",
-            "KEYS=numpy",
-        ],
+        "make add-py PKG=numpy && " "make lock && " "make report KEYS=numpy",
         cwd=path,
+        shell=True,
         capture_output=True,
         text=True,
         check=True,
@@ -359,8 +334,9 @@ def test_make_report(cookies):
     path = str(result.project_path)
 
     dump_all = subprocess.run(
-        ["make", "add-py", "PKG=numpy;", "make", "lock;", "make", "report"],
+        "make add-py PKG=numpy && make lock && make report",
         cwd=path,
+        shell=True,
         capture_output=True,
         text=True,
         check=True,
