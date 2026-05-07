@@ -307,7 +307,7 @@ terminate:
 # ==========================================
 # R
 # ==========================================
-.PHONY: add-r install-r sync-r
+.PHONY: add-r lock-r install-r sync-r
 
 define ADD_R_LOGIC
 #!/bin/bash
@@ -370,6 +370,9 @@ add-r:
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified. Usage: make add-r PKG=seurat"; exit 1; fi
 	@export CLEAN_PKG="$(CLEAN_PKG_VAL)"; export MAMBA_ENV="$(MAMBA_ENV)"; \
 	mamba run -n $(MAMBA_ENV) bash -c "$$ADD_R_LOGIC"
+
+lock-r:
+	mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "renv::snapshot(prompt=FALSE, type='all', force=TRUE)"
 
 install-r:
 	@TARGETS=$$($(call CALL_PY_FUNC,print_renv_targets)); \
