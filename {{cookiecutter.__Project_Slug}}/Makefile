@@ -5,7 +5,7 @@
 
 setup-mamba:
 	@echo "Installing 'conda-lock' to 'base' environment..."
-	mamba install -n base -c conda-forge conda-lock micromamba yq -y
+	mamba install -n base -c conda-forge conda-lock yq -y
 
 # ==========================================
 # Basic Project Management
@@ -185,7 +185,8 @@ sync-os:
 
 lock-conda:
 	@echo "Generating conda-lock.yml..."
-	CONDA_PKGS_DIRS=$$(mktemp -d) conda-lock -f environment.yml -p osx-arm64 -p linux-64 --conda micromamba --lockfile .basalcell/conda-lock.yml
+	mamba clean --all --yes
+	CONDA_PKGS_DIRS=$$(mktemp -d) conda-lock -f environment.yml -p osx-arm64 -p linux-64 --conda conda --lockfile .basalcell/conda-lock.yml
 
 install-conda:
 	@echo "Reproducing Mamba environment based on the 'conda-lock.yml' file..."
