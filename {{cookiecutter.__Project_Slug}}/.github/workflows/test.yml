@@ -17,6 +17,7 @@ on:
       - '{{cookiecutter.__project_slug}}_rtools/**'
       - 'renv.lock'
 {%- endif %}
+      - '.github/workflows/test.yml'
   pull_request:
     branches: [ main ]
 
@@ -25,18 +26,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install conda-lock for CI
+        shell: bash -el {0}
+        run: mamba install -c conda-forge conda-lock -y
+
       - name: Setup Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
           miniforge-version: latest
-          activate-environment: mamba_{{cookiecutter.__project_slug}}
-          environment-file: .basalcell/conda-lock.yml
-          auto-activate-base: false
           use-mamba: true
-{% raw %}
-          cache-environment: true
-          cache-environment-key: mamba-env-${{ runner.os }}-${{ hashFiles('.basalcell/conda-lock.yml') }}
-{% endraw %}
 
 {%- if cookiecutter.r_ver != "none" %}
 {% raw %}
