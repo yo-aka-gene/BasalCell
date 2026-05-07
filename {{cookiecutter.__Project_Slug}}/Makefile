@@ -246,28 +246,29 @@ PYDEV_CORE := ipykernel ipywidgets jupyterlab jupyter-resource-usage \
 # ==========================================
 # Advanced Project Management (Python)
 # ==========================================
-.PHONY: init test docs lock install terminate
+.PHONY: init test docs lock install setup-local terminate
 
 init:
-	@echo "Starting project environment setup..."
 	@if ! command -v mamba >/dev/null 2>&1; then \
 		echo "mamba is not installed. Please install it first."; \
 		exit 1; \
 	fi
-	@if [ ! -d "$$(mamba info --base)/envs/$(MAMBA_ENV)" ]; then \
-		mamba env create -f environment.yml -y; \
+	@if [ -f .basalcell/conda-lock.yml ]; then \
+		echo "--> Lockfile (.basalcell/conda-lock.yml) found! Delegating to 'make install'..."; \
+		$(MAKE) install; \
 	else \
-		echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
-		mamba env update -f environment.yml --prune -y; \
+		if ! mamba env list | grep -q $(MAMBA_ENV); then \
+			mamba env create -f environment.yml -y; \
+		else \
+			echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
+			mamba env update -f environment.yml --prune -y; \
+		fi; \
+		mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false; \
+		mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
+		$(MAKE) add-pydev PKG="$(PYDEV_CORE)"; \
+		$(MAKE) setup-local; \
+		mamba run -n $(MAMBA_ENV) git init -b main; \
 	fi
-	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
-	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""
-	@$(MAKE) add-pydev PKG="$(PYDEV_CORE)"
-	mamba run -n $(MAMBA_ENV) poetry install
-	mamba run -n $(MAMBA_ENV) git init -b main
-	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
-	mamba run -n $(MAMBA_ENV) \
-		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 	@echo "All done! You are ready to start coding."
 
 test:
@@ -287,7 +288,16 @@ docs:
 
 lock: lock-conda lock-py
 
-install: install-conda install-py
+install: install-conda
+	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
+	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""
+	$(MAKE) install-py
+	$(MAKE) setup-local
+
+setup-local:
+	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
+	mamba run -n $(MAMBA_ENV) \
+		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 
 terminate:
 	mamba env remove -n mamba_basalcelldemodev -y
@@ -296,54 +306,7 @@ terminate:
 # ==========================================
 # R
 # ==========================================
-.PHONY: setup-r add-r pin-r install-r sync-r
-
-R_VERSION := {{ cookiecutter.r_ver }}
-R_KERNEL_NAME := {{ cookiecutter.__Project_Slug }}
-
-define R_SETUP_COMMON_LOGIC
-conda_lib <- file.path(Sys.getenv("CONDA_PREFIX"), "lib", "R", "library")
-.libPaths(conda_lib)
-sysname <- Sys.info()[["sysname"]]
-if (sysname == "Linux") {
-    options(repos = c(CRAN = "https://packagemanager.posit.co/cran/__linux__/jammy/latest"), pkgType = "source")
-} else {
-    options(repos = c(CRAN = "https://cloud.r-project.org"), pkgType = "source")
-}
-endef
-export R_SETUP_COMMON_LOGIC
-
-define R_SETUP_INIT_LOGIC
-message("--> Initializing new renv environment...")
-renv::init(bare = TRUE, bioconductor = TRUE, restart = FALSE)
-renv::snapshot(prompt = FALSE, type = "all")
-endef
-export R_SETUP_INIT_LOGIC
-
-setup-r:
-	@echo "Building R env for $(R_KERNEL_NAME)..."
-	@echo "=================================================="
-	@echo 'R_LIBS_SITE="$${CONDA_PREFIX}/lib/R/library"' > .Renviron
-	@export R_LIBS_USER=""; export R_LIBS_SITE=""; \
-	mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "$$R_SETUP_COMMON_LOGIC"
-	@if [ ! -f renv.lock ]; then \
-		mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "$$R_SETUP_INIT_LOGIC"; \
-	else \
-		echo "--> renv.lock found. Delegating to 'make restore-r'..."; \
-		$(MAKE) restore-r; \
-	fi
-	@RBASE_VER=$$(mamba list -n $(MAMBA_ENV) "^r-base$$" | awk '/r-base/ {print $$2}'); \
-	RENV_VER=$$(mamba list -n $(MAMBA_ENV) "^r-renv$$" | awk '/r-renv/ {print $$2}'); \
-	IRKERNEL_VER=$$(mamba list -n $(MAMBA_ENV) "^r-irkernel$$" | awk '/r-irkernel/ {print $$2}'); \
-	mamba run -n $(MAMBA_ENV) bash -c "echo 'r-base =='$$RBASE_VER > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
-	perl -pi -e "s/- \"?r-base\"?$$/- r-base=$$RBASE_VER/; \
-	             s/- \"?r-renv\"?$$/- r-renv=$$RENV_VER/; \
-				 s/- \"?r-irkernel\"?$$/- r-irkernel=$$IRKERNEL_VER/" environment.yml; \
-	mamba run -n $(MAMBA_ENV) poetry run Rscript --vanilla -e "\
-	    .libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); \
-	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $$RBASE_VER ($(R_KERNEL_NAME))', user=TRUE)"
-	@echo "=== R env setup: Done! ==="
-
+.PHONY: add-r pin-r install-r sync-r
 
 define ADD_R_LOGIC
 #!/bin/bash
@@ -497,30 +460,49 @@ sync-r:
 # ==========================================
 # Advanced Project Management (Python & R)
 # ==========================================
-.PHONY: init test-py test-r test docs-r docs-py docs lock install terminate
+.PHONY: init test-py test-r test docs-r docs-py docs lock install setup-local terminate
 
 R_PKG_DIR := {{cookiecutter.__project_slug}}_rtools
+R_VERSION := {{ cookiecutter.r_ver }}
+R_KERNEL_NAME := {{ cookiecutter.__Project_Slug }}
+
+define R_SETUP_INIT_LOGIC
+message("--> Initializing new renv environment...")
+renv::init(bare = TRUE, bioconductor = TRUE, restart = FALSE)
+renv::snapshot(prompt = FALSE, type = "all")
+endef
+export R_SETUP_INIT_LOGIC
 
 init:
 	@if ! command -v mamba >/dev/null 2>&1; then \
 		echo "mamba is not installed. Please install it first."; \
 		exit 1; \
 	fi
-	@if ! mamba env list | grep -q $(MAMBA_ENV); then \
-		mamba env create -f environment.yml -y; \
+	@if [ -f .basalcell/conda-lock.yml ]; then \
+		echo "--> Lockfile (.basalcell/conda-lock.yml) found! Delegating to 'make install'..."; \
+		$(MAKE) install; \
 	else \
-		echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
-		mamba env update -f environment.yml --prune -y; \
+		if ! mamba env list | grep -q $(MAMBA_ENV); then \
+			mamba env create -f environment.yml -y; \
+		else \
+			echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
+			mamba env update -f environment.yml --prune -y; \
+		fi; \
+		mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false; \
+		mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
+		RBASE_VER=$$(mamba list -n $(MAMBA_ENV) "^r-base$$" | awk '/r-base/ {print $$2}'); \
+		RENV_VER=$$(mamba list -n $(MAMBA_ENV) "^r-renv$$" | awk '/r-renv/ {print $$2}'); \
+		IRKERNEL_VER=$$(mamba list -n $(MAMBA_ENV) "^r-irkernel$$" | awk '/r-irkernel/ {print $$2}'); \
+		mamba run -n $(MAMBA_ENV) bash -c "echo 'r-base =='$$RBASE_VER > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
+		perl -pi -e "s/- \"?r-base\"?$$/- r-base=$$RBASE_VER/; \
+					 s/- \"?r-renv\"?$$/- r-renv=$$RENV_VER/; \
+					 s/- \"?r-irkernel\"?$$/- r-irkernel=$$IRKERNEL_VER/" environment.yml; \
+		$(MAKE) add-pydev PKG="$(PYDEV_CORE)"; \
+		echo 'R_LIBS_SITE="$${CONDA_PREFIX}/lib/R/library"' > .Renviron; \
+		mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "$$R_SETUP_INIT_LOGIC"; \
+		$(MAKE) setup-local; \
+		mamba run -n $(MAMBA_ENV) git init -b main; \
 	fi
-	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
-	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""
-	@$(MAKE) add-pydev PKG="$(PYDEV_CORE)"
-	mamba run -n $(MAMBA_ENV) poetry install
-	mamba run -n $(MAMBA_ENV) git init -b main
-	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
-	mamba run -n $(MAMBA_ENV) \
-		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
-	@$(MAKE) setup-r
 	@echo "All done! You are ready to start coding."
 
 test-py:
@@ -567,7 +549,23 @@ docs: docs-r docs-py
 
 lock: lock-conda lock-py lock-r
 
-install: install-conda install-py install-r
+install: install-conda
+	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
+	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""
+	@RBASE_VER=$$(mamba list -n $(MAMBA_ENV) "^r-base$$" | awk '/r-base/ {print $$2}'); \
+	mamba run -n $(MAMBA_ENV) bash -c "echo 'r-base =='$$RBASE_VER > \"\$$CONDA_PREFIX/conda-meta/pinned\""
+	@echo 'R_LIBS_SITE="$${CONDA_PREFIX}/lib/R/library"' > .Renviron
+	$(MAKE) install-py
+	$(MAKE) install-r
+	$(MAKE) setup-local
+
+setup-local:
+	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
+	mamba run -n $(MAMBA_ENV) \
+		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
+	mamba run -n $(MAMBA_ENV) poetry run Rscript --vanilla -e "\
+	    .libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); \
+	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $(R_VERSION) ($(R_KERNEL_NAME))', user=TRUE)"
 
 terminate:
 	mamba env remove -n mamba_basalcelldemodev -y
