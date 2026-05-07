@@ -167,7 +167,7 @@ dump:
 
 report:
 	@echo "Generating human-readable dependency report..."
-	@$(call CALL_PY_FUNC,report,$(KEY))
+	@$(call CALL_PY_FUNC,report,$(KEYS))
 
 # ==========================================
 # Mamba
