@@ -246,7 +246,7 @@ PYDEV_CORE := ipykernel ipywidgets jupyterlab jupyter-resource-usage \
 # ==========================================
 # Advanced Project Management (Python)
 # ==========================================
-.PHONY: init test docs lock terminate
+.PHONY: init test docs lock install terminate
 
 init:
 	@echo "Starting project environment setup..."
@@ -286,6 +286,8 @@ docs:
 		"import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
 
 lock: lock-conda lock-py
+
+install: install-conda install-py
 
 terminate:
 	mamba env remove -n mamba_basalcelldemodev -y
@@ -495,7 +497,7 @@ sync-r:
 # ==========================================
 # Advanced Project Management (Python & R)
 # ==========================================
-.PHONY: init test-py test-r test docs-r docs-py docs lock terminate
+.PHONY: init test-py test-r test docs-r docs-py docs lock install terminate
 
 R_PKG_DIR := {{cookiecutter.__project_slug}}_rtools
 
@@ -564,6 +566,8 @@ docs: docs-r docs-py
 	@cp -r docs/r_api docs/_build/html/r_api
 
 lock: lock-conda lock-py lock-r
+
+install: install-conda install-py install-r
 
 terminate:
 	mamba env remove -n mamba_basalcelldemodev -y
