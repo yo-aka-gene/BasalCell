@@ -12,11 +12,14 @@ import sys
 sys.path.insert(0, os.path.abspath("../src"))
 
 import {{ cookiecutter.__project_slug }}
+
 release = {{ cookiecutter.__project_slug }}.__version__
 {%- else %}
 # If not a package, default version is used.
 release = "0.0.1"
 {%- endif %}
+sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath("./jupyternb"))
 
 # -- Project information -----------------------------------------------------
 project = "{{ cookiecutter.project_name }}"
@@ -40,6 +43,13 @@ source_suffix = {
     ".rst": "restructuredtext",
     ".md": "markdown",
 }
+
+# -- Options for Autodoc & Napoleon ------------------------------------------
+autodoc_member_order = "bysource"
+autodoc_typehints = "description"
+napoleon_google_docstring = False
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = True
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "sphinx_rtd_theme"
@@ -78,8 +88,6 @@ texinfo_documents = [
      "{{ cookiecutter.description }}",
      "Miscellaneous"),
 ]
-
-sys.path.insert(0, os.path.abspath('./jupyternb'))
 
 # -- Options for nbsphinx -----------------------------------------
 nbsphinx_execute = 'never'

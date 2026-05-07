@@ -279,7 +279,13 @@ test:
 docs:
 	@echo "Building Sphinx HTML documentation..."
 	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with docs --without-hashes --format=requirements.txt > docs/requirements.txt
+		poetry export --with dev --without-hashes --format=requirements.txt > docs/requirements.txt
+{%- if cookiecutter.create_package == "true" %}
+	@mamba run -n $(MAMBA_ENV) \
+		poetry run sphinx-apidoc -f -o docs/api src/{{cookiecutter.__project_slug}}/
+{%- endif %}
+	@mamba run -n $(MAMBA_ENV) \
+		poetry run sphinx-apidoc -f -o docs/auxiliary_api {{cookiecutter.__project_slug}}_tools/
 	@mamba run -n $(MAMBA_ENV) \
 		poetry run sphinx-build -b html docs docs/_build/html
 	@echo "Opening documentation in browser..."
@@ -478,6 +484,12 @@ docs-py:
 	@echo "Building Sphinx HTML documentation..."
 	@mamba run -n $(MAMBA_ENV) \
 		poetry export --with dev --without-hashes --format=requirements.txt > docs/requirements.txt
+{%- if cookiecutter.create_package == "true" %}
+	@mamba run -n $(MAMBA_ENV) \
+		poetry run sphinx-apidoc -f -o docs/api src/{{cookiecutter.__project_slug}}/
+{%- endif %}
+	@mamba run -n $(MAMBA_ENV) \
+		poetry run sphinx-apidoc -f -o docs/auxiliary_api {{cookiecutter.__project_slug}}_tools/
 	@mamba run -n $(MAMBA_ENV) \
 		poetry run sphinx-build -b html docs docs/_build/html
 	@echo "Opening documentation in browser..."
