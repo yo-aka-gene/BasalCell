@@ -98,7 +98,7 @@ def test_make_dump_core(cookies, ext):
     ext_cmd = f"EXT={ext}" if ext != "" else ""
 
     dump_core = subprocess.run(
-        "make add-py PKG=numpy && " "make lock && " f"make dump-core {ext_cmd}",
+        f"make add-py PKG=numpy && make lock && make dump-core {ext_cmd}",
         cwd=path,
         shell=True,
         capture_output=True,
@@ -152,7 +152,7 @@ def test_make_dump(cookies, ext):
     ext_cmd = f"EXT={ext}" if ext != "" else ""
 
     dump = subprocess.run(
-        "make add-py PKG=numpy && " "make lock && " f"make dump KEYS=numpy {ext_cmd}",
+        f"make add-py PKG=numpy && make lock && make dump KEYS=numpy {ext_cmd}",
         cwd=path,
         shell=True,
         capture_output=True,
@@ -241,7 +241,7 @@ def test_make_report_core(cookies):
     path = str(result.project_path)
 
     dump_all = subprocess.run(
-        "make add-py PKG=numpy && " "make lock && " "make report KEYS=core",
+        "make add-py PKG=numpy && make lock && make report KEYS=core",
         cwd=path,
         shell=True,
         capture_output=True,
@@ -290,7 +290,7 @@ def test_make_report_query(cookies):
     path = str(result.project_path)
 
     dump_all = subprocess.run(
-        "make add-py PKG=numpy && " "make lock && " "make report KEYS=numpy",
+        "make add-py PKG=numpy && make lock && make report KEYS=numpy",
         cwd=path,
         shell=True,
         capture_output=True,
