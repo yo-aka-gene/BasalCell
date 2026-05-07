@@ -185,7 +185,7 @@ sync-os:
 
 lock-conda:
 	@echo "Generating conda-lock.yml..."
-	conda-lock -f environment.yml -p osx-arm64 -p linux-64 --conda micromamba --lockfile .basalcell/conda-lock.yml
+	CONDA_PKGS_DIRS=$$(mktemp -d) conda-lock -f environment.yml -p osx-arm64 -p linux-64 --conda micromamba --lockfile .basalcell/conda-lock.yml
 
 install-conda:
 	@echo "Reproducing Mamba environment based on the 'conda-lock.yml' file..."
