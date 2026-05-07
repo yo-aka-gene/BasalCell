@@ -540,6 +540,7 @@ test: test-py test-r
 
 docs-r: sync-r
 	@echo "Generating R documentation (roxygen2 & pkgdown)..."
+	@rm -rf ./docs/r_api docs/_build/html/r_ap
 	@mamba run -n $(MAMBA_ENV) \
 		Rscript -e " \
 		Sys.setenv(RENV_CONFIG_SYNCHRONIZED_CHECK='false'); \
