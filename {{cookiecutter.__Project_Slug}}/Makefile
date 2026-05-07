@@ -82,7 +82,7 @@ def start_jupyter():
                     print("Failed to open browser automatically.")
                     print(f"Reason: {e}")
                     print("\nPlease open the URL below manually:")
-                    print(f"\n    \033[1;36m{url}\033[0m\n") 
+                    print(f"\n    \033[1;36m{url}\033[0m\n")
 
                 browser_opened = True
 
