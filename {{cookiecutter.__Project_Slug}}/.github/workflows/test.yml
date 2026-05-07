@@ -9,12 +9,12 @@ on:
 {%- if cookiecutter.create_package == "true" %}
       - 'src/**'
 {%- endif %}
-      - 'tools/**'
+      - '{{cookiecutter.__project_slug}}_tools/**'
       - 'tests/**'
       - 'pyproject.toml'
       - 'poetry.lock'
 {%- if cookiecutter.r_ver != "none" %}
-      - '**/*.R'
+      - '{{cookiecutter.__project_slug}}_rtools/**'
       - 'renv.lock'
 {%- endif %}
   pull_request:
