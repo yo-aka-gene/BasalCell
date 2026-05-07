@@ -25,9 +25,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/conda_pkgs_dir
-          key: ${{ runner.os }}-conda-${{ hashFiles('**/environment.yml') }}
+          key: ${{ runner.os }}-conda-v2-${{ hashFiles('**/environment.yml') }}
           restore-keys: |
-            ${{ runner.os }}-conda-
+            ${{ runner.os }}-conda-v2-
 
       - name: Setup Mamba
         uses: conda-incubator/setup-miniconda@v3
@@ -35,7 +35,7 @@ jobs:
           mamba-version: "*"
           use-mamba: true
           pkgs-dirs: ~/conda_pkgs_dir
-          channels: conda-forge,nodefaults
+          channels: conda-forge,bioconda,nodefaults
           python-version: ${{ matrix.python-version }}
 
       - name: Install conda-lock for CI
