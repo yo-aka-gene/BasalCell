@@ -38,6 +38,10 @@ jobs:
           channels: conda-forge,nodefaults
           python-version: ${{ matrix.python-version }}
 
+      - name: Install conda-lock for CI
+        shell: bash -el {0}
+        run: mamba install -c conda-forge conda-lock -y
+
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
