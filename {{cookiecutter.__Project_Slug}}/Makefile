@@ -471,7 +471,7 @@ test: test-py test-r
 
 docs-r: sync-r
 	@echo "Generating R documentation (roxygen2 & pkgdown)..."
-	@rm -rf ./docs/r_api docs/_build/html/r_ap
+	@rm -rf ./docs/r_api docs/_build/html/r_api
 	@mamba run -n $(MAMBA_ENV) \
 		Rscript -e " \
 		Sys.setenv(RENV_CONFIG_SYNCHRONIZED_CHECK='false'); \
@@ -491,7 +491,7 @@ docs-py:
 	@mamba run -n $(MAMBA_ENV) \
 		poetry run sphinx-apidoc -f -o docs/auxiliary_api {{cookiecutter.__project_slug}}_tools/
 	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-build -b html docs docs/_build/html
+		poetry run sphinx-build -a -E -b html docs docs/_build/html
 	@echo "Opening documentation in browser..."
 	@mamba run -n $(MAMBA_ENV) \
 		poetry run python -c \

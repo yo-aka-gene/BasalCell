@@ -34,6 +34,7 @@ For detailed documentation of the R tools and utilities used in this project, pl
 </ul>
 
 {%- endif %}
+
 ## About
 - Author: {{ cookiecutter.author_name }}
 - Contact: [{{ cookiecutter.email }}](mailto:{{ cookiecutter.email }})
