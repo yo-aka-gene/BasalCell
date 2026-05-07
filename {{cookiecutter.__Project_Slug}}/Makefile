@@ -267,6 +267,7 @@ init:
 		mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
 		$(MAKE) add-pydev PKG="$(PYDEV_CORE)"; \
 		$(MAKE) setup-local; \
+		$(MAKE) lock; \
 		mamba run -n $(MAMBA_ENV) git init -b main; \
 	fi
 	@echo "All done! You are ready to start coding."
@@ -436,8 +437,9 @@ init:
 		$(MAKE) add-pydev PKG="$(PYDEV_CORE)"; \
 		echo 'R_LIBS_SITE="$${CONDA_PREFIX}/lib/R/library"' > .Renviron; \
 		mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "$$R_SETUP_INIT_LOGIC"; \
-		$(MAKE) setup-local; \
 		mamba run -n $(MAMBA_ENV) git init -b main; \
+		$(MAKE) setup-local; \
+		$(MAKE) lock; \
 	fi
 	@echo "All done! You are ready to start coding."
 
@@ -505,6 +507,6 @@ setup-local:
 
 terminate:
 	mamba env remove -n mamba_basalcelldemodev -y
-	rm -rf renv/library
+	rm -rf renv/library renv.lock
 
 {%- endif %}
