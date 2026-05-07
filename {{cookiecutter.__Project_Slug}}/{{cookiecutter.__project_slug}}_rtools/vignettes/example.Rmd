@@ -2,9 +2,9 @@
 title: "{{cookiecutter.project_name}} Vignette"
 output: rmarkdown::html_vignette
 vignette: >
-    %\VignetteIndexEntry{ {{ cookiecutter.project_name }} Vignette}
-    %\VignetteEngine{rmarkdown::html_vignette}
-    %\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{ {{ cookiecutter.project_name }} Vignette}
+  %\VignetteEngine{rmarkdown::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -24,7 +24,6 @@ we do not actively recommend creating vignettes other than standard `.R` script 
 standard Markdown (`.md`) syntax while embedding R code inside code blocks.
 Please use this feature for purposes such as creating tutorials for your R scripts.
 
----
 # Example
 ## Polynomial Ring
 ```{r}
@@ -57,14 +56,14 @@ w <- 5678
 ```
 
 ### Scalar Multiplication
-- Closure
+#### Closure
 ```{r}
-typeof(sca_(f1, f2)(v))
-typeof(sca_(f1, f2)(w))
+typeof(sca_(w, f2)(v))
+typeof(sca_(v, f2)(w))
 ```
 
 ### Summation
-- Closure
+#### Closure
 ```{r}
 typeof(add_(f1, f2)(v))
 typeof(add_(f1, f2)(w))
