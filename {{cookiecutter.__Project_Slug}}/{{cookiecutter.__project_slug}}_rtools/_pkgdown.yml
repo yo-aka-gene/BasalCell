@@ -1,4 +1,9 @@
 url: https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/r_api/
+development:
+  mode: unreleased
+repo:
+  url:
+    cran: ~
 template:
   bootstrap: 5
   params:
@@ -9,7 +14,8 @@ navbar:
     right: [github, home]
   components:
     home:
-      text: '<img src="../_static/default_logo.png" width="20"">'
-      href: https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/
+      icon: fas fa-home
+      text: Main Site
+      href: ../index.html
     articles:
       text: Vignettes
