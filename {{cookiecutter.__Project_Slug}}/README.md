@@ -125,7 +125,9 @@ This project uses a unified interface to add dependencies:
 
 ### Building Documentation
 - For a brief guide on how to write documentation across various file types, please refer to the README.md of the [`BasalCell`](https://github.com/yo-aka-gene/BasalCell) repository.
-{%- if cookiecutter.r_ver != "none" %}- When creating R-related documentation, make sure to run `make docs` locally and commit the generated HTML files to the GitHub repository.{%- endif %}
+{%- if cookiecutter.r_ver != "none" %}
+- When creating R-related documentation, make sure to run `make docs` locally and commit the generated HTML files to the GitHub repository.
+{%- endif %}
 
 
 ### Update Version Tags
