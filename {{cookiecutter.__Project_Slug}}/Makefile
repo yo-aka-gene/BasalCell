@@ -268,7 +268,6 @@ init:
 		$(MAKE) add-pydev PKG="$(PYDEV_CORE)"; \
 		$(MAKE) setup-local; \
 		$(MAKE) lock; \
-		mamba run -n $(MAMBA_ENV) git init -b main; \
 	fi
 	@echo "All done! You are ready to start coding."
 
@@ -296,6 +295,7 @@ install: install-conda
 	$(MAKE) setup-local
 
 setup-local:
+	@if [ ! -d .git ]; then mamba run -n $(MAMBA_ENV) git init -b main; fi
 	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
 	mamba run -n $(MAMBA_ENV) \
 		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
@@ -437,7 +437,6 @@ init:
 		$(MAKE) add-pydev PKG="$(PYDEV_CORE)"; \
 		echo 'R_LIBS_SITE="$${CONDA_PREFIX}/lib/R/library"' > .Renviron; \
 		mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "$$R_SETUP_INIT_LOGIC"; \
-		mamba run -n $(MAMBA_ENV) git init -b main; \
 		$(MAKE) setup-local; \
 		$(MAKE) lock; \
 	fi
@@ -498,6 +497,7 @@ install: install-conda
 	$(MAKE) setup-local
 
 setup-local:
+	@if [ ! -d .git ]; then mamba run -n $(MAMBA_ENV) git init -b main; fi
 	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
 	mamba run -n $(MAMBA_ENV) \
 		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
