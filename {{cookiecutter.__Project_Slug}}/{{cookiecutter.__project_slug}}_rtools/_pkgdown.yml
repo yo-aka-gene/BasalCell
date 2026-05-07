@@ -19,3 +19,6 @@ navbar:
       href: ../index.html
     articles:
       text: Vignettes
+home:
+  sidebar:
+    structure: [license, authors]
