@@ -4,6 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
+      - '.basalcell/conda-lock.yml'
       - 'environment.yml'
 {%- if cookiecutter.create_package == "true" %}
       - 'src/**'
@@ -29,23 +30,13 @@ jobs:
         with:
           miniforge-version: latest
           activate-environment: mamba_{{cookiecutter.__project_slug}}
-          environment-file: environment.yml
-          python-version: {{cookiecutter.python_ver}}
+          environment-file: .basalcell/conda-lock.yml
           auto-activate-base: false
           use-mamba: true
 {% raw %}
           cache-environment: true
-          cache-environment-key: mamba-env-${{ runner.os }}-${{ hashFiles('environment.yml') }}
+          cache-environment-key: mamba-env-${{ runner.os }}-${{ hashFiles('.basalcell/conda-lock.yml') }}
 {% endraw %}
-
-      - name: Install dependencies
-        run: |
-          mamba run -n mamba_{{cookiecutter.__project_slug}} poetry config virtualenvs.create false
-{%- if cookiecutter.create_package == "true" %}
-          mamba run -n mamba_{{cookiecutter.__project_slug}} poetry install --with dev --no-interaction
-{%- else %}
-          mamba run -n mamba_{{cookiecutter.__project_slug}} poetry install --with dev --no-interaction --no-root
-{%- endif %}
 
 {%- if cookiecutter.r_ver != "none" %}
 {% raw %}
@@ -57,9 +48,9 @@ jobs:
           restore-keys: |
             renv-${{ runner.os }}-
 {% endraw %}
-      - name: Restore R environment via Mamba & renv
-        run: mamba run -n mamba_{{cookiecutter.__project_slug}} make restore-r
 {%- endif %}
+      - name: Install dependencies via Make
+        run: make install
 
       - name: Run pre-commit hooks
         run: mamba run -n mamba_{{cookiecutter.__project_slug}} poetry run pre-commit run --all-files
