@@ -27,7 +27,7 @@
 ## Project Directory Tree
 ```bash
 {{cookiecutter.__project_slug}}/
-    ├── .basalcell/                             # system 
+    ├── .basalcell/                             # system directory
     ├── .github/
     │   ├── workflows/
     │   │   └── test.yml                        # write CI/CD configuration here
@@ -44,7 +44,7 @@
     │   └── DESCRIPTION                         # write R API info (semi-auto generated)
 {%- endif %}
     ├── {{cookiecutter.__project_slug}}_tools/
-    │   └── __init__.py                         # init file for your Python utility scripts for analysis                     
+    │   └── __init__.py                         # init file for your Python utility scripts for analysis
     ├── data/                                   # store your data here
     ├── docs/                                   # documentation
     │   ├── _static/                            # directory for image files etc.
@@ -89,7 +89,7 @@
 
 
 ### Setting the Virtual Env
-1. Fork this repository and clone it to your local environment. 
+1. Fork this repository and clone it to your local environment.
 >**Note**: If you are new to this repository or any other [BasalCell](https://github.com/yo-aka-gene/BasalCell)-based projects, run:
 >```bash
 >make setup-mamba
