@@ -19,31 +19,13 @@ using `pkgdown` and published at [https://{{ cookiecutter.__project_slug }}.read
 - Because these files are somewhat isolated from the documentation built by Sphinx, 
 we do not actively recommend creating vignettes other than standard `.R` script documentation (e.g., using `roxygen2`). 
 (You can achieve the same functionality using `.ipynb` files, which can be integrated and built seamlessly with Sphinx).
-- However, as demonstrated in this file, you can still add a vignette by creating an `.Rmd` file
-and including the following YAML header tags:
-    ````yaml
-    ---
-    title: "Vignette Name"
-    output: rmarkdown::html_vignette
-    vignette: >
-        %\VignetteIndexEntry{Vignette Name}
-        %\VignetteEngine{rmarkdown::html_vignette}
-        %\VignetteEncoding{UTF-8}
-    ---
-
-    ```{r example_setup, include=FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-    ```
-    ````
+- However, as demonstrated in this file, you can still add a vignette by creating an `.Rmd` file including YAML header tags. 
 - Like any other `.Rmd` file, you can write your content using
 standard Markdown (`.md`) syntax while embedding R code inside code blocks.
 Please use this feature for purposes such as creating tutorials for your R scripts.
 
-## Example
 ---
+# Example
 ## Polynomial Ring
 ```{r}
 sca_ <- function(a, f) {
@@ -123,7 +105,7 @@ add_(f2, get_inverse(f2))(w) == fis(w)
 ```
 
 ### Multiplication
-- Closure
+#### Closure
 ```{r}
 typeof(mul_(f1, f2)(v))
 typeof(mul_(f1, f2)(w))
