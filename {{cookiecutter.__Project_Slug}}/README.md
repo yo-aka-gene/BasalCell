@@ -27,6 +27,7 @@
 ## Project Directory Tree
 ```bash
 {{cookiecutter.__project_slug}}/
+    ├── .basalcell/                             # system 
     ├── .github/
     │   ├── workflows/
     │   │   └── test.yml                        # write CI/CD configuration here
@@ -72,7 +73,6 @@
     ├── pyproject.toml                          # declarative Python env configuration
 {%- if cookiecutter.r_ver != "none" %}
     ├── renv.lock                               # detailed R env configuration
-    ├── restore_r_env.py                        # helper func to interact with renv
 {%- endif %}
     └── README.md                               # this file
 ```
@@ -89,7 +89,11 @@
 
 
 ### Setting the Virtual Env
-1. Fork this repository and clone it to your local environment
+1. Fork this repository and clone it to your local environment. 
+>**Note**: If you are new to this repository or any other [BasalCell](https://github.com/yo-aka-gene/BasalCell)-based projects, run:
+>```bash
+>make setup-mamba
+>```
 2.  Run the initialization command:
 ```bash
 make init

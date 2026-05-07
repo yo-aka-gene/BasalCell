@@ -76,9 +76,17 @@ Answer the prompts to define your project configurations:
 Once you've answered the prompts, the initialization script (`make init`) will automatically run to set up your environments.
 
 ### 5. Launch Jupyter Lab
-Navigate to your project directory and run:
+Navigate to your project directory:
 ```bash
 cd <your-directory-name>
+```
+if you are new to BasalCell, run:
+```bash
+make setup-mamba
+make launch
+```
+otherwise:
+```bash
 make launch
 ```
 Then `Jupyter Lab` will pop up in your default browser.
