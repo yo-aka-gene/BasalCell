@@ -306,7 +306,7 @@ terminate:
 # ==========================================
 # R
 # ==========================================
-.PHONY: add-r pin-r install-r sync-r
+.PHONY: add-r install-r sync-r
 
 define ADD_R_LOGIC
 #!/bin/bash
@@ -369,70 +369,6 @@ add-r:
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified. Usage: make add-r PKG=seurat"; exit 1; fi
 	@export CLEAN_PKG="$(CLEAN_PKG_VAL)"; export MAMBA_ENV="$(MAMBA_ENV)"; \
 	mamba run -n $(MAMBA_ENV) bash -c "$$ADD_R_LOGIC"
-
-
-define PIN_R_LOGIC
-#!/bin/bash
-set -e
-
-search_and_pin() {
-	local prefix=$$1
-	local pkg_name="$${prefix}$$2"
-
-	local version
-	version=$$(mamba list -n "$$MAMBA_ENV" "^$${pkg_name}$$" | grep -v '^#' | grep "$${pkg_name}" | awk '{print $$2}')
-
-	if [ -n "$$version" ]; then
-		echo "--> Successfully pinned: $$pkg_name == $$version!"
-
-		if ! grep -q "^ *- $${pkg_name}" environment.yml; then
-			yq -y -i ".dependencies += [\"$${pkg_name}=$$version\"]" environment.yml
-		else
-			perl -pi -e "s/^(\s*-\s*\"?)$${pkg_name}(\"?[=>~]?.*)$$/\1$${pkg_name}=$$version/" environment.yml
-		fi
-
-		mkdir -p "$$CONDA_PREFIX/conda-meta"
-		if ! grep -q "^$${pkg_name}[ =]" "$$CONDA_PREFIX/conda-meta/pinned" 2>/dev/null; then
-			echo "$${pkg_name} ==$$version" >> "$$CONDA_PREFIX/conda-meta/pinned"
-		else
-			perl -pi -e "s/^$${pkg_name}[ =].*$$/$${pkg_name} ==$$version/" "$$CONDA_PREFIX/conda-meta/pinned"
-		fi
-
-		return 0
-	fi
-	return 1
-}
-
-PKG_LOWER=$$1
-
-if search_and_pin "r-" "$$PKG_LOWER"; then
-	exit 0
-elif search_and_pin "bioconductor-" "$$PKG_LOWER"; then
-	exit 0
-else
-	exit 1
-fi
-endef
-export PIN_R_LOGIC
-
-pin-r:
-	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified. Usage: make pin-r PKG=seurat"; exit 1; fi
-	@for pkg in $(CLEAN_PKG_VAL); do \
-		pkg_lower=$$(echo "$$pkg" | tr "[:upper:]" "[:lower:]"); \
-		echo "------------------------------------------------------------"; \
-		echo "Processing $$pkg..."; \
-		if mamba run -n $(MAMBA_ENV) bash -c "$$PIN_R_LOGIC" _ "$$pkg_lower"; then \
-			continue; \
-		else \
-			echo "--> $$pkg is not installed yet. Calling add-r to install it first..."; \
-			$(MAKE) add-r PKG="$$pkg"; \
-			mamba run -n $(MAMBA_ENV) bash -c "$$PIN_R_LOGIC" _ "$$pkg_lower" || true; \
-		fi; \
-	done
-	@echo "Pinning complete!"
-	@echo "Packages that were never installed were automatically added."
-	@echo "Note: Packages falling back to renv (CRAN/Bioc) are not managed by Mamba and cannot be pinned..."
-
 
 install-r:
 	@TARGETS=$$($(call CALL_PY_FUNC,print_renv_targets)); \
