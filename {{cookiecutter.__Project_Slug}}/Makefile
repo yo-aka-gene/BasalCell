@@ -294,7 +294,7 @@ terminate:
 # ==========================================
 # R
 # ==========================================
-.PHONY: setup-r add-r pin-r restore-r sync-r
+.PHONY: setup-r add-r pin-r install-r sync-r
 
 R_VERSION := {{ cookiecutter.r_ver }}
 R_KERNEL_NAME := {{ cookiecutter.__Project_Slug }}
@@ -469,7 +469,7 @@ pin-r:
 	@echo "Note: Packages falling back to renv (CRAN/Bioc) are not managed by Mamba and cannot be pinned..."
 
 
-restore-r:
+install-r:
 	@TARGETS=$$($(call CALL_PY_FUNC,print_renv_targets)); \
 	if [ -z "$$TARGETS" ]; then \
 		echo "No renv packages to restore."; \
