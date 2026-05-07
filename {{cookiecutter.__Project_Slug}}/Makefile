@@ -30,7 +30,7 @@ import webbrowser
 
 def open_browser(url):
     is_wsl = "microsoft" in platform.uname().release.lower()
-    
+
     if is_wsl:
         try:
             subprocess.run(["wslview", url], check=True)
@@ -45,12 +45,12 @@ def start_jupyter():
 
     process = subprocess.Popen(
         [
-            "jupyter", "lab", 
-            "--no-browser", 
-            "--port=8888", 
+            "jupyter", "lab",
+            "--no-browser",
+            "--port=8888",
             "--ip=0.0.0.0",
             "--allow-root",
-            "--IdentityProvider.token=basalcelldemodev",
+            "--IdentityProvider.token={{cookiecutter.__project_slug}}",
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -68,7 +68,7 @@ def start_jupyter():
                 url = line.strip().split(" ")[-1]
 
                 if "token=" not in url:
-                    url = f"{url}?token=basalcelldemodev"
+                    url = f"{url}?token={{cookiecutter.__project_slug}}"
 
                 print("\n" + "=" * 70)
                 print("Jupyter Lab is available at:")
@@ -308,7 +308,7 @@ setup-local:
 		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 
 terminate:
-	mamba env remove -n mamba_basalcelldemodev -y
+	mamba env remove -n $(MAMBA_ENV) -y
 
 {%- else %}
 # ==========================================
@@ -522,7 +522,7 @@ setup-local:
 	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $(R_VERSION) ($(R_KERNEL_NAME))', user=TRUE)"
 
 terminate:
-	mamba env remove -n mamba_basalcelldemodev -y
+	mamba env remove -n $(MAMBA_ENV) -y
 	rm -rf renv/library renv.lock
 
 {%- endif %}
