@@ -172,16 +172,12 @@ report:
 # ==========================================
 # Mamba
 # ==========================================
-.PHONY: add-os sync-os lock-conda install-conda
+.PHONY: add-os lock-conda install-conda
 
 add-os:
 	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
 	mamba run -n $(MAMBA_ENV) \
 		yq -y -i '.dependencies |= (. + ("'"$$CLEAN_PKG"'" | split(" ")) | unique)' environment.yml
-	mamba env update -n $(MAMBA_ENV) -f environment.yml --prune
-
-sync-os:
-	mamba env update -n $(MAMBA_ENV) -f environment.yml --prune
 
 lock-conda:
 	@echo "Generating conda-lock.yml..."
