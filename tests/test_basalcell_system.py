@@ -22,16 +22,16 @@ def _format_determinant(s: str) -> bool:
 
 
 @pytest.fixture
-def create_project(cookies):
+def create_project(cookies, monkeypatch):
     def _create_project(extra_context) -> tuple:
+        monkeypatch.delenv("CONDA_PREFIX", raising=False)
+        monkeypatch.delenv("CONDA_DEFAULT_ENV", raising=False)
+        monkeypatch.delenv("CONDA_PROMPT_MODIFIER", raising=False)
+        monkeypatch.delenv("VIRTUAL_ENV", raising=False)
+        monkeypatch.delenv("POETRY_ACTIVE", raising=False)
         result = cookies.bake(extra_context=extra_context)
         path = str(result.project_path)
         env = os.environ.copy()
-        env.pop("CONDA_PREFIX", None)
-        env.pop("CONDA_DEFAULT_ENV", None)
-        env.pop("CONDA_PROMPT_MODIFIER", None)
-        env.pop("VIRTUAL_ENV", None)
-        env.pop("POETRY_ACTIVE", None)
         return path, env
 
     return _create_project
