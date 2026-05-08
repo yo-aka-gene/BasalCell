@@ -12,7 +12,7 @@ ext_dict = [
     ("", "", "csv", "csv"),
     ("csv", "EXT=csv", "csv", "csv"),
     ("ipc", "EXT=ipc", "ipc", "ipc"),
-    ("feather", "EXT=feather", "ipc", "ipc"),
+    ("feather", "EXT=feather", "ipc", "feather"),
     ("pq", "EXT=pq", "parquet", "pq"),
     ("parquet", "EXT=parquet", "parquet", "parquet"),
 ]
