@@ -309,6 +309,7 @@ setup-local:
 
 terminate:
 	mamba env remove -n $(MAMBA_ENV) -y
+	rm -rf .basalcell/conf-lock.yml .basalcell/requirements.txt poetry.lock
 
 {%- else %}
 # ==========================================
@@ -523,6 +524,6 @@ setup-local:
 
 terminate:
 	mamba env remove -n $(MAMBA_ENV) -y
-	rm -rf renv/library renv.lock
+	rm -rf renv/library renv.lock .basalcell/conf-lock.yml .basalcell/requirements.txt poetry.lock
 
 {%- endif %}
