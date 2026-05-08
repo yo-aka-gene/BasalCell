@@ -63,7 +63,7 @@ def test_make_dump_all(create_project, ext):
 
     ext_cmd = f"EXT={ext}" if ext != "" else ""
 
-    dump_all = subprocess.run(
+    subprocess.run(
         f"make dump-all {ext_cmd}",
         cwd=path,
         shell=True,
@@ -72,8 +72,6 @@ def test_make_dump_all(create_project, ext):
         check=True,
         env=env,
     )
-    if dump_all.exit_code != 0:
-        raise dump_all.exception
 
     filename = "testprj_dependencies"
     assert os.path.exists(
@@ -112,7 +110,7 @@ def test_make_dump_core(create_project, ext):
 
     ext_cmd = f"EXT={ext}" if ext != "" else ""
 
-    dump_core = subprocess.run(
+    subprocess.run(
         f"make add-py PKG=numpy && make lock && make dump-core {ext_cmd}",
         cwd=path,
         shell=True,
@@ -121,8 +119,6 @@ def test_make_dump_core(create_project, ext):
         check=True,
         env=env,
     )
-    if dump_core.exit_code != 0:
-        raise dump_core.exception
 
     filename = "testprj_dependencies"
     assert os.path.exists(
@@ -166,7 +162,7 @@ def test_make_dump(create_project, ext):
 
     ext_cmd = f"EXT={ext}" if ext != "" else ""
 
-    dump = subprocess.run(
+    subprocess.run(
         f"make add-py PKG=numpy && make lock && make dump KEYS=numpy {ext_cmd}",
         cwd=path,
         shell=True,
@@ -175,8 +171,6 @@ def test_make_dump(create_project, ext):
         check=True,
         env=env,
     )
-    if dump.exit_code != 0:
-        raise dump.exception
 
     filename = "testprj_dependencies"
     assert os.path.exists(
@@ -211,7 +205,7 @@ def test_make_dump(create_project, ext):
 def test_make_report_all(create_project):
     path, env = create_project(prj_config)
 
-    dump_all = subprocess.run(
+    subprocess.run(
         "make report KEYS=all",
         cwd=path,
         shell=True,
@@ -220,8 +214,6 @@ def test_make_report_all(create_project):
         check=True,
         env=env,
     )
-    if dump_all.exit_code != 0:
-        raise dump_all.exception
 
     filename = "testprj_dependencies"
     assert os.path.exists(
@@ -255,7 +247,7 @@ def test_make_report_all(create_project):
 def test_make_report_core(create_project):
     path, env = create_project(prj_config)
 
-    dump_all = subprocess.run(
+    subprocess.run(
         "make add-py PKG=numpy && make lock && make report KEYS=core",
         cwd=path,
         shell=True,
@@ -264,8 +256,6 @@ def test_make_report_core(create_project):
         check=True,
         env=env,
     )
-    if dump_all.exit_code != 0:
-        raise dump_all.exception
 
     filename = "testprj_dependencies"
     assert os.path.exists(
@@ -304,7 +294,7 @@ def test_make_report_core(create_project):
 def test_make_report_query(create_project):
     path, env = create_project(prj_config)
 
-    dump_all = subprocess.run(
+    subprocess.run(
         "make add-py PKG=numpy && make lock && make report KEYS=numpy",
         cwd=path,
         shell=True,
@@ -313,8 +303,6 @@ def test_make_report_query(create_project):
         check=True,
         env=env,
     )
-    if dump_all.exit_code != 0:
-        raise dump_all.exception
 
     filename = "testprj_dependencies"
     assert os.path.exists(
@@ -348,7 +336,7 @@ def test_make_report_query(create_project):
 def test_make_report(create_project):
     path, env = create_project(prj_config)
 
-    dump_all = subprocess.run(
+    subprocess.run(
         "make add-py PKG=numpy && make lock && make report",
         cwd=path,
         shell=True,
@@ -357,8 +345,6 @@ def test_make_report(create_project):
         check=True,
         env=env,
     )
-    if dump_all.exit_code != 0:
-        raise dump_all.exception
 
     filename = "testprj_dependencies"
     assert os.path.exists(
