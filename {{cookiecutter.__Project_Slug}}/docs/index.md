@@ -39,5 +39,6 @@ For detailed documentation of the R tools and utilities used in this project, pl
 - Author: {{ cookiecutter.author_name }}
 - Contact: [{{ cookiecutter.email }}](mailto:{{ cookiecutter.email }})
 - GitHub: [@{{ cookiecutter.github_username }}](https://github.com/{{ cookiecutter.github_username }})
+- Repository: [<img src="https://img.shields.io/badge/GitHub-{{cookiecutter.__gh_id_badge}}/{{cookiecutter.__Project_Slug_badge}}-181717?style=flat&logo=github">](https://github.com/{{cookiecutter.github_username}}/{{cookiecutter.__Project_Slug}})
 ---
 This project was created with [Cookiecutter](https://github.com/cookiecutter/cookiecutter) and [BasalCell](https://github.com/yo-aka-gene/BasalCell) version {{cookiecutter.__version}}

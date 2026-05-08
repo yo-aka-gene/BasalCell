@@ -1,6 +1,10 @@
 # {{cookiecutter.project_name}}
-[![DOI](https://img.shields.io/badge/DOI-wip-blue.svg?longCache=true)]()
-[![PMID](https://img.shields.io/badge/PMID-wip-orange.svg?longCache=true)]()
+[<img src="https://img.shields.io/badge/DOI-WIP-FAB70C?style=flat&logo=doi">]()
+[<img src="https://img.shields.io/badge/PMID-WIP-326599?style=flat&logo=pubmed">]()
+[![Documentation Status](https://readthedocs.org/projects/{{cookiecutter.__rtd_url_badge}}/badge/?version=latest)](https://{{cookiecutter.__rtd_url}}.readthedocs.io/en/latest/?badge=latest)
+[<img src="https://img.shields.io/badge/Documentation-{{cookiecutter.__rtd_url_badge}}.readthedocs.io-8CA1AF?style=flat&logo=readthedocs">](https://{{cookiecutter.__rtd_url}}.readthedocs.io/en/latest/)
+[<img src="https://img.shields.io/badge/Code_Examples-Jupyter_Notebook-F37626?style=flat&logo=jupyter">](https://{{cookiecutter.__rtd_url}}.readthedocs.io/en/latest/notebooks.html)
+[<img src="https://img.shields.io/badge/GitHub-{{cookiecutter.__gh_id_badge}}/{{cookiecutter.__Project_Slug_badge}}-181717?style=flat&logo=github">](https://github.com/{{cookiecutter.github_username}}/{{cookiecutter.__Project_Slug}})
 <div align="center">
 <img src="./docs/_static/default_logo.png" alt="graphical abstract" width="300" height="300" title="graphical abstract">
 </div>

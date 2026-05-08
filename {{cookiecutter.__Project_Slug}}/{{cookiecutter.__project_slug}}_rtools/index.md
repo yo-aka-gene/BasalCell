@@ -9,3 +9,7 @@
 
 ## [Vignettes Reference](articles/index.html)
 - Vignettes for R scripts in this project
+
+## See Also
+- [Main Page](../index.html)
+- GitHub Repo: [<img src="https://img.shields.io/badge/GitHub-{{cookiecutter.__gh_id_badge}}/{{cookiecutter.__Project_Slug_badge}}-181717?style=flat&logo=github">](https://github.com/{{cookiecutter.github_username}}/{{cookiecutter.__Project_Slug}})
