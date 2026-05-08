@@ -27,12 +27,12 @@ def extension_checker(extension: str) -> Tuple[str, str]:
 
 def export_all_dependencies(extension: str = "csv") -> None:
     path, fmt = extension_checker(extension)
-    getattr(read_database(), f"sink_{fmt}")(path)
+    getattr(read_database(), f"write_{fmt}")(path)
 
 
 def export_essentials(extension: str = "csv") -> None:
     path, fmt = extension_checker(extension)
-    getattr(query_essentials(), f"sink_{fmt}")(path)
+    getattr(query_essentials(), f"write_{fmt}")(path)
 
 
 def export(*args) -> None:
@@ -44,16 +44,16 @@ def export(*args) -> None:
         keys = list(args)
 
     path, fmt = extension_checker(extension)
-    getattr(query(key=keys), f"sink_{fmt}")(path)
+    getattr(query(key=keys), f"write_{fmt}")(path)
 
 
 def report(*args) -> None:
     if not args or args[0] == "core":
-        df = query_essentials().collect()
+        df = query_essentials()
     elif args[0] == "all":
-        df = read_database().collect()
+        df = read_database()
     else:
-        df = query(key=list(args)).collect()
+        df = query(key=list(args))
 
     now_str = datetime.now().strftime("%H:%M:%S, %b %d, %Y")
     lines = [

@@ -53,7 +53,7 @@ pypkgs = [v.split(" = ")[0] for v in pyproject_pkgs]
 pydevs = [v.split(" = ")[0] for v in pyproject_dev_pkgs]
 
 
-def read_poetry_df() -> pl.LazyFrame:
+def read_poetry_df() -> pl.DataFrame:
     txt_based = pl.DataFrame(
         {
             "name": txt_pkg,
@@ -63,7 +63,7 @@ def read_poetry_df() -> pl.LazyFrame:
             "platform": "any",
             "installation": "poetry",
         }
-    ).lazy()
+    )
 
     toml_based = (
         pl.DataFrame(
@@ -75,7 +75,6 @@ def read_poetry_df() -> pl.LazyFrame:
             }
         )
         .unique("name", maintain_order=True)
-        .lazy()
     )
 
     return (
@@ -119,7 +118,7 @@ for pkg in conda_lock.get("package", []):
             "installation": "Mamba",
         }
     )
-df_conda_lock = pl.DataFrame(lock_pkgs)
+df_conda_lock = pl.DataFrame(lock_pkgs).with_columns(pl.col("version").cast(pl.String))
 valid_mamba_names = df_conda_lock["name"].to_list()
 {%- if cookiecutter.r_ver != "none" %}
 
@@ -161,11 +160,11 @@ df_renv = (
 )
 
 
-def read_renv_df() -> pl.LazyFrame:
-    return df_renv.lazy().sort("alias")
+def read_renv_df() -> pl.DataFrame:
+    return df_renv.sort("alias")
 
 
-df_poetry = read_poetry_df().collect()
+df_poetry = read_poetry_df()
 
 
 df_os = (
@@ -173,7 +172,7 @@ df_os = (
         (~pl.col("name").is_in(df_renv["name"].to_list()))
         & (~pl.col("name").is_in(df_poetry["name"].to_list()))
     )
-    .with_columns(alias="name")
+    .with_columns(alias=pl.col("name"))
     .join(df_env.unique("name"), on="name", how="left")
     .select(cols)
     .with_columns(
@@ -191,23 +190,23 @@ df_os = (
 )
 
 
-def read_mamba_df() -> pl.LazyFrame():
-    return df_os.lazy().sort("name")
+def read_mamba_df() -> pl.DataFrame:
+    return df_os.sort("name")
 
 
-def read_database() -> pl.LazyFrame:
+def read_database() -> pl.DataFrame:
     return pl.concat([read_poetry_df(), read_renv_df(), read_mamba_df()]).sort(
         ["language", "alias"]
     )
 {%- else %}
 
 
-df_poetry = read_poetry_df().collect()
+df_poetry = read_poetry_df()
 
 
 df_os = df_conda_lock.filter(
     (~pl.col("name").is_in(df_poetry["name"].to_list()))
-).with_columns(alias="name").join(
+).with_columns(alias=pl.col("name")).join(
     df_env.unique("name"), on="name", how="left"
 ).select(cols).with_columns(
     pl.when(pl.col("name") == "python").then(pl.lit("Python"))
@@ -215,11 +214,11 @@ df_os = df_conda_lock.filter(
     .alias("language")
 )
 
-def read_mamba_df() -> pl.LazyFrame():
-    return df_os.lazy().sort("name")
+def read_mamba_df() -> pl.DataFrame:
+    return df_os.sort("name")
 
 
-def read_database() -> pl.LazyFrame:
+def read_database() -> pl.DataFrame:
     return pl.concat([
         read_poetry_df(),
         read_mamba_df()
@@ -227,7 +226,7 @@ def read_database() -> pl.LazyFrame:
 {%- endif %}
 
 
-def read_lookup() -> pl.LazyFrame:
+def read_lookup() -> pl.DataFrame:
     return (
         read_database()
         .with_columns(pl.concat_list(["name", "alias"]).list.unique().alias("query"))
