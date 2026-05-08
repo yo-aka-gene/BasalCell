@@ -76,17 +76,9 @@ Answer the prompts to define your project configurations:
 Once you've answered the prompts, the initialization script (`make init`) will automatically run to set up your environments.
 
 ### 5. Launch Jupyter Lab
-Navigate to your project directory:
+Navigate to your project directory and run:
 ```bash
 cd <your-directory-name>
-```
-if you are new to BasalCell, run:
-```bash
-make setup-mamba
-make launch
-```
-otherwise:
-```bash
 make launch
 ```
 Then `Jupyter Lab` will pop up in your default browser.
@@ -174,6 +166,51 @@ Writing test code is crucial for verifying the behavior of your developed code. 
 - Test: use [`testthat`](https://testthat.r-lib.org/) package. `testthat.R` and test directory for R `testthat/` are all set in `tests` inside your project directory.
 - Linting: `pre-commit` automatically runs linting using [`lintr`](https://lintr.r-lib.org/) and [`styler`](https://styler.r-lib.org/).
 - CI/CD: GitHub Actions are also implemented for R language as well.
+
+### Instructions for Make Commands
+- BasalCell utilizes `GNU Make` to streamline complex CLI operations into simple one-liners. Please perform fundamental operations via the `make` commands listed below.
+
+#### common
+| command | run when... | description |
+| :---: | :----: | :----|
+| `init` | initializing environments | This command is automatically triggered in `cookiecutter git@github.com:yo-aka-gene/BasalCell.git`. Run this command when you reboot the environment after `make terminate` or when your cloned a repository based on BasalCell. |
+| `launch` | launching Jupyter Lab |  This connects `Jupyter Lab` and your default browser. Sometimes access token will be asked: the default token will be your project slug (e.g., `Your Project-ABC` -> `your_project_abc`)|
+| `lock` | before `git commit` | This transcribes the environment configuration ensuring reproducibility. **Always run this command after you added/removed packages before `git commit` to reflect the alteration in GitHub** |
+| `dump-all` | exporting all version configurations as a matrix (after `make lock`) | This exports version configurations of all packages (including Python, R, and System dependencies) as a matrix in the designated data format. Run `make dump-all` to have a `csv` file. For alternative file formats, `ipc`, `feather`, `pq`, and `parquet` are supported (designate them like `make dump-all EXT=pq`). |
+| `dump-core` | exporting core version configurations as a matrix (after `make lock`) | This exports version configurations of core packages (non-development Python and R packages) as a matrix in the designated data format. Run `make dump-core` to have a `csv` file. For alternative file formats, `ipc`, `feather`, `pq`, and `parquet` are supported (designate them like `make dump-core EXT=pq`). |
+| `dump` | exporting queried version configurations as a matrix (after `make lock`) | This exports version configurations of queried packages as a matrix in the designated data format (e.g., `make dump KEYS='numpy DESeq2' EXT=pq`). |
+| `report` | exporting version configurations as a human-readable `.md` file (after `make lock`) | This exports version configurations of queried packages as a `md` file. Pass `KEYS=all`, `KEYS=core`, or `KEYS=<query>` (e.g., `make report KEYS='numpy DESeq2'`) to get necessary information. |
+| `install` | copying existing enviroment | This command is automatically triggered in `make init` for cloned repositories. This reproduces locked environments. |
+| `test` | unit test | This command is triggers unit test modules defined via `pytest` (test code deposited in `tests/`), `doctest` (`Examples` in docstrings), or `testthat` (test code deposited in `<your_project_name>_rtools/tests/testthat/`)  if available |
+| `docs` | building documentations | This command builds documentation HTML files with `Sphinx` or `pkgdown`. Created HTML files will pop in your default browser. |
+| `terminate` | deprecating existing environment | Run `make terminate init` to restart the environment (e.g., when you got stuck with certain errors). |
+
+
+#### Python
+| command | run when... | description |
+| :---: | :----: | :----|
+| `add-py` | adding python package(s) | e.g., `make add-py PKG='scanpy pandas numpy'` |
+| `add-pydev` | adding python package(s) for development | e.g., `make add-pydev PKG=watchdog` |
+| `remove-py` | removing python package(s) | e.g., `make remove-py PKG='scanpy pandas numpy'` |
+| `remove-pydev` | removing python package(s) for development | e.g., `make remove-pydev PKG=watchdog` |
+
+
+#### R
+| command | run when... | description |
+| :---: | :----: | :----|
+| `add-r` | adding R package(s) | e.g., `make add-r PKG='ggplot2 dplyr Seurat DESeq2 org.Hs.eg.db'` |
+
+#### System dependencies
+| command | run when... | description |
+| :---: | :----: | :----|
+| `add-os` | adding OS software(s) | e.g., `make add-os PKG='cmake cxx-compiler'` **Note**: OS dependencies for Python/R packages are automatically installed via `add-py`, `add-pydev`, or `add-r`  |
+
+#### For Developers
+| command | run when... | description |
+| :---: | :----: | :----|
+| `bump-patch` | before `git version patch` | A shortcurt for `mamba run <mamba_env> poetry version patch` |
+| `bump-minor` | before `git version minor` | A shortcurt for `mamba run <mamba_env> poetry version minor` |
+| `bump-major` | before `git version major` | A shortcurt for `mamba run <mamba_env> poetry version major` |
 
 
 ## Feature(s) to be added in the near future
