@@ -17,6 +17,16 @@ ext_dict = [
     ("parquet", "EXT=parquet", "parquet", "parquet"),
 ]
 
+cols = [
+    "name",
+    "alias",
+    "version",
+    "required_version",
+    "language",
+    "platform",
+    "installation",
+]
+
 
 def _format_determinant(s: str) -> bool:
     return not s.startswith("_") and s != ""
@@ -80,15 +90,6 @@ def test_make_dump_all(create_project, ext):
     f"dump-all EXT={ext}"
 
     df = getattr(pl, f"read_{ext_meth}")(filepath)
-    cols = [
-        "name",
-        "alias",
-        "version",
-        "required_version",
-        "language",
-        "platform",
-        "installation",
-    ]
     pkgs = df["name"].to_list()
 
     assert (
@@ -126,15 +127,6 @@ def test_make_dump_core(create_project, ext):
     f"dump-core EXT={ext}"
 
     df = getattr(pl, f"read_{ext_meth}")(filepath)
-    cols = [
-        "name",
-        "alias",
-        "version",
-        "required_version",
-        "language",
-        "platform",
-        "installation",
-    ]
     pkgs = df["name"].to_list()
 
     assert (
@@ -177,15 +169,6 @@ def test_make_dump(create_project, ext):
     f"dump KEY=numpy EXT={ext}"
 
     df = getattr(pl, f"read_{ext_meth}")(filepath)
-    cols = [
-        "name",
-        "alias",
-        "version",
-        "required_version",
-        "language",
-        "platform",
-        "installation",
-    ]
     pkgs = df["name"].to_list()
 
     assert (
@@ -220,15 +203,6 @@ def test_make_report_all(create_project):
     ), f"FAILED in #2-1-1! {filename}.md was not created for report KEYS=all"
 
     df = read_markdown(filepath)
-    cols = [
-        "name",
-        "alias",
-        "version",
-        "required_version",
-        "language",
-        "platform",
-        "installation",
-    ]
     pkgs = df["name"].to_list()
 
     assert (
@@ -263,15 +237,6 @@ def test_make_report_core(create_project):
     ), f"FAILED in #2-2-1! {filename}.md was not created for report KEYS=core"
 
     df = read_markdown(filepath)
-    cols = [
-        "name",
-        "alias",
-        "version",
-        "required_version",
-        "language",
-        "platform",
-        "installation",
-    ]
     pkgs = df["name"].to_list()
 
     assert (
@@ -311,15 +276,6 @@ def test_make_report_query(create_project):
     ), f"FAILED in #2-3-1! {filename}.md was not created for report KEYS=numpy"
 
     df = read_markdown(filepath)
-    cols = [
-        "name",
-        "alias",
-        "version",
-        "required_version",
-        "language",
-        "platform",
-        "installation",
-    ]
     pkgs = df["name"].to_list()
 
     assert (
@@ -354,15 +310,6 @@ def test_make_report(create_project):
     ), f"FAILED in #2-4-1! {filename}.md was not created for report KEY="
 
     df = read_markdown(filepath)
-    cols = [
-        "name",
-        "alias",
-        "version",
-        "required_version",
-        "language",
-        "platform",
-        "installation",
-    ]
     pkgs = df["name"].to_list()
 
     assert (
