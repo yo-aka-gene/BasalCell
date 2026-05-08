@@ -111,7 +111,7 @@ Run:
 make launch
 ```
 Then `Jupyter Lab` will pop up in your default browser.
-**Note**: Sometimes, token is required to login to Jupyter Lab for the first time. 
+**Note**: Sometimes, token is required to login to Jupyter Lab for the first time.
 The default token is `{{cookiecutter.__project_slug}}`.
 
 ### Adding Packages
