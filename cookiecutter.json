@@ -10,7 +10,7 @@
     "email": "",
     "github_username": "",
     "__gh_id_badge": "{{ cookiecutter.github_username.replace('-', '--').replace('_', '__') }}",
-    "python_ver": ["3.12", "3.13"],
+    "python_ver": ["3.12"],
     "__pyver": "{{ 'py' + cookiecutter.python_ver.replace('.', '') }}",
     "r_ver": ["none", "4.3", "4.4"],
     "create_package": ["false", "true"],

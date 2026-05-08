@@ -253,7 +253,6 @@ def test_correct_template_for_package_mode(
             "project_name": "Test Project-CI/CD-2",
             "author_name": "John Smith",
             "email": "example@example.com",
-            "python_ver": "3.13",
             "create_package": "true",
         }
     )
