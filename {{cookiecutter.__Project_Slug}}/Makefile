@@ -384,10 +384,7 @@ install-r:
 	if [ -z "$$TARGETS" ]; then \
 		echo "No renv packages to restore."; \
 	else \
-		mamba run -n $(MAMBA_ENV) Rscript -e '\
-			pkgs <- commandArgs(trailingOnly = TRUE); \
-			renv::restore(packages = pkgs, prompt = FALSE) \
-		' $$TARGETS; \
+		mamba run -n $(MAMBA_ENV) Rscript -e 'pkgs <- commandArgs(trailingOnly = TRUE); renv::restore(packages = pkgs, prompt = FALSE)' $$TARGETS; \
 	fi
 
 PROJECT_NAME := $(shell grep '^name = ' pyproject.toml | cut -d '"' -f 2)
