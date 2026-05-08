@@ -1,4 +1,4 @@
-url: https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/r_api/
+url: https://{{ cookiecutter.__rtd_url }}.readthedocs.io/en/latest/r_api/
 development:
   mode: unreleased
 repo:

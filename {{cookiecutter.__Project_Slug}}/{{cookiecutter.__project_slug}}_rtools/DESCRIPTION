@@ -5,4 +5,4 @@ Authors@R: person("{{ cookiecutter.author_name }}", email = "{{ cookiecutter.ema
 Description: {{ cookiecutter.description }}
 Encoding: UTF-8
 License: UNLICENSED
-URL: https://{{ cookiecutter.__project_slug }}.readthedocs.io/en/latest/r_api/
+URL: https://{{ cookiecutter.__rtd_url }}.readthedocs.io/en/latest/r_api/
