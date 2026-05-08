@@ -254,6 +254,7 @@ init:
 		echo "mamba is not installed. Please install it first."; \
 		exit 1; \
 	fi
+	$(MAKE) setup-mamba
 	@if [ -f .basalcell/conda-lock.yml ]; then \
 		echo "--> Lockfile (.basalcell/conda-lock.yml) found! Delegating to 'make install'..."; \
 		$(MAKE) install; \
@@ -421,11 +422,12 @@ renv::snapshot(prompt = FALSE, type = "all")
 endef
 export R_SETUP_INIT_LOGIC
 
-init:
+init: setup-mamba
 	@if ! command -v mamba >/dev/null 2>&1; then \
 		echo "mamba is not installed. Please install it first."; \
 		exit 1; \
 	fi
+	$(MAKE) setup-mamba
 	@if [ -f .basalcell/conda-lock.yml ]; then \
 		echo "--> Lockfile (.basalcell/conda-lock.yml) found! Delegating to 'make install'..."; \
 		$(MAKE) install; \
