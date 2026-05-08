@@ -74,12 +74,13 @@ def test_make_dump_all(create_project, ext):
     )
 
     filename = "testprj_dependencies"
+    filepath = os.path.join(path, f"{filename}.{extension}")
     assert os.path.exists(
-        os.path.join(path, f"{filename}.{extension}")
+        filepath
     ), f"FAILED in #1-1-1! {filename}.{extension} was not created for "
     f"dump-all EXT={ext}"
 
-    df = getattr(pl, f"read_{extension}")(f"{filename}.{extension}")
+    df = getattr(pl, f"read_{extension if extension != 'pq' else 'parquet'}")(filepath)
     cols = [
         "name",
         "alias",
@@ -100,7 +101,7 @@ def test_make_dump_all(create_project, ext):
     ), f"FAILED in #1-1-3! {filename}.{extension} for dump-all EXT={ext} "
     f"does not include python info: {pkgs}"
 
-    os.remove(os.path.join(path, f"{filename}.{extension}"))
+    os.remove(filepath)
 
 
 @pytest.mark.parametrize("ext", ext_dict)
@@ -121,12 +122,13 @@ def test_make_dump_core(create_project, ext):
     )
 
     filename = "testprj_dependencies"
+    filepath = os.path.join(path, f"{filename}.{extension}")
     assert os.path.exists(
-        os.path.join(path, f"{filename}.{extension}")
+        filepath
     ), f"FAILED in #1-2-1! {filename}.{extension} was not created for "
     f"dump-core EXT={ext}"
 
-    df = getattr(pl, f"read_{extension}")(f"{filename}.{extension}")
+    df = getattr(pl, f"read_{extension if extension != 'pq' else 'parquet'}")(filepath)
     cols = [
         "name",
         "alias",
@@ -173,12 +175,13 @@ def test_make_dump(create_project, ext):
     )
 
     filename = "testprj_dependencies"
+    filepath = os.path.join(path, f"{filename}.{extension}")
     assert os.path.exists(
-        os.path.join(path, f"{filename}.{extension}")
+        filepath
     ), f"FAILED in #1-3-1! {filename}.{extension} was not created for "
     f"dump KEY=numpy EXT={ext}"
 
-    df = getattr(pl, f"read_{extension}")(f"{filename}.{extension}")
+    df = getattr(pl, f"read_{extension if extension != 'pq' else 'parquet'}")(filepath)
     cols = [
         "name",
         "alias",
@@ -199,7 +202,7 @@ def test_make_dump(create_project, ext):
     ] == pkgs, f"FAILED in #1-3-3! {filename}.{extension} for dump KEY=numpy EXT={ext} "
     f"is expected to have querried pkg info: got {pkgs}"
 
-    os.remove(os.path.join(path, f"{filename}.{extension}"))
+    os.remove(filepath)
 
 
 def test_make_report_all(create_project):
@@ -216,11 +219,12 @@ def test_make_report_all(create_project):
     )
 
     filename = "testprj_dependencies"
+    filepath = os.path.join(path, f"{filename}.md")
     assert os.path.exists(
-        os.path.join(path, f"{filename}.md")
+        filepath
     ), f"FAILED in #2-1-1! {filename}.md was not created for report KEYS=all"
 
-    df = read_markdown(f"{filename}.md")
+    df = read_markdown(filepath)
     cols = [
         "name",
         "alias",
@@ -241,7 +245,7 @@ def test_make_report_all(create_project):
     ), f"FAILED in #2-1-3! {filename}.md for report KEYS=all does not "
     f"include python info: {pkgs}"
 
-    os.remove(os.path.join(path, f"{filename}.md"))
+    os.remove(filepath)
 
 
 def test_make_report_core(create_project):
@@ -258,11 +262,12 @@ def test_make_report_core(create_project):
     )
 
     filename = "testprj_dependencies"
+    filepath = os.path.join(path, f"{filename}.md")
     assert os.path.exists(
-        os.path.join(path, f"{filename}.md")
+        filepath
     ), f"FAILED in #2-2-1! {filename}.md was not created for report KEYS=core"
 
-    df = read_markdown(f"{filename}.md")
+    df = read_markdown(filepath)
     cols = [
         "name",
         "alias",
@@ -288,7 +293,7 @@ def test_make_report_core(create_project):
     "include added pkg info: "
     f"expected to have numpy in {pkgs}"
 
-    os.remove(os.path.join(path, f"{filename}.md"))
+    os.remove(filepath)
 
 
 def test_make_report_query(create_project):
@@ -305,11 +310,12 @@ def test_make_report_query(create_project):
     )
 
     filename = "testprj_dependencies"
+    filepath = os.path.join(path, f"{filename}.md")
     assert os.path.exists(
-        os.path.join(path, f"{filename}.md")
+        filepath
     ), f"FAILED in #2-3-1! {filename}.md was not created for report KEYS=numpy"
 
-    df = read_markdown(f"{filename}.md")
+    df = read_markdown(filepath)
     cols = [
         "name",
         "alias",
@@ -330,7 +336,7 @@ def test_make_report_query(create_project):
     ] == pkgs, f"FAILED in #2-3-3! {filename}.md for report KEYS=numpy is "
     f"expected to have querried pkg info: got {pkgs}"
 
-    os.remove(os.path.join(path, f"{filename}.md"))
+    os.remove(filepath)
 
 
 def test_make_report(create_project):
@@ -347,11 +353,12 @@ def test_make_report(create_project):
     )
 
     filename = "testprj_dependencies"
+    filepath = os.path.join(path, f"{filename}.md")
     assert os.path.exists(
-        os.path.join(path, f"{filename}.md")
+        filepath
     ), f"FAILED in #2-4-1! {filename}.md was not created for report KEY="
 
-    df = read_markdown(f"{filename}.md")
+    df = read_markdown(filepath)
     cols = [
         "name",
         "alias",
@@ -375,4 +382,4 @@ def test_make_report(create_project):
     "for report KEY= does not include added pkg info: "
     f"expected to have numpy in {pkgs}"
 
-    os.remove(os.path.join(path, f"{filename}.md"))
+    os.remove(filepath)
