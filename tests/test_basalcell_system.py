@@ -8,12 +8,13 @@ import pytest
 prj_config = {"project_name": "testprj"}
 
 ext_dict = [
-    ("", "csv"),
-    ("csv", "csv"),
-    ("ipc", "ipc"),
-    ("feather", "ipc"),
-    ("pq", "pq"),
-    ("parquet", "pq"),
+    # (arg, cmd, method, output_ext)
+    ("", "", "csv", "csv"),
+    ("csv", "EXT=csv", "csv", "csv"),
+    ("ipc", "EXT=ipc", "ipc", "ipc"),
+    ("feather", "EXT=feather", "ipc", "ipc"),
+    ("pq", "EXT=pq", "parquet", "pq"),
+    ("parquet", "EXT=parquet", "parquet", "parquet"),
 ]
 
 
@@ -59,9 +60,7 @@ def read_markdown(filename: str) -> pl.DataFrame:
 @pytest.mark.parametrize("ext", ext_dict)
 def test_make_dump_all(create_project, ext):
     path, env = create_project(prj_config)
-    ext, extension = ext
-
-    ext_cmd = f"EXT={ext}" if ext != "" else ""
+    _, ext_cmd, ext_meth, ext_out = ext
 
     subprocess.run(
         f"make dump-all {ext_cmd}",
@@ -74,13 +73,13 @@ def test_make_dump_all(create_project, ext):
     )
 
     filename = "testprj_dependencies"
-    filepath = os.path.join(path, f"{filename}.{extension}")
+    filepath = os.path.join(path, f"{filename}.{ext_out}")
     assert os.path.exists(
         filepath
-    ), f"FAILED in #1-1-1! {filename}.{extension} was not created for "
+    ), f"FAILED in #1-1-1! {filename}.{ext_out} was not created for "
     f"dump-all EXT={ext}"
 
-    df = getattr(pl, f"read_{extension if extension != 'pq' else 'parquet'}")(filepath)
+    df = getattr(pl, f"read_{ext_meth}")(filepath)
     cols = [
         "name",
         "alias",
@@ -94,11 +93,11 @@ def test_make_dump_all(create_project, ext):
 
     assert (
         df.columns == cols
-    ), f"FAILED in #1-1-2! {filename}.{extension} for dump-all EXT={ext} "
+    ), f"FAILED in #1-1-2! {filename}.{ext_out} for dump-all EXT={ext} "
     f"has invalid columns: {df.columns}"
     assert (
         "python" in pkgs
-    ), f"FAILED in #1-1-3! {filename}.{extension} for dump-all EXT={ext} "
+    ), f"FAILED in #1-1-3! {filename}.{ext_out} for dump-all EXT={ext} "
     f"does not include python info: {pkgs}"
 
     os.remove(filepath)
@@ -107,9 +106,7 @@ def test_make_dump_all(create_project, ext):
 @pytest.mark.parametrize("ext", ext_dict)
 def test_make_dump_core(create_project, ext):
     path, env = create_project(prj_config)
-    ext, extension = ext
-
-    ext_cmd = f"EXT={ext}" if ext != "" else ""
+    _, ext_cmd, ext_meth, ext_out = ext
 
     subprocess.run(
         f"make add-py PKG=numpy && make lock && make dump-core {ext_cmd}",
@@ -122,13 +119,13 @@ def test_make_dump_core(create_project, ext):
     )
 
     filename = "testprj_dependencies"
-    filepath = os.path.join(path, f"{filename}.{extension}")
+    filepath = os.path.join(path, f"{filename}.{ext_out}")
     assert os.path.exists(
         filepath
-    ), f"FAILED in #1-2-1! {filename}.{extension} was not created for "
+    ), f"FAILED in #1-2-1! {filename}.{ext_out} was not created for "
     f"dump-core EXT={ext}"
 
-    df = getattr(pl, f"read_{extension if extension != 'pq' else 'parquet'}")(filepath)
+    df = getattr(pl, f"read_{ext_meth}")(filepath)
     cols = [
         "name",
         "alias",
@@ -142,27 +139,25 @@ def test_make_dump_core(create_project, ext):
 
     assert (
         df.columns == cols
-    ), f"FAILED in #1-2-2! {filename}.{extension} for dump-core EXT={ext} "
+    ), f"FAILED in #1-2-2! {filename}.{ext_out} for dump-core EXT={ext} "
     f"has invalid columns: {df.columns}"
     assert (
         "python" in pkgs
-    ), f"FAILED in #1-2-3! {filename}.{extension} for dump-core EXT={ext} "
+    ), f"FAILED in #1-2-3! {filename}.{ext_out} for dump-core EXT={ext} "
     f"does not include python info: {pkgs}"
     assert (
         "numpy" in pkgs
-    ), f"FAILED in #1-2-4! {filename}.{extension} for dump-core EXT={ext} "
+    ), f"FAILED in #1-2-4! {filename}.{ext_out} for dump-core EXT={ext} "
     "does not include added pkg info: "
     f"expected to have numpy in {pkgs}"
 
-    os.remove(os.path.join(path, f"{filename}.{extension}"))
+    os.remove(filepath)
 
 
 @pytest.mark.parametrize("ext", ext_dict)
 def test_make_dump(create_project, ext):
     path, env = create_project(prj_config)
-    ext, extension = ext
-
-    ext_cmd = f"EXT={ext}" if ext != "" else ""
+    _, ext_cmd, ext_meth, ext_out = ext
 
     subprocess.run(
         f"make add-py PKG=numpy && make lock && make dump KEYS=numpy {ext_cmd}",
@@ -175,13 +170,13 @@ def test_make_dump(create_project, ext):
     )
 
     filename = "testprj_dependencies"
-    filepath = os.path.join(path, f"{filename}.{extension}")
+    filepath = os.path.join(path, f"{filename}.{ext_out}")
     assert os.path.exists(
         filepath
-    ), f"FAILED in #1-3-1! {filename}.{extension} was not created for "
+    ), f"FAILED in #1-3-1! {filename}.{ext_out} was not created for "
     f"dump KEY=numpy EXT={ext}"
 
-    df = getattr(pl, f"read_{extension if extension != 'pq' else 'parquet'}")(filepath)
+    df = getattr(pl, f"read_{ext_meth}")(filepath)
     cols = [
         "name",
         "alias",
@@ -195,11 +190,11 @@ def test_make_dump(create_project, ext):
 
     assert (
         df.columns == cols
-    ), f"FAILED in #1-3-2! {filename}.{extension} for dump KEY=numpy EXT={ext} "
+    ), f"FAILED in #1-3-2! {filename}.{ext_out} for dump KEY=numpy EXT={ext} "
     f"has invalid columns: {df.columns}"
     assert [
         "numpy"
-    ] == pkgs, f"FAILED in #1-3-3! {filename}.{extension} for dump KEY=numpy EXT={ext} "
+    ] == pkgs, f"FAILED in #1-3-3! {filename}.{ext_out} for dump KEY=numpy EXT={ext} "
     f"is expected to have querried pkg info: got {pkgs}"
 
     os.remove(filepath)
