@@ -21,6 +21,22 @@ def _format_determinant(s: str) -> bool:
     return not s.startswith("_") and s != ""
 
 
+@pytest.fixture
+def create_project(cookies):
+    def _create_project(extra_context) -> tuple:
+        result = cookies.bake(extra_context=extra_context)
+        path = str(result.project_path)
+        env = os.environ.copy()
+        env.pop("CONDA_PREFIX", None)
+        env.pop("CONDA_DEFAULT_ENV", None)
+        env.pop("CONDA_PROMPT_MODIFIER", None)
+        env.pop("VIRTUAL_ENV", None)
+        env.pop("POETRY_ACTIVE", None)
+        return path, env
+
+    return _create_project
+
+
 def read_markdown(filename: str) -> pl.DataFrame:
     with open(filename, "r") as f:
         lines = f.readlines()
@@ -41,9 +57,8 @@ def read_markdown(filename: str) -> pl.DataFrame:
 
 
 @pytest.mark.parametrize("ext", ext_dict)
-def test_make_dump_all(cookies, ext):
-    result = cookies.bake(extra_context=prj_config)
-    path = str(result.project_path)
+def test_make_dump_all(create_project, ext):
+    path, env = create_project(prj_config)
     ext, extension = ext
 
     ext_cmd = f"EXT={ext}" if ext != "" else ""
@@ -55,6 +70,7 @@ def test_make_dump_all(cookies, ext):
         capture_output=True,
         text=True,
         check=True,
+        env=env,
     )
     if dump_all.exit_code != 0:
         raise dump_all.exception
@@ -90,9 +106,8 @@ def test_make_dump_all(cookies, ext):
 
 
 @pytest.mark.parametrize("ext", ext_dict)
-def test_make_dump_core(cookies, ext):
-    result = cookies.bake(extra_context=prj_config)
-    path = str(result.project_path)
+def test_make_dump_core(create_project, ext):
+    path, env = create_project(prj_config)
     ext, extension = ext
 
     ext_cmd = f"EXT={ext}" if ext != "" else ""
@@ -104,6 +119,7 @@ def test_make_dump_core(cookies, ext):
         capture_output=True,
         text=True,
         check=True,
+        env=env,
     )
     if dump_core.exit_code != 0:
         raise dump_core.exception
@@ -144,9 +160,8 @@ def test_make_dump_core(cookies, ext):
 
 
 @pytest.mark.parametrize("ext", ext_dict)
-def test_make_dump(cookies, ext):
-    result = cookies.bake(extra_context=prj_config)
-    path = str(result.project_path)
+def test_make_dump(create_project, ext):
+    path, env = create_project(prj_config)
     ext, extension = ext
 
     ext_cmd = f"EXT={ext}" if ext != "" else ""
@@ -158,6 +173,7 @@ def test_make_dump(cookies, ext):
         capture_output=True,
         text=True,
         check=True,
+        env=env,
     )
     if dump.exit_code != 0:
         raise dump.exception
@@ -192,9 +208,8 @@ def test_make_dump(cookies, ext):
     os.remove(os.path.join(path, f"{filename}.{extension}"))
 
 
-def test_make_report_all(cookies):
-    result = cookies.bake(extra_context=prj_config)
-    path = str(result.project_path)
+def test_make_report_all(create_project):
+    path, env = create_project(prj_config)
 
     dump_all = subprocess.run(
         "make report KEYS=all",
@@ -203,6 +218,7 @@ def test_make_report_all(cookies):
         capture_output=True,
         text=True,
         check=True,
+        env=env,
     )
     if dump_all.exit_code != 0:
         raise dump_all.exception
@@ -236,9 +252,8 @@ def test_make_report_all(cookies):
     os.remove(os.path.join(path, f"{filename}.md"))
 
 
-def test_make_report_core(cookies):
-    result = cookies.bake(extra_context=prj_config)
-    path = str(result.project_path)
+def test_make_report_core(create_project):
+    path, env = create_project(prj_config)
 
     dump_all = subprocess.run(
         "make add-py PKG=numpy && make lock && make report KEYS=core",
@@ -247,6 +262,7 @@ def test_make_report_core(cookies):
         capture_output=True,
         text=True,
         check=True,
+        env=env,
     )
     if dump_all.exit_code != 0:
         raise dump_all.exception
@@ -285,9 +301,8 @@ def test_make_report_core(cookies):
     os.remove(os.path.join(path, f"{filename}.md"))
 
 
-def test_make_report_query(cookies):
-    result = cookies.bake(extra_context=prj_config)
-    path = str(result.project_path)
+def test_make_report_query(create_project):
+    path, env = create_project(prj_config)
 
     dump_all = subprocess.run(
         "make add-py PKG=numpy && make lock && make report KEYS=numpy",
@@ -296,6 +311,7 @@ def test_make_report_query(cookies):
         capture_output=True,
         text=True,
         check=True,
+        env=env,
     )
     if dump_all.exit_code != 0:
         raise dump_all.exception
@@ -329,9 +345,8 @@ def test_make_report_query(cookies):
     os.remove(os.path.join(path, f"{filename}.md"))
 
 
-def test_make_report(cookies):
-    result = cookies.bake(extra_context=prj_config)
-    path = str(result.project_path)
+def test_make_report(create_project):
+    path, env = create_project(prj_config)
 
     dump_all = subprocess.run(
         "make add-py PKG=numpy && make lock && make report",
@@ -340,6 +355,7 @@ def test_make_report(cookies):
         capture_output=True,
         text=True,
         check=True,
+        env=env,
     )
     if dump_all.exit_code != 0:
         raise dump_all.exception
