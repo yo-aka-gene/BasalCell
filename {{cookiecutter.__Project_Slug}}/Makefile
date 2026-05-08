@@ -255,11 +255,11 @@ init:
 		echo "--> Lockfile (.basalcell/conda-lock.yml) found! Delegating to 'make install'..."; \
 		$(MAKE) install; \
 	else \
-		if ! mamba env list | grep -q $(MAMBA_ENV); then \
-			mamba env create -f environment.yml -y; \
+		if ! mamba run -n $(MAMBA_ENV) true >/dev/null 2>&1; then \
+			mamba env create -n $(MAMBA_ENV) -f environment.yml -y; \
 		else \
 			echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
-			mamba env update -f environment.yml --prune -y; \
+			mamba env update -n $(MAMBA_ENV) -f environment.yml --prune -y; \
 		fi; \
 		mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false; \
 		mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
@@ -425,11 +425,11 @@ init: setup-mamba
 		echo "--> Lockfile (.basalcell/conda-lock.yml) found! Delegating to 'make install'..."; \
 		$(MAKE) install; \
 	else \
-		if ! mamba env list | grep -q $(MAMBA_ENV); then \
-			mamba env create -f environment.yml -y; \
+		if ! mamba run -n $(MAMBA_ENV) true >/dev/null 2>&1; then \
+			mamba env create -n $(MAMBA_ENV) -f environment.yml -y; \
 		else \
 			echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
-			mamba env update -f environment.yml --prune -y; \
+			mamba env update -n $(MAMBA_ENV) -f environment.yml --prune -y; \
 		fi; \
 		mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false; \
 		mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
