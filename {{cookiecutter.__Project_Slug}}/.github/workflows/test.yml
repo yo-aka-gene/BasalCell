@@ -27,15 +27,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install conda-lock for CI
-        shell: bash -el {0}
-        run: mamba install -c conda-forge conda-lock -y
-
       - name: Setup Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
           miniforge-version: latest
           use-mamba: true
+
+      - name: Install conda-lock for CI
+        shell: bash -el {0}
+        run: mamba install -c conda-forge conda-lock -y
 
 {%- if cookiecutter.r_ver != "none" %}
 {% raw %}
@@ -49,10 +49,13 @@ jobs:
 {% endraw %}
 {%- endif %}
       - name: Install dependencies via Make
+        shell: bash -el {0}
         run: make install
 
       - name: Run pre-commit hooks
+        shell: bash -el {0}
         run: mamba run -n mamba_{{cookiecutter.__project_slug}} poetry run pre-commit run --all-files
 
       - name: Run Tests
+        shell: bash -el {0}
         run: make test
