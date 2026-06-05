@@ -186,7 +186,7 @@ lock-conda:
 
 install-conda:
 	@echo "Reproducing Mamba environment based on the 'conda-lock.yml' file..."
-	conda-lock install -n $(MAMBA_ENV) .basalcell/conda-lock.yml
+	mamba run -n base conda-lock install -n $(MAMBA_ENV) .basalcell/conda-lock.yml
 
 # ==========================================
 # Python
