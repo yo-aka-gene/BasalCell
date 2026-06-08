@@ -35,7 +35,7 @@ jobs:
 
       - name: Install conda-lock for CI
         shell: bash -el {0}
-        run: mamba install -c conda-forge conda-lock -y
+        run: mamba install -n base -c conda-forge conda-lock -y
 
 {%- if cookiecutter.r_ver != "none" %}
 {% raw %}
