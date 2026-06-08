@@ -4,6 +4,7 @@
 
 
 ![BasalCell Version](https://img.shields.io/github/v/tag/yo-aka-gene/BasalCell?label=BasalCell&color=blue)
+[<img src="https://img.shields.io/badge/DOI-10.64898/2026.05.27.720396-FAB70C?style=flat&logo=doi">](https://doi.org/10.64898/2026.05.27.720396)
 
 
 - Free software: MIT license
@@ -11,6 +12,18 @@
 BasalCell is a [cookiecutter](https://github.com/cookiecutter/cookiecutter) template designed for reproducible and distributable bioinformatics data analysis. It streamlines the creation of isolated Python and R environments integrated within JupyterLab.
 
 **:eyes: See it in action:** Check out the [BasalCellDemo repository](https://github.com/yo-aka-gene/BasalCellDemo) for a complete scRNA-seq workflow example.
+
+### Citation
+```
+@article{okano2026basalcell,
+  title={BasalCell: A project scaffold generator for bioinformatics analysis},
+  author={Okano, Yuji and Ishikawa, Tetsuo and Sakurada, Kazuhiro},
+  journal={bioRxiv},
+  pages={2026--05},
+  year={2026},
+  publisher={Cold Spring Harbor Laboratory}
+}
+```
 
 ## Features
 - **Poetry-managed Python environment**: Pre-configured with `jupyterlab` and essential data science tools.
