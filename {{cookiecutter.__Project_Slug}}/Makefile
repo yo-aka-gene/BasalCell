@@ -184,9 +184,20 @@ lock-conda:
 	mamba clean --all --yes
 	CONDA_PKGS_DIRS=$$(mktemp -d) mamba run -n base conda-lock -f environment.yml -p osx-arm64 -p linux-64 -p osx-64 --conda conda --lockfile .basalcell/conda-lock.yml
 
+{%- if cookiecutter.r_ver == "none" %}
 install-conda:
 	@echo "Reproducing Mamba environment based on the 'conda-lock.yml' file..."
 	mamba run -n base conda-lock install -n $(MAMBA_ENV) .basalcell/conda-lock.yml
+{%- else %}
+install-conda:
+	@echo "Reproducing Mamba environment based on the 'conda-lock.yml' file..."
+	@if [ -f .Rprofile ]; then mv .Rprofile .Rprofile_temp_bak; fi
+	@if ! mamba run -n base conda-lock install -n $(MAMBA_ENV) .basalcell/conda-lock.yml; then \
+		if [ -f .Rprofile_temp_bak ]; then mv .Rprofile_temp_bak .Rprofile; fi; \
+		exit 1; \
+	fi
+	@if [ -f .Rprofile_temp_bak ]; then mv .Rprofile_temp_bak .Rprofile; fi
+{%- endif %}
 
 # ==========================================
 # Python
