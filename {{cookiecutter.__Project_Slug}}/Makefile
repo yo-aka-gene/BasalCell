@@ -431,7 +431,7 @@ renv::snapshot(prompt = FALSE, type = "all")
 endef
 export R_SETUP_INIT_LOGIC
 
-init: setup-mamba
+init:
 	@if ! command -v mamba >/dev/null 2>&1; then \
 		echo "mamba is not installed. Please install it first."; \
 		exit 1; \
