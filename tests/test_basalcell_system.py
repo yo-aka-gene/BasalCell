@@ -41,6 +41,11 @@ def create_project(cookies, monkeypatch):
         monkeypatch.delenv("VIRTUAL_ENV", raising=False)
         monkeypatch.delenv("POETRY_ACTIVE", raising=False)
         result = cookies.bake(extra_context=extra_context)
+        if result.exit_code != 0:
+            raise result.exception
+
+        assert result.project_path is not None
+
         path = str(result.project_path)
         env = os.environ.copy()
         return path, env
