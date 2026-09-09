@@ -246,7 +246,7 @@ install-py:
 	mamba run -n $(MAMBA_ENV) poetry install
 
 PYDEV_CORE := ipykernel ipywidgets jupyterlab jupyter-resource-usage \
-			  pytest mypy ruff pre-commit \
+			  pytest mypy ruff \
 			  sphinx sphinx-rtd-theme sphinx-gallery nbsphinx numpydoc myst-parser pandoc \
 			  polars pyarrow PyYAML
 
