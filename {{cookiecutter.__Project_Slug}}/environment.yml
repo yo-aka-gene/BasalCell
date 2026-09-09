@@ -17,6 +17,7 @@ dependencies:
   - llvmdev
   - llvmlite
   - numba
+  - pre-commit
 {%- if cookiecutter.r_ver != "none" %}
   - r-base={{cookiecutter.r_ver}}
   - r-renv
