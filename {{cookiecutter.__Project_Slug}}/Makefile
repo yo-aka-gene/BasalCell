@@ -272,7 +272,6 @@ init:
 			echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
 			mamba env update -n $(MAMBA_ENV) -f environment.yml --prune -y; \
 		fi; \
-		mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false; \
 		mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
 		$(MAKE) add-pydev PKG="$(PYDEV_CORE)"; \
 		$(MAKE) setup-local; \
@@ -304,7 +303,6 @@ docs:
 lock: lock-conda lock-py
 
 install: install-conda
-	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
 	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""
 	$(MAKE) install-py
 	$(MAKE) setup-local
@@ -449,7 +447,6 @@ init: setup-mamba
 			echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
 			mamba env update -n $(MAMBA_ENV) -f environment.yml --prune -y; \
 		fi; \
-		mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false; \
 		mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
 		RBASE_VER=$$(mamba list -n $(MAMBA_ENV) "^r-base$$" | awk '/r-base/ {print $$2}'); \
 		RENV_VER=$$(mamba list -n $(MAMBA_ENV) "^r-renv$$" | awk '/r-renv/ {print $$2}'); \
@@ -517,7 +514,6 @@ docs: docs-r docs-py
 lock: lock-conda lock-py lock-r
 
 install: install-conda
-	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
 	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""
 	@RBASE_VER=$$(mamba list -n $(MAMBA_ENV) "^r-base$$" | awk '/r-base/ {print $$2}'); \
 	mamba run -n $(MAMBA_ENV) bash -c "echo 'r-base =='$$RBASE_VER > \"\$$CONDA_PREFIX/conda-meta/pinned\""
