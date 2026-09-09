@@ -34,6 +34,7 @@ def essential_deps():
         "llvmdev",
         "llvmlite",
         "numba",
+        "pre-commit",
     ]
 
 
@@ -45,6 +46,7 @@ def essential_files():
         ".readthedocs.yaml",
         "environment.yml",
         "Makefile",
+        "poetry.toml",
         "pyproject.toml",
         "README.md",
         ".basalcell/basalcell_system/__init__.py",
