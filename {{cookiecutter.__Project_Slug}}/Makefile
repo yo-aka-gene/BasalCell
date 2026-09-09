@@ -262,7 +262,8 @@ init:
 		exit 1; \
 	fi
 	$(MAKE) setup-mamba
-	@if [ -f .basalcell/conda-lock.yml ]; then \
+	@set -e; \
+	if [ -f .basalcell/conda-lock.yml ]; then \
 		echo "--> Lockfile (.basalcell/conda-lock.yml) found! Delegating to 'make install'..."; \
 		$(MAKE) install; \
 	else \
@@ -437,7 +438,8 @@ init:
 		exit 1; \
 	fi
 	$(MAKE) setup-mamba
-	@if [ -f .basalcell/conda-lock.yml ]; then \
+	@set -e; \
+	if [ -f .basalcell/conda-lock.yml ]; then \
 		echo "--> Lockfile (.basalcell/conda-lock.yml) found! Delegating to 'make install'..."; \
 		$(MAKE) install; \
 	else \
