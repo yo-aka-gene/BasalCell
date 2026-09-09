@@ -4,6 +4,7 @@ Test for BasalCell template generation
 
 import json
 import subprocess
+import tomllib
 
 import pytest
 import yaml
@@ -46,10 +47,12 @@ def essential_files():
         ".readthedocs.yaml",
         "environment.yml",
         "Makefile",
+        "poetry.lock",
         "poetry.toml",
         "pyproject.toml",
         "README.md",
         ".basalcell/basalcell_system/__init__.py",
+        ".basalcell/conda-lock.yml",
         ".github/workflows/test.yml",
         ".github/pull_request_template.md",
         "REPLACETHIS_tools/__init__.py",
@@ -121,15 +124,7 @@ def uninstall_kernel(name, cwd):
     subprocess.run(uninstall_cmd, cwd=cwd, capture_output=True, text=True)
 
 
-def minimal_tests(
-    result,
-    fixture_essential_chs,
-    fixture_essential_deps,
-    fixture_essential_files,
-    fixture_symbolic_links,
-    slug,
-    idx,
-):
+def check_bake_result(result, idx):
     print("===== #1. Checking exit code =====")
     if result.exit_code != 0:
         raise result.exception
@@ -150,8 +145,18 @@ def minimal_tests(
 
     assert result.project_path.is_dir(), f"FAILED in #3-2! {path} is not a directory"
 
+
+def minimal_project_tests(
+    project_path,
+    project_name,
+    fixture_essential_chs,
+    fixture_essential_deps,
+    fixture_essential_files,
+    fixture_symbolic_links,
+    slug,
+):
     print("===== #4. Checking Mamba environment =====")
-    expected_env_name = f"mamba_{result.project_path.name.lower()}"
+    expected_env_name = f"mamba_{project_name.lower()}"
     mamba_proc = subprocess.run(
         ["mamba", "env", "list", "--json"], capture_output=True, text=True, check=True
     )
@@ -165,7 +170,7 @@ def minimal_tests(
         env_exists
     ), f"FAILED in #4-1! {expected_env_name} is not found in {env_paths}"
 
-    env_file = result.project_path / "environment.yml"
+    env_file = project_path / "environment.yml"
     with open(env_file, "r") as f:
         env_data = yaml.safe_load(f)
     channels = env_data.get("channels", [])
@@ -184,16 +189,24 @@ def minimal_tests(
 
     print("===== #5. Checking essential files =====")
     for i, file in enumerate(fixture_essential_files):
-        file = (file).replace(slug, path.lower())
-        file_path = result.project_path / file
+        file = (file).replace(slug, project_name.lower())
+        file_path = project_path / file
         assert (
             file_path.exists()
-        ), f"FAILED in #5-{i + 1}! {file} is not found in {path}"
+        ), f"FAILED in #5-{i + 1}! {file} is not found in {project_name}"
+
+    poetry_config_file = project_path / "poetry.toml"
+    with open(poetry_config_file, "rb") as f:
+        poetry_config = tomllib.load(f)
+
+    assert (
+        poetry_config.get("virtualenvs", {}).get("create") is False
+    ), "FAILED in #5! poetry.toml must set virtualenvs.create = false"
 
     print("===== #6–8. Checking symbolic links =====")
     for i, link in enumerate(fixture_symbolic_links):
-        link = (link).replace(slug, path.lower())
-        link_path = result.project_path / link
+        link = (link).replace(slug, project_name.lower())
+        link_path = project_path / link
         expected_target_name = link.split("/")[-1]
         resolved_path = link_path.resolve()
         # #6. If it's a symbolic link?
@@ -210,17 +223,39 @@ def minimal_tests(
         ), f"FAILED in #8-{i + 1}! {link} points to wrong target: {resolved_path.name}"
 
     print("===== #9. Checking Jupyter Kernel =====")
-    kernel_name = f"{path.lower()}_py"
+    kernel_name = f"{project_name.lower()}_py"
     try:
         check_cmd = ["poetry", "run", "jupyter", "kernelspec", "list"]
         res = subprocess.run(
-            check_cmd, cwd=result.project_path, capture_output=True, text=True
+            check_cmd, cwd=project_path, capture_output=True, text=True
         )
         assert (
             kernel_name in res.stdout.lower()
         ), f"FAILED in #9! '{kernel_name}' not found in:\n{res.stdout}"
     finally:
-        uninstall_kernel(kernel_name, result.project_path)
+        uninstall_kernel(kernel_name, project_path)
+
+
+def minimal_tests(
+    result,
+    fixture_essential_chs,
+    fixture_essential_deps,
+    fixture_essential_files,
+    fixture_symbolic_links,
+    slug,
+    idx,
+):
+    check_bake_result(result, idx)
+
+    minimal_project_tests(
+        result.project_path,
+        result.project_path.name,
+        fixture_essential_chs,
+        fixture_essential_deps,
+        fixture_essential_files,
+        fixture_symbolic_links,
+        slug,
+    )
 
 
 def test_correct_template(
@@ -327,6 +362,99 @@ def test_correct_template_with_rlang(
             ), f"FAILED in #10! '{kernel_name}' not found in:\n{res.stdout}"
         finally:
             uninstall_kernel(kernel_name, result.project_path)
+    finally:
+        subprocess.run(
+            ["mamba", "env", "remove", "-n", env_name, "-y"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+
+
+def test_correct_template_is_reproducible(
+    cookies, essential_chs, essential_deps, essential_files, symbolic_links, prj_slug
+):
+    result = cookies.bake(extra_context={"project_name": "Test Project-CI/CD-4"})
+    project_path = result.project_path
+    project_name = project_path.name
+    env_name = f"mamba_{project_name.lower()}"
+    kernel_name = f"{project_name.lower()}_py"
+    clone_path = project_path.parent / f"{project_name}_clone"
+
+    try:
+        print("===== Checking fresh template generation =====")
+        check_bake_result(result, 4)
+
+        print("===== Removing side effects from fresh initialization =====")
+        uninstall_kernel(kernel_name, project_path)
+
+        subprocess.run(
+            ["git", "add", "-A"],
+            cwd=project_path,
+            check=True,
+        )
+        subprocess.run(
+            [
+                "git",
+                "-c",
+                "user.name=BasalCell-CI",
+                "-c",
+                "user.email=ci@example.com",
+                "commit",
+                "--no-verify",
+                "-m",
+                "Test clone reproducibility",
+            ],
+            cwd=project_path,
+            check=True,
+        )
+
+        subprocess.run(
+            ["mamba", "env", "remove", "-n", env_name, "-y"],
+            check=True,
+        )
+
+        print("===== Cloning project from committed repository state =====")
+        subprocess.run(
+            [
+                "git",
+                "clone",
+                "--no-local",
+                str(project_path),
+                str(clone_path),
+            ],
+            check=True,
+        )
+        assert (
+            clone_path / ".basalcell" / "conda-lock.yml"
+        ).exists(), "FAILED! conda-lock.yml was not preserved through git clone"
+        assert (
+            clone_path / "poetry.lock"
+        ).exists(), "FAILED! poetry.lock was not preserved through git clone"
+
+        print("===== Reconstructing project from cloned repository =====")
+        subprocess.run(
+            ["make", "init"],
+            cwd=clone_path,
+            check=True,
+        )
+
+        print("===== Checking reconstructed project =====")
+        minimal_project_tests(
+            clone_path,
+            project_name,
+            essential_chs,
+            essential_deps,
+            essential_files,
+            symbolic_links,
+            prj_slug,
+        )
+
+        precommit_hook = clone_path / ".git" / "hooks" / "pre-commit"
+        assert (
+            precommit_hook.exists()
+        ), "FAILED! pre-commit hook was not installed in the cloned repository"
+
     finally:
         subprocess.run(
             ["mamba", "env", "remove", "-n", env_name, "-y"],
