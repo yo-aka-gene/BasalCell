@@ -310,7 +310,7 @@ install: install-conda
 
 setup-local:
 	@if [ ! -d .git ]; then mamba run -n $(MAMBA_ENV) git init -b main; fi
-	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
+	mamba run -n $(MAMBA_ENV) pre-commit install
 	mamba run -n $(MAMBA_ENV) \
 		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 
@@ -526,7 +526,7 @@ install: install-conda
 
 setup-local:
 	@if [ ! -d .git ]; then mamba run -n $(MAMBA_ENV) git init -b main; fi
-	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
+	mamba run -n $(MAMBA_ENV) pre-commit install
 	mamba run -n $(MAMBA_ENV) \
 		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 	mamba run -n $(MAMBA_ENV) poetry run Rscript --vanilla -e "\
