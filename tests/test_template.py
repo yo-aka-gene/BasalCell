@@ -379,7 +379,9 @@ def test_correct_template_is_reproducible(
     project_name = project_path.name
     env_name = f"mamba_{project_name.lower()}"
     kernel_name = f"{project_name.lower()}_py"
-    clone_path = project_path.parent / f"{project_name}_clone"
+    clone_root = project_path.parent / "clone"
+    clone_path = clone_root / project_name
+    clone_root.mkdir()
 
     try:
         print("===== Checking fresh template generation =====")
