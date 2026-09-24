@@ -207,10 +207,15 @@ install-conda:
 # ==========================================
 # Python
 # ==========================================
-.PHONY: add-py add-pydev remove-py remove-pydev lock-py install-py
+.PHONY: setup-poetry add-py add-pydev remove-py remove-pydev lock-py install-py
 
 COMMA := ,
 CLEAN_PKG_VAL = $(strip $(subst $(COMMA), ,$(PKG)))
+
+setup-poetry:
+	@echo "Configuring Poetry to use a project-local .venv..."
+	@$(POETRY) config virtualenvs.create true --local
+	@$(POETRY) config virtualenvs.in-project true --local
 
 add-py:
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
