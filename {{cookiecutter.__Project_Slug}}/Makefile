@@ -235,12 +235,11 @@ remove-py: setup-poetry
 	@$(MAKE) lock-py
 	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
-remove-pydev:
+remove-pydev: setup-poetry
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
-	@mamba run -n $(MAMBA_ENV) poetry remove --group dev $(CLEAN_PKG_VAL)
+	@$(POETRY) remove --group dev $(CLEAN_PKG_VAL)
 	@$(MAKE) lock-py
-	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
+	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
 lock-py:
 	@echo "Updating poetry.lock without installing..."
