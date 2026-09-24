@@ -142,13 +142,13 @@ clean:
 	@echo "Clean up complete."
 
 bump-patch:
-	@mamba run -n $(MAMBA_ENV) poetry version patch
+	@$(POETRY) version patch
 
 bump-minor:
-	@mamba run -n $(MAMBA_ENV) poetry version minor
+	@$(POETRY) version minor
 
 bump-major:
-	@mamba run -n $(MAMBA_ENV) poetry version major
+	@$(POETRY) version major
 
 define CALL_PY_FUNC
 	mamba run -n $(MAMBA_ENV) python -c "import sys; sys.path.append('./.basalcell'); \
