@@ -18,6 +18,12 @@ PY_KERNEL := $(DIR_NAME)_py
 VERSION := $(shell grep '^version = ' pyproject.toml | cut -d '"' -f 2)
 PYTHON_VERSION := {{cookiecutter.python_ver}}
 
+# Run Poetry from the Mamba environment while hiding the active Conda
+# environment markers from Poetry itself. Without this, Poetry treats
+# mamba_{{cookiecutter.__project_slug}} as the active project environment and may install/uninstall
+# packages directly in Conda's site-packages.
+POETRY = mamba run -n $(MAMBA_ENV) env -u VIRTUAL_ENV -u CONDA_PREFIX -u CONDA_DEFAULT_ENV poetry
+
 define LAUNCH_JUPYTER_LOGIC
 import os
 import platform
