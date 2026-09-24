@@ -267,7 +267,7 @@ PYDEV_CORE := ipykernel ipywidgets jupyterlab jupyter-resource-usage \
 # ==========================================
 # Advanced Project Management (Python)
 # ==========================================
-.PHONY: init test docs lock install setup-local terminate
+.PHONY: init test docs lock install setup-local terminate purge
 
 init:
 	@if ! command -v mamba >/dev/null 2>&1; then \
@@ -324,7 +324,9 @@ setup-local: setup-poetry
 terminate:
 	rm -rf .venv
 	mamba env remove -n $(MAMBA_ENV) -y
-	rm -rf .basalcell/conf-lock.yml .basalcell/requirements.txt poetry.lock
+
+purge: terminate
+	rm -rf .basalcell/conf-lock.yml .basalcell/requirements.txt .basalcell/conda-lock.yml poetry.lock
 
 {%- else %}
 # ==========================================
@@ -427,7 +429,7 @@ sync-r:
 # ==========================================
 # Advanced Project Management (Python & R)
 # ==========================================
-.PHONY: init test-py test-r test docs-r docs-py docs lock install setup-local terminate
+.PHONY: init test-py test-r test docs-r docs-py docs lock install setup-local terminate purge
 
 R_PKG_DIR := {{cookiecutter.__project_slug}}_rtools
 R_VERSION := {{ cookiecutter.r_ver }}
@@ -538,6 +540,8 @@ setup-local: setup-poetry
 terminate:
 	rm -rf .venv
 	mamba env remove -n $(MAMBA_ENV) -y
-	rm -rf renv/library renv.lock .basalcell/conf-lock.yml .basalcell/requirements.txt poetry.lock
+
+purge: terminate
+	rm -rf renv/library renv.lock .basalcell/conf-lock.yml .basalcell/requirements.txt .basalcell/conda-lock.yml poetry.lock
 
 {%- endif %}
