@@ -322,6 +322,7 @@ setup-local: setup-poetry
 	@$(POETRY) run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 
 terminate:
+	rm -rf .venv
 	mamba env remove -n $(MAMBA_ENV) -y
 	rm -rf .basalcell/conf-lock.yml .basalcell/requirements.txt poetry.lock
 
@@ -535,6 +536,7 @@ setup-local: setup-poetry
 	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $(R_VERSION) ($(R_KERNEL_NAME))', user=TRUE)"
 
 terminate:
+	rm -rf .venv
 	mamba env remove -n $(MAMBA_ENV) -y
 	rm -rf renv/library renv.lock .basalcell/conf-lock.yml .basalcell/requirements.txt poetry.lock
 
