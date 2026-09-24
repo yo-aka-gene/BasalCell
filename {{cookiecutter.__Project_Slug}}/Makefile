@@ -241,11 +241,10 @@ remove-pydev: setup-poetry
 	@$(MAKE) lock-py
 	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
-lock-py:
+lock-py: setup-poetry
 	@echo "Updating poetry.lock without installing..."
-	mamba run -n $(MAMBA_ENV) poetry lock
-	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
+	@$(POETRY) lock
+	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
 install-py:
 	@echo "Installing Python dependencies from lock file..."
