@@ -308,11 +308,10 @@ install: install-conda
 	$(MAKE) install-py
 	$(MAKE) setup-local
 
-setup-local:
+setup-local: setup-poetry
 	@if [ ! -d .git ]; then mamba run -n $(MAMBA_ENV) git init -b main; fi
-	mamba run -n $(MAMBA_ENV) pre-commit install
-	mamba run -n $(MAMBA_ENV) \
-		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
+	@$(POETRY) run pre-commit install
+	@$(POETRY) run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 
 terminate:
 	mamba env remove -n $(MAMBA_ENV) -y
@@ -493,21 +492,16 @@ docs-r: sync-r
 		devtools::document('$(R_PKG_DIR)'); \
 		pkgdown::build_site(pkg = '$(R_PKG_DIR)', override = list(destination = '../docs/r_api'), new_process = FALSE, install = FALSE)"
 
-docs-py:
+docs-py: setup-poetry
 	@echo "Building Sphinx HTML documentation..."
-	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with dev --without-hashes --format=requirements.txt > docs/requirements.txt
+	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > docs/requirements.txt
 {%- if cookiecutter.create_package == "true" %}
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-apidoc -f -o docs/api src/{{cookiecutter.__project_slug}}/
+	@$(POETRY) run sphinx-apidoc -f -o docs/api src/{{cookiecutter.__project_slug}}/
 {%- endif %}
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-apidoc -f -o docs/auxiliary_api {{cookiecutter.__project_slug}}_tools/
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-build -a -E -b html docs docs/_build/html
+	@$(POETRY) run sphinx-apidoc -f -o docs/auxiliary_api {{cookiecutter.__project_slug}}_tools/
+	@$(POETRY) run sphinx-build -a -E -b html docs docs/_build/html
 	@echo "Opening documentation in browser..."
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run python -c \
+	@$(POETRY) run python -c \
 		"import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
 
 docs: docs-r docs-py
@@ -524,12 +518,11 @@ install: install-conda
 	$(MAKE) install-r
 	$(MAKE) setup-local
 
-setup-local:
+setup-local: setup-poetry
 	@if [ ! -d .git ]; then mamba run -n $(MAMBA_ENV) git init -b main; fi
-	mamba run -n $(MAMBA_ENV) pre-commit install
-	mamba run -n $(MAMBA_ENV) \
-		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
-	mamba run -n $(MAMBA_ENV) poetry run Rscript --vanilla -e "\
+	@$(POETRY) run pre-commit install
+	@$(POETRY) run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
+	@$(POETRY) run Rscript --vanilla -e "\
 	    .libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); \
 	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $(R_VERSION) ($(R_KERNEL_NAME))', user=TRUE)"
 
