@@ -522,7 +522,7 @@ setup-local: setup-poetry
 	@if [ ! -d .git ]; then mamba run -n $(MAMBA_ENV) git init -b main; fi
 	@$(POETRY) run pre-commit install
 	@$(POETRY) run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
-	@$(POETRY) run Rscript --vanilla -e "\
+	mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "\
 	    .libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); \
 	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $(R_VERSION) ($(R_KERNEL_NAME))', user=TRUE)"
 
