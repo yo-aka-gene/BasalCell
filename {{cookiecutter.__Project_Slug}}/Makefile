@@ -248,7 +248,7 @@ lock-py: setup-poetry
 
 install-py: setup-poetry
 	@echo "Installing Python dependencies from lock file..."
-	@$(POETRY) install
+	@$(POETRY) sync --with dev
 
 PYDEV_CORE := ipykernel ipywidgets jupyterlab jupyter-resource-usage \
 			  pytest mypy ruff \
