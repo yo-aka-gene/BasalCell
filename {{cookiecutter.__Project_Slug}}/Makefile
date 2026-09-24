@@ -291,19 +291,14 @@ test:
 
 docs:
 	@echo "Building Sphinx HTML documentation..."
-	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with dev --without-hashes --format=requirements.txt > docs/requirements.txt
+	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > docs/requirements.txt
 {%- if cookiecutter.create_package == "true" %}
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-apidoc -f -o docs/api src/{{cookiecutter.__project_slug}}/
+	@$(POETRY) run sphinx-apidoc -f -o docs/api src/{{cookiecutter.__project_slug}}/
 {%- endif %}
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-apidoc -f -o docs/auxiliary_api {{cookiecutter.__project_slug}}_tools/
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-build -b html docs docs/_build/html
+	@$(POETRY) run sphinx-apidoc -f -o docs/auxiliary_api {{cookiecutter.__project_slug}}_tools/
+	@$(POETRY) run sphinx-build -b html docs docs/_build/html
 	@echo "Opening documentation in browser..."
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run python -c \
+	@$(POETRY) run python -c \
 		"import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
 
 lock: lock-conda lock-py
