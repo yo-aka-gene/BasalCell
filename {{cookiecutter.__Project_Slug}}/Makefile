@@ -286,7 +286,7 @@ init:
 	@echo "All done! You are ready to start coding."
 
 test:
-	mamba run -n $(MAMBA_ENV) poetry run pytest
+	@$(POETRY) run pytest
 	@rm -fr .pytest_cache
 
 docs:
