@@ -188,7 +188,7 @@ lock-conda:
 	@echo "Generating conda-lock.yml..."
 	@TMP_DIR=$$(mktemp -d); \
 	trap 'rm -rf "$$TMP_DIR"' EXIT; \
-	CONDA_PKGS_DIRS="$$TMP_DIR" \ 
+	CONDA_PKGS_DIRS="$$TMP_DIR" \
 	mamba run -n base conda-lock \
 		-f environment.yml \
 		-p osx-arm64 \
