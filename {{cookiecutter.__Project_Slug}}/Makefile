@@ -132,8 +132,7 @@ export LAUNCH_JUPYTER_LOGIC
 
 
 launch:
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run python -c "$$LAUNCH_JUPYTER_LOGIC"
+	@$(POETRY) run python -c "$$LAUNCH_JUPYTER_LOGIC"
 
 clean:
 	@echo "Cleaning up built documentation and cache..."
