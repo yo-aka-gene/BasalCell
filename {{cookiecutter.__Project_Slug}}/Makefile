@@ -151,7 +151,7 @@ bump-major:
 	@$(POETRY) version major
 
 define CALL_PY_FUNC
-	@$(POETRY) run python -c "import sys; sys.path.append('./.basalcell'); \
+	$(POETRY) run python -c "import sys; sys.path.append('./.basalcell'); \
 	from basalcell_system import $(1); \
 	args = [arg for arg in '$(2)'.split() if arg]; \
 	$(1)(*args)"
