@@ -186,8 +186,16 @@ add-os:
 
 lock-conda:
 	@echo "Generating conda-lock.yml..."
-	mamba clean --all --yes
-	CONDA_PKGS_DIRS=$$(mktemp -d) mamba run -n base conda-lock -f environment.yml -p osx-arm64 -p linux-64 -p osx-64 --conda conda --lockfile .basalcell/conda-lock.yml
+	@TMP_DIR=$$(mktemp -d); \
+	trap 'rm -rf "$$TMP_DIR"' EXIT; \
+	CONDA_PKGS_DIRS="$$TMP_DIR" \ 
+	mamba run -n base conda-lock \
+		-f environment.yml \
+		-p osx-arm64 \
+		-p linux-64 \
+		-p osx-64 \
+		--conda conda \
+		--lockfile .basalcell/conda-lock.yml
 
 {%- if cookiecutter.r_ver == "none" %}
 install-conda:
