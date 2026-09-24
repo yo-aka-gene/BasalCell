@@ -467,7 +467,7 @@ init:
 
 test-py:
 	@echo "Running Python tests..."
-	mamba run -n $(MAMBA_ENV) poetry run pytest
+	@$(POETRY) run pytest
 	@rm -fr .pytest_cache
 
 test-r:
