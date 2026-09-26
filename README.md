@@ -82,7 +82,7 @@ Answer the prompts to define your project configurations:
     - ``author_name``: your name (required when `create_package` is `true`)
     - ``email``: your contact info (required when `create_package` is `true`)
     - ``github_username``: your GitHub ID
-    - ``python_ver``: the version of Python: choose from `3.12`, or `3.13`.
+    - ``python_ver``: the version of Python: choose from `3.12`, `3.13`, or `3.14`. Python 3.12 is covered by the full CI test suite.
     - `r_ver`: the version of R: choose from `none` (then R setup will be omitted), `4.3`, or `4.4`.
     - `create_package`: choose `true` if you will publish your project as a Python package; otherwise `false`
 
