@@ -14,9 +14,6 @@ dependencies:
   - cmake
   - c-compiler
   - cxx-compiler
-  - llvmdev
-  - llvmlite
-  - numba
   - pre-commit
 {%- if cookiecutter.r_ver != "none" %}
   - r-base={{cookiecutter.r_ver}}
