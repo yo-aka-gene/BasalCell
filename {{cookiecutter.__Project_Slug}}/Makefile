@@ -102,7 +102,9 @@ if __name__ == "__main__":
 {%- if cookiecutter.r_ver != "none" %}
 {% raw %}
 	project_root = Path.cwd()
-	mamba_r_lib = Path(sys.prefix) / "lib" / "R" / "library"
+	mamba_r_lib = (
+		Path(os.environ["BASALCELL_MAMBA_PREFIX"]) / "lib" / "R" / "library"
+	)
 	r_profile_proxy = project_root / ".Rprofile_proxy"
 	r_profile_content = textwrap.dedent(f"""\
 		old_wd <- getwd()
@@ -132,7 +134,14 @@ export LAUNCH_JUPYTER_LOGIC
 
 
 launch:
+{%- if cookiecutter.r_ver != "none" %}
+	@export BASALCELL_MAMBA_PREFIX=$$( \
+		mamba run -n $(MAMBA_ENV) python -c "import sys; print(sys.prefix)" \
+	); \
+	$(POETRY) run python -c "$$LAUNCH_JUPYTER_LOGIC"
+{%- else %}
 	@$(POETRY) run python -c "$$LAUNCH_JUPYTER_LOGIC"
+{%- endif %}
 
 clean:
 	@echo "Cleaning up built documentation and cache..."
