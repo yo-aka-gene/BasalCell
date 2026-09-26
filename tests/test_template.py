@@ -392,6 +392,9 @@ def test_correct_template_is_reproducible(
     cookies, essential_chs, essential_deps, essential_files, symbolic_links, prj_slug
 ):
     result = cookies.bake(extra_context={"project_name": "Test Project-CI/CD-4"})
+
+    check_bake_result(result, 4)
+
     project_path = result.project_path
     project_name = project_path.name
     env_name = f"mamba_{project_name.lower()}"
@@ -401,9 +404,6 @@ def test_correct_template_is_reproducible(
     clone_root.mkdir()
 
     try:
-        print("===== Checking fresh template generation =====")
-        check_bake_result(result, 4)
-
         print("===== Removing side effects from fresh initialization =====")
         uninstall_kernel(kernel_name, project_path)
 
