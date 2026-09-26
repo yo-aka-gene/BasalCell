@@ -74,6 +74,7 @@
     ├── environment.yml                         # detailed OS env configuration
     ├── Makefile                                # shortcut commands
     ├── poetry.lock                             # detailed Python env configuration
+    ├── poetry.toml                             # declarative Poetry configuration
     ├── pyproject.toml                          # declarative Python env configuration
 {%- if cookiecutter.r_ver != "none" %}
     ├── renv.lock                               # detailed R env configuration
@@ -92,21 +93,18 @@
 - **For Windows Users**: Please make sure to access this directory via `WSL`
 
 
-### Setting the Virtual Env
+### Setting Up the Environment
 1. Fork this repository and clone it to your local environment.
->**Note**: If you are new to this repository or any other [BasalCell](https://github.com/yo-aka-gene/BasalCell)-based projects, run:
->```bash
->make setup-mamba
->```
+
 2.  Run the initialization command:
 ```bash
 make init
 ```
 {%- set use_r = cookiecutter.r_ver != 'none' %}
 {%- if use_r %}
-(This command will automatically install Python dependencies, register the Jupyter kernel, and build the R virtual environment).
+`make init` automatically prepares the required Mamba tooling, restores or creates the environment, installs Python and R dependencies, and registers the Jupyter kernels.
 {%- else %}
-(This command will automatically install Python dependencies and register the Jupyter kernel).
+`make init` automatically prepares the required Mamba tooling, restores or creates the environment, installs Python dependencies, and registers the Jupyter kernel.
 {%- endif %}
 
 ### Launching Jupyter Lab

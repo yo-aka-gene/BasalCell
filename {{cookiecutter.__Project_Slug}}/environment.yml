@@ -14,10 +14,9 @@ dependencies:
   - cmake
   - c-compiler
   - cxx-compiler
-  - llvmdev
-  - llvmlite
-  - numba
+  - pre-commit
 {%- if cookiecutter.r_ver != "none" %}
+  - fortran-compiler
   - r-base={{cookiecutter.r_ver}}
   - r-renv
   - r-irkernel

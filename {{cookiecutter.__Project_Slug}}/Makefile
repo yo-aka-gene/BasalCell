@@ -18,6 +18,12 @@ PY_KERNEL := $(DIR_NAME)_py
 VERSION := $(shell grep '^version = ' pyproject.toml | cut -d '"' -f 2)
 PYTHON_VERSION := {{cookiecutter.python_ver}}
 
+# Run Poetry from the Mamba environment while hiding the active Conda
+# environment markers from Poetry itself. Without this, Poetry treats
+# mamba_{{cookiecutter.__project_slug}} as the active project environment and may install/uninstall
+# packages directly in Conda's site-packages.
+POETRY = mamba run -n $(MAMBA_ENV) env -u VIRTUAL_ENV -u CONDA_PREFIX -u CONDA_DEFAULT_ENV poetry
+
 define LAUNCH_JUPYTER_LOGIC
 import os
 import platform
@@ -96,7 +102,9 @@ if __name__ == "__main__":
 {%- if cookiecutter.r_ver != "none" %}
 {% raw %}
 	project_root = Path.cwd()
-	mamba_r_lib = Path(sys.prefix) / "lib" / "R" / "library"
+	mamba_r_lib = (
+		Path(os.environ["BASALCELL_MAMBA_PREFIX"]) / "lib" / "R" / "library"
+	)
 	r_profile_proxy = project_root / ".Rprofile_proxy"
 	r_profile_content = textwrap.dedent(f"""\
 		old_wd <- getwd()
@@ -126,8 +134,14 @@ export LAUNCH_JUPYTER_LOGIC
 
 
 launch:
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run python -c "$$LAUNCH_JUPYTER_LOGIC"
+{%- if cookiecutter.r_ver != "none" %}
+	@export BASALCELL_MAMBA_PREFIX=$$( \
+		mamba run -n $(MAMBA_ENV) python -c "import sys; print(sys.prefix)" \
+	); \
+	$(POETRY) run python -c "$$LAUNCH_JUPYTER_LOGIC"
+{%- else %}
+	@$(POETRY) run python -c "$$LAUNCH_JUPYTER_LOGIC"
+{%- endif %}
 
 clean:
 	@echo "Cleaning up built documentation and cache..."
@@ -137,16 +151,16 @@ clean:
 	@echo "Clean up complete."
 
 bump-patch:
-	@mamba run -n $(MAMBA_ENV) poetry version patch
+	@$(POETRY) version patch
 
 bump-minor:
-	@mamba run -n $(MAMBA_ENV) poetry version minor
+	@$(POETRY) version minor
 
 bump-major:
-	@mamba run -n $(MAMBA_ENV) poetry version major
+	@$(POETRY) version major
 
 define CALL_PY_FUNC
-	mamba run -n $(MAMBA_ENV) python -c "import sys; sys.path.append('./.basalcell'); \
+	$(POETRY) run python -c "import sys; sys.path.append('./.basalcell'); \
 	from basalcell_system import $(1); \
 	args = [arg for arg in '$(2)'.split() if arg]; \
 	$(1)(*args)"
@@ -181,8 +195,16 @@ add-os:
 
 lock-conda:
 	@echo "Generating conda-lock.yml..."
-	mamba clean --all --yes
-	CONDA_PKGS_DIRS=$$(mktemp -d) mamba run -n base conda-lock -f environment.yml -p osx-arm64 -p linux-64 -p osx-64 --conda conda --lockfile .basalcell/conda-lock.yml
+	@TMP_DIR=$$(mktemp -d); \
+	trap 'rm -rf "$$TMP_DIR"' EXIT; \
+	CONDA_PKGS_DIRS="$$TMP_DIR" \
+	mamba run -n base conda-lock \
+		-f environment.yml \
+		-p osx-arm64 \
+		-p linux-64 \
+		-p osx-64 \
+		--conda conda \
+		--lockfile .basalcell/conda-lock.yml
 
 {%- if cookiecutter.r_ver == "none" %}
 install-conda:
@@ -202,51 +224,51 @@ install-conda:
 # ==========================================
 # Python
 # ==========================================
-.PHONY: add-py add-pydev remove-py remove-pydev lock-py install-py
+.PHONY: setup-poetry add-py add-pydev remove-py remove-pydev lock-py install-py
 
 COMMA := ,
 CLEAN_PKG_VAL = $(strip $(subst $(COMMA), ,$(PKG)))
 
-add-py:
-	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
-	@mamba run -n $(MAMBA_ENV) poetry add $(CLEAN_PKG_VAL)
-	@$(MAKE) lock-py
-	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
+setup-poetry:
+	@echo "Configuring Poetry to use a project-local .venv..."
+	@$(POETRY) config virtualenvs.create true --local
+	@$(POETRY) config virtualenvs.in-project true --local
 
-add-pydev:
+add-py: setup-poetry
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
-	@mamba run -n $(MAMBA_ENV) poetry add --group dev $(CLEAN_PKG_VAL)
+	@$(POETRY) add $(CLEAN_PKG_VAL)
 	@$(MAKE) lock-py
-	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
+	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
-remove-py:
+add-pydev: setup-poetry
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
-	@mamba run -n $(MAMBA_ENV) poetry remove $(CLEAN_PKG_VAL)
+	@$(POETRY) add --group dev $(CLEAN_PKG_VAL)
 	@$(MAKE) lock-py
-	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
+	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
-remove-pydev:
+remove-py: setup-poetry
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
-	@mamba run -n $(MAMBA_ENV) poetry remove --group dev $(CLEAN_PKG_VAL)
+	@$(POETRY) remove $(CLEAN_PKG_VAL)
 	@$(MAKE) lock-py
-	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
+	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
-lock-py:
+remove-pydev: setup-poetry
+	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified."; exit 1; fi
+	@$(POETRY) remove --group dev $(CLEAN_PKG_VAL)
+	@$(MAKE) lock-py
+	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
+
+lock-py: setup-poetry
 	@echo "Updating poetry.lock without installing..."
-	mamba run -n $(MAMBA_ENV) poetry lock
-	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
+	@$(POETRY) lock
+	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > .basalcell/requirements.txt
 
-install-py:
+install-py: setup-poetry
 	@echo "Installing Python dependencies from lock file..."
-	mamba run -n $(MAMBA_ENV) poetry install
+	@$(POETRY) sync --with dev
 
 PYDEV_CORE := ipykernel ipywidgets jupyterlab jupyter-resource-usage \
-			  pytest mypy ruff pre-commit \
+			  pytest mypy ruff \
 			  sphinx sphinx-rtd-theme sphinx-gallery nbsphinx numpydoc myst-parser pandoc \
 			  polars pyarrow PyYAML
 
@@ -254,7 +276,7 @@ PYDEV_CORE := ipykernel ipywidgets jupyterlab jupyter-resource-usage \
 # ==========================================
 # Advanced Project Management (Python)
 # ==========================================
-.PHONY: init test docs lock install setup-local terminate
+.PHONY: init test docs lock install setup-local terminate purge
 
 init:
 	@if ! command -v mamba >/dev/null 2>&1; then \
@@ -262,7 +284,8 @@ init:
 		exit 1; \
 	fi
 	$(MAKE) setup-mamba
-	@if [ -f .basalcell/conda-lock.yml ]; then \
+	@set -e; \
+	if [ -f .basalcell/conda-lock.yml ]; then \
 		echo "--> Lockfile (.basalcell/conda-lock.yml) found! Delegating to 'make install'..."; \
 		$(MAKE) install; \
 	else \
@@ -272,7 +295,6 @@ init:
 			echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
 			mamba env update -n $(MAMBA_ENV) -f environment.yml --prune -y; \
 		fi; \
-		mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false; \
 		mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
 		$(MAKE) add-pydev PKG="$(PYDEV_CORE)"; \
 		$(MAKE) setup-local; \
@@ -281,43 +303,39 @@ init:
 	@echo "All done! You are ready to start coding."
 
 test:
-	mamba run -n $(MAMBA_ENV) poetry run pytest
+	@$(POETRY) run pytest
 	@rm -fr .pytest_cache
 
 docs:
 	@echo "Building Sphinx HTML documentation..."
-	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with dev --without-hashes --format=requirements.txt > docs/requirements.txt
+	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > docs/requirements.txt
 {%- if cookiecutter.create_package == "true" %}
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-apidoc -f -o docs/api src/{{cookiecutter.__project_slug}}/
+	@$(POETRY) run sphinx-apidoc -f -o docs/api src/{{cookiecutter.__project_slug}}/
 {%- endif %}
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-apidoc -f -o docs/auxiliary_api {{cookiecutter.__project_slug}}_tools/
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-build -b html docs docs/_build/html
+	@$(POETRY) run sphinx-apidoc -f -o docs/auxiliary_api {{cookiecutter.__project_slug}}_tools/
+	@$(POETRY) run sphinx-build -b html docs docs/_build/html
 	@echo "Opening documentation in browser..."
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run python -c \
+	@$(POETRY) run python -c \
 		"import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
 
 lock: lock-conda lock-py
 
 install: install-conda
-	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
 	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""
 	$(MAKE) install-py
 	$(MAKE) setup-local
 
-setup-local:
+setup-local: setup-poetry
 	@if [ ! -d .git ]; then mamba run -n $(MAMBA_ENV) git init -b main; fi
-	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
-	mamba run -n $(MAMBA_ENV) \
-		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
+	mamba run -n $(MAMBA_ENV) pre-commit install
+	@$(POETRY) run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
 
 terminate:
+	rm -rf .venv
 	mamba env remove -n $(MAMBA_ENV) -y
-	rm -rf .basalcell/conf-lock.yml .basalcell/requirements.txt poetry.lock
+
+purge: terminate
+	rm -rf .basalcell/conf-lock.yml .basalcell/requirements.txt .basalcell/conda-lock.yml poetry.lock
 
 {%- else %}
 # ==========================================
@@ -420,7 +438,7 @@ sync-r:
 # ==========================================
 # Advanced Project Management (Python & R)
 # ==========================================
-.PHONY: init test-py test-r test docs-r docs-py docs lock install setup-local terminate
+.PHONY: init test-py test-r test docs-r docs-py docs lock install setup-local terminate purge
 
 R_PKG_DIR := {{cookiecutter.__project_slug}}_rtools
 R_VERSION := {{ cookiecutter.r_ver }}
@@ -433,13 +451,14 @@ renv::snapshot(prompt = FALSE, type = "all")
 endef
 export R_SETUP_INIT_LOGIC
 
-init: setup-mamba
+init:
 	@if ! command -v mamba >/dev/null 2>&1; then \
 		echo "mamba is not installed. Please install it first."; \
 		exit 1; \
 	fi
 	$(MAKE) setup-mamba
-	@if [ -f .basalcell/conda-lock.yml ]; then \
+	@set -e; \
+	if [ -f .basalcell/conda-lock.yml ]; then \
 		echo "--> Lockfile (.basalcell/conda-lock.yml) found! Delegating to 'make install'..."; \
 		$(MAKE) install; \
 	else \
@@ -449,7 +468,6 @@ init: setup-mamba
 			echo "Environment $(MAMBA_ENV) already exists. Updating..."; \
 			mamba env update -n $(MAMBA_ENV) -f environment.yml --prune -y; \
 		fi; \
-		mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false; \
 		mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""; \
 		RBASE_VER=$$(mamba list -n $(MAMBA_ENV) "^r-base$$" | awk '/r-base/ {print $$2}'); \
 		RENV_VER=$$(mamba list -n $(MAMBA_ENV) "^r-renv$$" | awk '/r-renv/ {print $$2}'); \
@@ -468,7 +486,7 @@ init: setup-mamba
 
 test-py:
 	@echo "Running Python tests..."
-	mamba run -n $(MAMBA_ENV) poetry run pytest
+	@$(POETRY) run pytest
 	@rm -fr .pytest_cache
 
 test-r:
@@ -494,21 +512,16 @@ docs-r: sync-r
 		devtools::document('$(R_PKG_DIR)'); \
 		pkgdown::build_site(pkg = '$(R_PKG_DIR)', override = list(destination = '../docs/r_api'), new_process = FALSE, install = FALSE)"
 
-docs-py:
+docs-py: setup-poetry
 	@echo "Building Sphinx HTML documentation..."
-	@mamba run -n $(MAMBA_ENV) \
-		poetry export --with dev --without-hashes --format=requirements.txt > docs/requirements.txt
+	@$(POETRY) export --with dev --without-hashes --format=requirements.txt > docs/requirements.txt
 {%- if cookiecutter.create_package == "true" %}
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-apidoc -f -o docs/api src/{{cookiecutter.__project_slug}}/
+	@$(POETRY) run sphinx-apidoc -f -o docs/api src/{{cookiecutter.__project_slug}}/
 {%- endif %}
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-apidoc -f -o docs/auxiliary_api {{cookiecutter.__project_slug}}_tools/
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run sphinx-build -a -E -b html docs docs/_build/html
+	@$(POETRY) run sphinx-apidoc -f -o docs/auxiliary_api {{cookiecutter.__project_slug}}_tools/
+	@$(POETRY) run sphinx-build -a -E -b html docs docs/_build/html
 	@echo "Opening documentation in browser..."
-	@mamba run -n $(MAMBA_ENV) \
-		poetry run python -c \
+	@$(POETRY) run python -c \
 		"import webbrowser, os; webbrowser.open('file://' + os.path.realpath('docs/_build/html/index.html'))"
 
 docs: docs-r docs-py
@@ -517,7 +530,6 @@ docs: docs-r docs-py
 lock: lock-conda lock-py lock-r
 
 install: install-conda
-	mamba run -n $(MAMBA_ENV) poetry config virtualenvs.create false
 	mamba run -n $(MAMBA_ENV) bash -c "echo 'python =='$$PYTHON_VERSION > \"\$$CONDA_PREFIX/conda-meta/pinned\""
 	@RBASE_VER=$$(mamba list -n $(MAMBA_ENV) "^r-base$$" | awk '/r-base/ {print $$2}'); \
 	mamba run -n $(MAMBA_ENV) bash -c "echo 'r-base =='$$RBASE_VER > \"\$$CONDA_PREFIX/conda-meta/pinned\""
@@ -526,17 +538,20 @@ install: install-conda
 	$(MAKE) install-r
 	$(MAKE) setup-local
 
-setup-local:
+setup-local: setup-poetry
 	@if [ ! -d .git ]; then mamba run -n $(MAMBA_ENV) git init -b main; fi
-	mamba run -n $(MAMBA_ENV) poetry run pre-commit install
-	mamba run -n $(MAMBA_ENV) \
-		poetry run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
-	mamba run -n $(MAMBA_ENV) poetry run Rscript --vanilla -e "\
+	mamba run -n $(MAMBA_ENV) pre-commit install
+	@$(POETRY) run python -m ipykernel install --user --name=$(PY_KERNEL) --display-name "Python ($(DIR_NAME))"
+	mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "\
+		Sys.setenv(PATH=paste('$(CURDIR)/.venv/bin', Sys.getenv('PATH'), sep=.Platform[['path.sep']])); \
 	    .libPaths(file.path(Sys.getenv('CONDA_PREFIX'), 'lib', 'R', 'library')); \
 	    IRkernel::installspec(name='$(R_KERNEL_NAME)_r', displayname='R $(R_VERSION) ($(R_KERNEL_NAME))', user=TRUE)"
 
 terminate:
+	rm -rf .venv
 	mamba env remove -n $(MAMBA_ENV) -y
-	rm -rf renv/library renv.lock .basalcell/conf-lock.yml .basalcell/requirements.txt poetry.lock
+
+purge: terminate
+	rm -rf renv/library renv.lock .basalcell/conf-lock.yml .basalcell/requirements.txt .basalcell/conda-lock.yml poetry.lock
 
 {%- endif %}
