@@ -369,6 +369,9 @@ def test_correct_template_with_rlang(
                 check_cmd, cwd=result.project_path, capture_output=True, text=True
             )
             assert (
+                res.returncode == 0
+            ), f"FAILED in #10! Failed to list Jupyter kernels:\n{res.stderr}"
+            assert (
                 kernel_name in res.stdout.lower()
             ), f"FAILED in #10! '{kernel_name}' not found in:\n{res.stdout}"
         finally:
