@@ -236,10 +236,13 @@ def minimal_project_tests(
     print("===== #9. Checking Jupyter Kernel =====")
     kernel_name = f"{project_name.lower()}_py"
     try:
-        check_cmd = ["poetry", "run", "jupyter", "kernelspec", "list"]
+        check_cmd = [get_project_jupyter(project_path), "kernelspec", "list"]
         res = subprocess.run(
             check_cmd, cwd=project_path, capture_output=True, text=True
         )
+        assert (
+            res.returncode == 0
+        ), f"FAILED in #9! Failed to list Jupyter kernels:\n{res.stderr}"
         assert (
             kernel_name in res.stdout.lower()
         ), f"FAILED in #9! '{kernel_name}' not found in:\n{res.stdout}"
