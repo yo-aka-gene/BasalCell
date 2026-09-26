@@ -32,9 +32,6 @@ def essential_deps():
         "cmake",
         "c-compiler",
         "cxx-compiler",
-        "llvmdev",
-        "llvmlite",
-        "numba",
         "pre-commit",
     ]
 
@@ -76,6 +73,7 @@ def symbolic_links():
 @pytest.fixture
 def rlang_deps():
     return [
+        "fortran-compiler",
         "r-base",
         "r-renv",
         "r-irkernel",
