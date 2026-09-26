@@ -17,7 +17,7 @@ repos:
     hooks:
       # Linter
       - id: ruff-check
-        args: [ --fix ]
+        args: [--fix]
       # Formatter
       - id: ruff-format
 
