@@ -117,8 +117,14 @@ def rlang_symbolic_links():
     ]
 
 
+def get_project_jupyter(project_path):
+    jupyter = project_path / ".venv" / "bin" / "jupyter"
+    assert jupyter.exists(), f"Jupyter executable not found: {jupyter}"
+    return str(jupyter)
+
+
 def uninstall_kernel(name, cwd):
-    uninstall_cmd = ["poetry", "run", "jupyter", "kernelspec", "uninstall", "-y", name]
+    uninstall_cmd = [get_project_jupyter(cwd), "kernelspec", "uninstall", "-y", name]
     subprocess.run(uninstall_cmd, cwd=cwd, capture_output=True, text=True)
 
 
