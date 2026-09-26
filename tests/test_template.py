@@ -367,7 +367,7 @@ def test_correct_template_with_rlang(
         path = result.project_path.name
         kernel_name = f"{path.lower()}_r"
         try:
-            check_cmd = ["poetry", "run", "jupyter", "kernelspec", "list"]
+            check_cmd = [get_project_jupyter(result.project_path), "kernelspec", "list"]
             res = subprocess.run(
                 check_cmd, cwd=result.project_path, capture_output=True, text=True
             )
