@@ -276,6 +276,7 @@ def test_correct_template(
     cookies, essential_chs, essential_deps, essential_files, symbolic_links, prj_slug
 ):
     result = cookies.bake(extra_context={"project_name": "Test Project-CI/CD-1"})
+    check_bake_result(result, 1)
     env_name = f"mamba_{result.project_path.name.lower()}"
     try:
         minimal_tests(
@@ -307,6 +308,7 @@ def test_correct_template_for_package_mode(
             "create_package": "true",
         }
     )
+    check_bake_result(result, 2)
     env_name = f"mamba_{result.project_path.name.lower()}"
     try:
         minimal_tests(
@@ -351,6 +353,7 @@ def test_correct_template_with_rlang(
             "r_ver": "4.4",
         }
     )
+    check_bake_result(result, 3)
     env_name = f"mamba_{result.project_path.name.lower()}"
     try:
         minimal_tests(
