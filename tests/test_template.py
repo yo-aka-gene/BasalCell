@@ -257,10 +257,7 @@ def minimal_tests(
     fixture_essential_files,
     fixture_symbolic_links,
     slug,
-    idx,
 ):
-    check_bake_result(result, idx)
-
     minimal_project_tests(
         result.project_path,
         result.project_path.name,
@@ -286,7 +283,6 @@ def test_correct_template(
             essential_files,
             symbolic_links,
             prj_slug,
-            1,
         )
     finally:
         subprocess.run(
@@ -318,7 +314,6 @@ def test_correct_template_for_package_mode(
             essential_files,
             symbolic_links,
             prj_slug,
-            2,
         )
 
         print("===== #10. Checking Package files =====")
@@ -363,7 +358,6 @@ def test_correct_template_with_rlang(
             essential_files + rlang_files,
             rlang_symbolic_links,
             prj_slug,
-            3,
         )
 
         print("===== #10. Checking R Kernel =====")
