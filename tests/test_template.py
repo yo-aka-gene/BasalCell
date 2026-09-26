@@ -198,8 +198,15 @@ def minimal_project_tests(
         poetry_config = tomllib.load(f)
 
     assert (
-        poetry_config.get("virtualenvs", {}).get("create") is False
-    ), "FAILED in #5! poetry.toml must set virtualenvs.create = false"
+        poetry_config.get("virtualenvs", {}).get("create") is True
+    ), "FAILED in #5! poetry.toml must set virtualenvs.create = true"
+
+    assert (
+        poetry_config.get("virtualenvs", {}).get("in-project") is True
+    ), "FAILED in #5! poetry.toml must set virtualenvs.in-project = true"
+
+    venv_path = project_path / ".venv"
+    assert venv_path.is_dir(), "FAILED in #5! project-local .venv was not created"
 
     print("===== #6–8. Checking symbolic links =====")
     for i, link in enumerate(fixture_symbolic_links):
