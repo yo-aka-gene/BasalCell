@@ -208,6 +208,8 @@ add-os:
 				)' \
 				environment.yml; \
 	done
+	@$(MAKE) lock-conda
+	@$(MAKE) sync-conda
 
 remove-os:
 	@if [ -z "$(strip $(PKG))" ]; then echo "Error: PKG is not specified."; exit 1; fi
@@ -228,7 +230,7 @@ remove-os:
 				environment.yml; \
 	done
 	@$(MAKE) lock-conda
-	@$(MAKE) install-conda
+	@$(MAKE) sync-conda
 
 sync-conda:
 	@mamba env update -n $(MAMBA_ENV) -f environment.yml --prune
