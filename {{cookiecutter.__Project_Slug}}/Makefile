@@ -186,7 +186,7 @@ report:
 # ==========================================
 # Mamba
 # ==========================================
-.PHONY: add-os remove-os sync-conda lock-conda install-conda
+.PHONY: add-os remove-os lock-conda sync-conda install-conda
 
 add-os:
 	@if [ -z "$(strip $(PKG))" ]; then echo "Error: PKG is not specified."; exit 1; fi
@@ -232,9 +232,6 @@ remove-os:
 	@$(MAKE) lock-conda
 	@$(MAKE) sync-conda
 
-sync-conda:
-	@mamba env update -n $(MAMBA_ENV) -f environment.yml --prune
-
 lock-conda:
 	@echo "Generating conda-lock.yml..."
 	@TMP_DIR=$$(mktemp -d); \
@@ -249,10 +246,21 @@ lock-conda:
 		--lockfile .basalcell/conda-lock.yml
 
 {%- if cookiecutter.r_ver == "none" %}
+sync-conda:
+	@mamba env update -n $(MAMBA_ENV) -f environment.yml --prune -y
+
 install-conda:
 	@echo "Reproducing Mamba environment based on the 'conda-lock.yml' file..."
 	mamba run -n base conda-lock install -n $(MAMBA_ENV) .basalcell/conda-lock.yml
 {%- else %}
+sync-conda:
+	@if [ -f .Rprofile ]; then mv .Rprofile .Rprofile_temp_bak; fi
+	@if ! mamba env update -n $(MAMBA_ENV) -f environment.yml --prune -y; then \
+		if [ -f .Rprofile_temp_bak ]; then mv .Rprofile_temp_bak .Rprofile; fi; \
+		exit 1; \
+	fi
+	@if [ -f .Rprofile_temp_bak ]; then mv .Rprofile_temp_bak .Rprofile; fi
+
 install-conda:
 	@echo "Reproducing Mamba environment based on the 'conda-lock.yml' file..."
 	@if [ -f .Rprofile ]; then mv .Rprofile .Rprofile_temp_bak; fi
