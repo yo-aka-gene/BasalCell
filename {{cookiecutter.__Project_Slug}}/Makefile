@@ -419,7 +419,13 @@ try_mamba_install() {
 
 		if mamba install -y -c "$$channel" "$$target_pkg"; then
 			mv .Rprofile_proxy_bak .Rprofile_proxy 2>/dev/null || true
-			if ! grep -q -- "- $$target_pkg" environment.yml; then
+			if ! yq -e --arg name "$$target_pkg" \
+				'.dependencies
+					| any(.[];
+						type == "string"
+						and (sub("[<>=!~].*$$"; "") == $$name)
+					)' \
+				environment.yml >/dev/null; then
 				yq -y -i ".dependencies += [\"$$target_pkg\"]" environment.yml
 				MAMBA_CHANGED=1
 			fi
