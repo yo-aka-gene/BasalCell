@@ -186,7 +186,7 @@ report:
 # ==========================================
 # Mamba
 # ==========================================
-.PHONY: add-os remove-os lock-conda install-conda
+.PHONY: add-os remove-os sync-conda lock-conda install-conda
 
 add-os:
 	@if [ -z "$(strip $(PKG))" ]; then echo "Error: PKG is not specified."; exit 1; fi
@@ -229,6 +229,9 @@ remove-os:
 	done
 	@$(MAKE) lock-conda
 	@$(MAKE) install-conda
+
+sync-conda:
+	@mamba env update -n $(MAMBA_ENV) -f environment.yml --prune
 
 lock-conda:
 	@echo "Generating conda-lock.yml..."
