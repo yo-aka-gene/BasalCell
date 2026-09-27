@@ -382,7 +382,7 @@ purge: terminate
 # ==========================================
 # R
 # ==========================================
-.PHONY: add-r lock-r install-r sync-r
+.PHONY: add-r remove-r lock-r install-r sync-r
 
 define ADD_R_LOGIC
 #!/bin/bash
@@ -452,6 +452,93 @@ add-r:
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified. Usage: make add-r PKG=seurat"; exit 1; fi
 	@export CLEAN_PKG="$(CLEAN_PKG_VAL)"; export MAMBA_ENV="$(MAMBA_ENV)"; \
 	mamba run -n $(MAMBA_ENV) bash -c "$$ADD_R_LOGIC"
+
+define REMOVE_R_LOGIC
+#!/bin/bash
+set -e
+set -f
+
+MAMBA_CHANGED=0
+REMOVED_PKGS=""
+
+for pkg in $$CLEAN_PKG; do
+	pkg_lower=$$(printf '%s\n' "$$pkg" | tr '[:upper:]' '[:lower:]')
+
+	# Check whether the package is currently Mamba-owned.
+	mamba_pkg=$$( \
+		yq -r \
+			--arg r_name "r-$$pkg_lower" \
+			--arg bioc_name "bioconductor-$$pkg_lower" \
+			'.dependencies[] \
+				| select(type == "string") \
+				| sub("[<>=!~].*$$"; "") \
+				| select(. == $$r_name or . == $$bioc_name)' \
+			environment.yml \
+		| head -n 1 \
+	)
+
+	if [ -n "$$mamba_pkg" ]; then
+		echo "--> Removing $$pkg ($$mamba_pkg) from Mamba dependencies..."
+
+		yq -y -i \
+			--arg name "$$mamba_pkg" \
+			'.dependencies |= map(select( \
+				if type == "string" then \
+					(sub("[<>=!~].*$$"; "") != $$name) \
+				else \
+					true \
+				end \
+			))' \
+			environment.yml
+
+		MAMBA_CHANGED=1
+		REMOVED_PKGS="$$REMOVED_PKGS $$pkg"
+		continue
+	fi
+
+	# Otherwise, check the renv lockfile.
+	renv_pkg=$$(python -c '\
+import json, sys; \
+packages = json.load(open("renv.lock")).get("Packages", {}); \
+query = sys.argv[1].lower(); \
+print(next((name for name in packages if name.lower() == query), ""))' \
+		"$$pkg")
+
+	if [ -n "$$renv_pkg" ]; then
+		echo "--> Removing $$renv_pkg from renv..."
+
+		Rscript --vanilla -e '\
+			pkg <- commandArgs(trailingOnly = TRUE)[1]; \
+			renv::remove(pkg, project = getwd())' \
+			"$$renv_pkg"
+
+		REMOVED_PKGS="$$REMOVED_PKGS $$renv_pkg"
+	else
+		echo "--> [Warning] $$pkg is not managed by Mamba or renv. Skipping."
+	fi
+done
+
+if [ "$$MAMBA_CHANGED" -eq 1 ]; then
+	echo "--> Updating Mamba environment..."
+	$(MAKE) lock-conda
+	$(MAKE) sync-conda
+fi
+
+echo "--> Updating renv.lock..."
+Rscript --vanilla -e "renv::snapshot(prompt=FALSE, type='all', force=TRUE)"
+
+if [ -n "$$REMOVED_PKGS" ]; then
+	echo "Successfully removed:$$REMOVED_PKGS"
+else
+	echo "No packages were removed."
+fi
+endef
+export REMOVE_R_LOGIC
+
+remove-r:
+	@if [ -z "$(strip $(PKG))" ]; then echo "Error: PKG is not specified. Usage: make remove-r PKG=Seurat"; exit 1; fi
+	@export CLEAN_PKG="$(strip $(PKG))"; export MAMBA_ENV="$(MAMBA_ENV)"; \
+	mamba run -n $(MAMBA_ENV) bash -c "$$REMOVE_R_LOGIC"
 
 lock-r:
 	mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "renv::snapshot(prompt=FALSE, type='all', force=TRUE)"
