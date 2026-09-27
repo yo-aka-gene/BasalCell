@@ -409,9 +409,6 @@ try_mamba_install() {
 	local prefix=$$2
 	local target_pkg="$${prefix}$$3"
 
-	local search_res
-	search_res=$$(mamba search -c "$$channel" "^$${target_pkg}$$" 2>/dev/null | grep -v -i "No match" | grep "$${target_pkg}" || true)
-
 	if mamba install --dry-run -q -y -c "$$channel" "$$target_pkg" >/dev/null 2>&1; then
 		echo "--> Found $$3 in $$channel. Attempting to install..."
 
