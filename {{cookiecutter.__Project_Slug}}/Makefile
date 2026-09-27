@@ -226,8 +226,7 @@ install-conda:
 # ==========================================
 .PHONY: setup-poetry add-py add-pydev remove-py remove-pydev lock-py install-py
 
-COMMA := ,
-CLEAN_PKG_VAL = $(strip $(subst $(COMMA), ,$(PKG)))
+CLEAN_PKG_VAL = $(strip $(PKG))
 
 setup-poetry:
 	@echo "Configuring Poetry to use a project-local .venv..."
