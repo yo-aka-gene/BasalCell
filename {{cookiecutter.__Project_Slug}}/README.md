@@ -116,14 +116,21 @@ Then `Jupyter Lab` will pop up in your default browser.
 **Note**: Sometimes, token is required to login to Jupyter Lab for the first time.
 The default token is `{{cookiecutter.__project_slug}}`.
 
-### Adding Packages
-This project uses a unified interface to add dependencies:
-- **Python**: `make add-py PKG=name` (or `add-pydev` for dev tools)
-    - install dependencies listed in `poetry.lock` with `make install-py`
+### Managing Packages
+This project uses a unified interface to manage dependencies:
+- **Python**
+    - Add: `make add-py PKG=name` (or `add-pydev` for dev tools)
+    - Remove: `make remove-py PKG=name` (or `remove-pydev`)
 {%- if cookiecutter.r_ver != "none" %}
-- **R**: `make add-r PKG=name`
+- **R**
+    - Add: `make add-r PKG=name`
+    - Remove: `make remove-r PKG=name`
 {%- endif %}
-- **OS**: `make add-os PKG=name` (for Mamba/system libraries)
+- **System dependencies**
+    - Add: `make add-os PKG=name`
+    - Remove: `make remove-os PKG=name`
+
+The corresponding environment configuration and lock files are updated automatically.
 
 ### Building Documentation
 - For a brief guide on how to write documentation across various file types, please refer to the README.md of the [`BasalCell`](https://github.com/yo-aka-gene/BasalCell) repository.
