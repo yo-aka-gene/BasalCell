@@ -189,7 +189,7 @@ report:
 .PHONY: add-os lock-conda install-conda
 
 add-os:
-	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
+	@CLEAN_PKG=$$(echo "$(PKG)" | tr -s " "); \
 	mamba run -n $(MAMBA_ENV) \
 		yq -y -i '.dependencies |= (. + ("'"$$CLEAN_PKG"'" | split(" ")) | unique)' environment.yml
 
