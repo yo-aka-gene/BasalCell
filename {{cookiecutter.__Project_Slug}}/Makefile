@@ -189,9 +189,25 @@ report:
 .PHONY: add-os lock-conda install-conda
 
 add-os:
-	@CLEAN_PKG=$$(echo "$(PKG)" | tr -s " "); \
-	mamba run -n $(MAMBA_ENV) \
-		yq -y -i '.dependencies |= (. + ("'"$$CLEAN_PKG"'" | split(" ")) | unique)' environment.yml
+	@if [ -z "$(strip $(PKG))" ]; then echo "Error: PKG is not specified."; exit 1; fi
+	@set -e; \
+	set -f; \
+	CLEAN_PKG="$(strip $(PKG))"; \
+	for pkg in $$CLEAN_PKG; do \
+		pkg_name=$$(printf '%s\n' "$$pkg" | sed -E 's/[<>=!~].*$$//'); \
+		mamba run -n $(MAMBA_ENV) \
+			yq -y -i --arg spec "$$pkg" --arg name "$$pkg_name" \
+				'.dependencies |= ( \
+					map(select( \
+						if type == "string" then \
+							(sub("[<>=!~].*$$"; "") != $$name) \
+						else \
+							true \
+						end \
+					)) + [$$spec] \
+				)' \
+				environment.yml; \
+	done
 
 lock-conda:
 	@echo "Generating conda-lock.yml..."
