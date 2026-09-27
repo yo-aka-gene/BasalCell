@@ -186,7 +186,7 @@ report:
 # ==========================================
 # Mamba
 # ==========================================
-.PHONY: add-os lock-conda install-conda
+.PHONY: add-os remove-os lock-conda install-conda
 
 add-os:
 	@if [ -z "$(strip $(PKG))" ]; then echo "Error: PKG is not specified."; exit 1; fi
@@ -208,6 +208,27 @@ add-os:
 				)' \
 				environment.yml; \
 	done
+
+remove-os:
+	@if [ -z "$(strip $(PKG))" ]; then echo "Error: PKG is not specified."; exit 1; fi
+	@set -e; \
+	set -f; \
+	CLEAN_PKG="$(strip $(PKG))"; \
+	for pkg in $$CLEAN_PKG; do \
+		pkg_name=$$(printf '%s\n' "$$pkg" | sed -E 's/[<>=!~].*$$//'); \
+		mamba run -n $(MAMBA_ENV) \
+			yq -y -i --arg name "$$pkg_name" \
+				'.dependencies |= map(select( \
+					if type == "string" then \
+						(sub("[<>=!~].*$$"; "") != $$name) \
+					else \
+						true \
+					end \
+				))' \
+				environment.yml; \
+	done
+	@$(MAKE) lock-conda
+	@$(MAKE) install-conda
 
 lock-conda:
 	@echo "Generating conda-lock.yml..."
