@@ -99,32 +99,47 @@ Default token will be your project slug:
 e.g., `Your Project Name` -> `your_project_name`
 
 ## Maintenance
-### Add new Python packages
+### Manage Python packages
 ```bash
 # For main analysis (e.g., polars, torch, scanpy)
 make add-py PKG=polars
 make add-py PKG="torch scanpy<1.12"
 
-# For development tools (e.g., tqdm)
+# Remove packages
+make remove-py PKG=polars
+make remove-py PKG="torch scanpy"
+
+# Add/remove development tools
 make add-pydev PKG=tqdm
+make remove-pydev PKG=tqdm
 ```
 
-:warning: Do not add packages via `pip install` or `poetry add`.
-These commands are invalid for adding designated packages in the BasalCell env.
+:warning: Do not manage packages directly via `pip` or `poetry`.
+Use the BasalCell `make` commands to keep the environment configuration and lock files synchronized.
 
-### **[Optional]** Add new R packages
-To add new packages within the isolated `renv` env:
+### **[Optional]** Manage R packages
 ```bash
-# For R packages (e.g., ggplot2, dplyr, Seurat, DESeq2, org.Hs.eg.db)
+# Add R packages
 make add-r PKG="ggplot2 dplyr Seurat DESeq2 org.Hs.eg.db"
 
-# Sometimes R packages require OS-level dependencies (e.g., perl)
-# If so, you can add them to the Mamba env with add-os
+# Remove R packages
+make remove-r PKG="Seurat DESeq2"
+```
+BasalCell installs R packages through Mamba when available and otherwise falls back to `renv`. `remove-r` removes packages according to their current package manager ownership.
+
+Sometimes R packages require OS-level dependencies. If so, you can manage them to the Mamba env with `make` commands:
+
+```bash
+# Add system-level dependencies
 make add-os PKG=perl
+make add-os PKG="cmake cxx-compiler git>=2.30.0"
+
+# Remove system-level dependencies
+make remove-os PKG="cmake cxx-compiler git"
 ```
 
-:warning: Do not add packages via `install.packages`, `renv::install`,  or `apt-get`.
-These commands are invalid for adding designated packages in the BasalCell env.
+:warning: Do not manage R or system dependencies directly via `install.packages`, `renv::install`, `mamba install`, or `apt-get`.
+Use the BasalCell `make` commands instead.
 
 ## Development Tips
 ### How to upload your project to GitHub
@@ -188,7 +203,7 @@ Writing test code is crucial for verifying the behavior of your developed code. 
 | :---: | :----: | :----|
 | `init` | initializing environments | This command is automatically triggered in `cookiecutter git@github.com:yo-aka-gene/BasalCell.git`. Run this command when you reboot the environment after `make terminate` or when your cloned a repository based on BasalCell. |
 | `launch` | launching Jupyter Lab |  This connects `Jupyter Lab` and your default browser. Sometimes access token will be asked: the default token will be your project slug (e.g., `Your Project-ABC` -> `your_project_abc`)|
-| `lock` | before `git commit` | This transcribes the environment configuration ensuring reproducibility. **Always run this command after you added/removed packages before `git commit` to reflect the alteration in GitHub** |
+| `lock` | manually regenerating all lock files | Regenerates the Conda, Poetry, and, when applicable, renv lock files. Package-management commands such as `add-*` and `remove-*` automatically update the relevant lock files. |
 | `dump-all` | exporting all version configurations as a matrix (after `make lock`) | This exports version configurations of all packages (including Python, R, and System dependencies) as a matrix in the designated data format. Run `make dump-all` to have a `csv` file. For alternative file formats, `ipc`, `feather`, `pq`, and `parquet` are supported (designate them like `make dump-all EXT=pq`). |
 | `dump-core` | exporting core version configurations as a matrix (after `make lock`) | This exports version configurations of core packages (non-development Python and R packages) as a matrix in the designated data format. Run `make dump-core` to have a `csv` file. For alternative file formats, `ipc`, `feather`, `pq`, and `parquet` are supported (designate them like `make dump-core EXT=pq`). |
 | `dump` | exporting queried version configurations as a matrix (after `make lock`) | This exports version configurations of queried packages as a matrix in the designated data format (e.g., `make dump KEYS='numpy DESeq2' EXT=pq`). |
@@ -212,11 +227,13 @@ Writing test code is crucial for verifying the behavior of your developed code. 
 | command | run when... | description |
 | :---: | :----: | :----|
 | `add-r` | adding R package(s) | e.g., `make add-r PKG='ggplot2 dplyr Seurat DESeq2 org.Hs.eg.db'` |
+| `remove-r` | removing R package(s) | e.g., `make remove-r PKG='Seurat DESeq2'` |
 
 #### System dependencies
 | command | run when... | description |
 | :---: | :----: | :----|
-| `add-os` | adding OS software(s) | e.g., `make add-os PKG='cmake cxx-compiler'` **Note**: OS dependencies for Python/R packages are automatically installed via `add-py`, `add-pydev`, or `add-r`  |
+| `add-os` | adding OS software(s) | e.g., `make add-os PKG='cmake cxx-compiler'`. Use this command when Python/R packages require additional native or system-level dependencies. |
+| `remove-os` | removing OS software(s) | e.g., `make remove-os PKG='cmake cxx-compiler'` |
 
 #### For Developers
 | command | run when... | description |

@@ -186,12 +186,51 @@ report:
 # ==========================================
 # Mamba
 # ==========================================
-.PHONY: add-os lock-conda install-conda
+.PHONY: add-os remove-os lock-conda sync-conda install-conda
 
 add-os:
-	@CLEAN_PKG=$$(echo "$(PKG)" | tr "," " " | tr -s " "); \
-	mamba run -n $(MAMBA_ENV) \
-		yq -y -i '.dependencies |= (. + ("'"$$CLEAN_PKG"'" | split(" ")) | unique)' environment.yml
+	@if [ -z "$(strip $(PKG))" ]; then echo "Error: PKG is not specified."; exit 1; fi
+	@set -e; \
+	set -f; \
+	CLEAN_PKG="$(strip $(PKG))"; \
+	for pkg in $$CLEAN_PKG; do \
+		pkg_name=$$(printf '%s\n' "$$pkg" | sed -E 's/[<>=!~].*$$//'); \
+		mamba run -n $(MAMBA_ENV) \
+			yq -y -i --arg spec "$$pkg" --arg name "$$pkg_name" \
+				'.dependencies |= ( \
+					map(select( \
+						if type == "string" then \
+							(sub("[<>=!~].*$$"; "") != $$name) \
+						else \
+							true \
+						end \
+					)) + [$$spec] \
+				)' \
+				environment.yml; \
+	done
+	@$(MAKE) lock-conda
+	@$(MAKE) sync-conda
+
+remove-os:
+	@if [ -z "$(strip $(PKG))" ]; then echo "Error: PKG is not specified."; exit 1; fi
+	@set -e; \
+	set -f; \
+	CLEAN_PKG="$(strip $(PKG))"; \
+	for pkg in $$CLEAN_PKG; do \
+		pkg_name=$$(printf '%s\n' "$$pkg" | sed -E 's/[<>=!~].*$$//'); \
+		mamba run -n $(MAMBA_ENV) \
+			yq -y -i --arg name "$$pkg_name" \
+				'.dependencies |= map(select( \
+					if type == "string" then \
+						(sub("[<>=!~].*$$"; "") != $$name) \
+					else \
+						true \
+					end \
+				))' \
+				environment.yml; \
+	done
+	@$(MAKE) lock-conda
+	@$(MAKE) sync-conda
 
 lock-conda:
 	@echo "Generating conda-lock.yml..."
@@ -207,10 +246,21 @@ lock-conda:
 		--lockfile .basalcell/conda-lock.yml
 
 {%- if cookiecutter.r_ver == "none" %}
+sync-conda:
+	@mamba env update -n $(MAMBA_ENV) -f environment.yml --prune -y
+
 install-conda:
 	@echo "Reproducing Mamba environment based on the 'conda-lock.yml' file..."
 	mamba run -n base conda-lock install -n $(MAMBA_ENV) .basalcell/conda-lock.yml
 {%- else %}
+sync-conda:
+	@if [ -f .Rprofile ]; then mv .Rprofile .Rprofile_temp_bak; fi
+	@if ! mamba env update -n $(MAMBA_ENV) -f environment.yml --prune -y; then \
+		if [ -f .Rprofile_temp_bak ]; then mv .Rprofile_temp_bak .Rprofile; fi; \
+		exit 1; \
+	fi
+	@if [ -f .Rprofile_temp_bak ]; then mv .Rprofile_temp_bak .Rprofile; fi
+
 install-conda:
 	@echo "Reproducing Mamba environment based on the 'conda-lock.yml' file..."
 	@if [ -f .Rprofile ]; then mv .Rprofile .Rprofile_temp_bak; fi
@@ -226,8 +276,7 @@ install-conda:
 # ==========================================
 .PHONY: setup-poetry add-py add-pydev remove-py remove-pydev lock-py install-py
 
-COMMA := ,
-CLEAN_PKG_VAL = $(strip $(subst $(COMMA), ,$(PKG)))
+CLEAN_PKG_VAL = $(strip $(PKG))
 
 setup-poetry:
 	@echo "Configuring Poetry to use a project-local .venv..."
@@ -341,7 +390,7 @@ purge: terminate
 # ==========================================
 # R
 # ==========================================
-.PHONY: add-r lock-r install-r sync-r
+.PHONY: add-r remove-r lock-r install-r sync-r
 
 define ADD_R_LOGIC
 #!/bin/bash
@@ -353,14 +402,12 @@ conda_lib="$$CONDA_PREFIX/lib/R/library"
 export RENV_CONFIG_SANDBOX_ENABLED="false"
 
 SUCCESS_PKGS=""
+MAMBA_CHANGED=0
 
 try_mamba_install() {
 	local channel=$$1
 	local prefix=$$2
 	local target_pkg="$${prefix}$$3"
-
-	local search_res
-	search_res=$$(mamba search -c "$$channel" "^$${target_pkg}$$" 2>/dev/null | grep -v -i "No match" | grep "$${target_pkg}" || true)
 
 	if mamba install --dry-run -q -y -c "$$channel" "$$target_pkg" >/dev/null 2>&1; then
 		echo "--> Found $$3 in $$channel. Attempting to install..."
@@ -369,8 +416,15 @@ try_mamba_install() {
 
 		if mamba install -y -c "$$channel" "$$target_pkg"; then
 			mv .Rprofile_proxy_bak .Rprofile_proxy 2>/dev/null || true
-			if ! grep -q -- "- $$target_pkg" environment.yml; then
+			if ! yq -e --arg name "$$target_pkg" \
+				'.dependencies
+					| any(.[];
+						type == "string"
+						and (sub("[<>=!~].*$$"; "") == $$name)
+					)' \
+				environment.yml >/dev/null; then
 				yq -y -i ".dependencies += [\"$$target_pkg\"]" environment.yml
+				MAMBA_CHANGED=1
 			fi
 			return 0
 		fi
@@ -396,6 +450,11 @@ for pkg in $$CLEAN_PKG; do
 	fi
 done
 
+if [ "$$MAMBA_CHANGED" -eq 1 ]; then
+	echo "--> Updating Mamba lockfile..."
+	$(MAKE) lock-conda
+fi
+
 echo "--> Updating renv.lock..."
 Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); renv::snapshot(prompt=FALSE, type='all', force=TRUE)"
 
@@ -411,6 +470,93 @@ add-r:
 	@if [ -z "$(PKG)" ]; then echo "Error: PKG is not specified. Usage: make add-r PKG=seurat"; exit 1; fi
 	@export CLEAN_PKG="$(CLEAN_PKG_VAL)"; export MAMBA_ENV="$(MAMBA_ENV)"; \
 	mamba run -n $(MAMBA_ENV) bash -c "$$ADD_R_LOGIC"
+
+define REMOVE_R_LOGIC
+#!/bin/bash
+set -e
+set -f
+
+MAMBA_CHANGED=0
+REMOVED_PKGS=""
+
+for pkg in $$CLEAN_PKG; do
+	pkg_lower=$$(printf '%s\n' "$$pkg" | tr '[:upper:]' '[:lower:]')
+
+	# Check whether the package is currently Mamba-owned.
+	mamba_pkg=$$( \
+		yq -r \
+			--arg r_name "r-$$pkg_lower" \
+			--arg bioc_name "bioconductor-$$pkg_lower" \
+			'.dependencies[] \
+				| select(type == "string") \
+				| sub("[<>=!~].*$$"; "") \
+				| select(. == $$r_name or . == $$bioc_name)' \
+			environment.yml \
+		| head -n 1 \
+	)
+
+	if [ -n "$$mamba_pkg" ]; then
+		echo "--> Removing $$pkg ($$mamba_pkg) from Mamba dependencies..."
+
+		yq -y -i \
+			--arg name "$$mamba_pkg" \
+			'.dependencies |= map(select( \
+				if type == "string" then \
+					(sub("[<>=!~].*$$"; "") != $$name) \
+				else \
+					true \
+				end \
+			))' \
+			environment.yml
+
+		MAMBA_CHANGED=1
+		REMOVED_PKGS="$$REMOVED_PKGS $$pkg"
+		continue
+	fi
+
+	# Otherwise, check the renv lockfile.
+	renv_pkg=$$(python -c '\
+import json, sys; \
+packages = json.load(open("renv.lock")).get("Packages", {}); \
+query = sys.argv[1].lower(); \
+print(next((name for name in packages if name.lower() == query), ""))' \
+		"$$pkg")
+
+	if [ -n "$$renv_pkg" ]; then
+		echo "--> Removing $$renv_pkg from renv..."
+
+		Rscript --vanilla -e '\
+			pkg <- commandArgs(trailingOnly = TRUE)[1]; \
+			renv::remove(pkg, project = getwd())' \
+			"$$renv_pkg"
+
+		REMOVED_PKGS="$$REMOVED_PKGS $$renv_pkg"
+	else
+		echo "--> [Warning] $$pkg is not managed by Mamba or renv. Skipping."
+	fi
+done
+
+if [ "$$MAMBA_CHANGED" -eq 1 ]; then
+	echo "--> Updating Mamba environment..."
+	$(MAKE) lock-conda
+	$(MAKE) sync-conda
+fi
+
+echo "--> Updating renv.lock..."
+Rscript --vanilla -e "renv::snapshot(prompt=FALSE, type='all', force=TRUE)"
+
+if [ -n "$$REMOVED_PKGS" ]; then
+	echo "Successfully removed:$$REMOVED_PKGS"
+else
+	echo "No packages were removed."
+fi
+endef
+export REMOVE_R_LOGIC
+
+remove-r:
+	@if [ -z "$(strip $(PKG))" ]; then echo "Error: PKG is not specified. Usage: make remove-r PKG=Seurat"; exit 1; fi
+	@export CLEAN_PKG="$(strip $(PKG))"; export MAMBA_ENV="$(MAMBA_ENV)"; \
+	mamba run -n $(MAMBA_ENV) bash -c "$$REMOVE_R_LOGIC"
 
 lock-r:
 	mamba run -n $(MAMBA_ENV) Rscript --vanilla -e "renv::snapshot(prompt=FALSE, type='all', force=TRUE)"

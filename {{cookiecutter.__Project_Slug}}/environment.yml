@@ -9,7 +9,7 @@ dependencies:
   - poetry
   - poetry-plugin-export
   - make
-  - git >=2.30.0
+  - git>=2.30.0
   - yq
   - cmake
   - c-compiler
