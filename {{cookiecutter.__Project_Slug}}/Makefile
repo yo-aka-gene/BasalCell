@@ -402,6 +402,7 @@ conda_lib="$$CONDA_PREFIX/lib/R/library"
 export RENV_CONFIG_SANDBOX_ENABLED="false"
 
 SUCCESS_PKGS=""
+MAMBA_CHANGED=0
 
 try_mamba_install() {
 	local channel=$$1
@@ -420,6 +421,7 @@ try_mamba_install() {
 			mv .Rprofile_proxy_bak .Rprofile_proxy 2>/dev/null || true
 			if ! grep -q -- "- $$target_pkg" environment.yml; then
 				yq -y -i ".dependencies += [\"$$target_pkg\"]" environment.yml
+				MAMBA_CHANGED=1
 			fi
 			return 0
 		fi
@@ -444,6 +446,11 @@ for pkg in $$CLEAN_PKG; do
 		fi
 	fi
 done
+
+if [ "$$MAMBA_CHANGED" -eq 1 ]; then
+	echo "--> Updating Mamba lockfile..."
+	$(MAKE) lock-conda
+fi
 
 echo "--> Updating renv.lock..."
 Rscript --vanilla -e ".libPaths(\"$$conda_lib\"); renv::snapshot(prompt=FALSE, type='all', force=TRUE)"
