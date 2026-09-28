@@ -184,7 +184,7 @@ Please create your own icon image or graphical abstract and replace it according
 ### Test and Readability Improvement
 Writing test code is crucial for verifying the behavior of your developed code. Additionally, linting is essential to improve code readability. BasalCell makes it easy to run tests and linters by utilizing the following frameworks:
 - [Pytest](https://docs.pytest.org/en/stable/): The standard testing library for Python. Please refer to the official documentation on how to write test code, and place your tests in the appropriate paths within the `tests` directory of your generated project.
-- [Ruff](https://docs.astral.sh/ruff/): Performs linting and automatically reformats your `.py` files. In BasalCell, Ruff is integrated with [`pre-commit`](https://pre-commit.com/), meaning it will automatically run whenever you make a `git commit`.
+- [Ruff](https://docs.astral.sh/ruff/): Performs linting and automatically reformats your `.py` and `.ipynb` files. In BasalCell, Ruff is integrated with [`pre-commit`](https://pre-commit.com/), meaning it will automatically run whenever you make a `git commit`.
 - [GitHub Actions](https://github.com/features/actions): A CI/CD platform. BasalCell is pre-configured to automatically run the aforementioned workflows on the server whenever a `pull request` is created or `git push origin main` is executed, ensuring code quality and reproducibility even during collaborative data analysis.
 
 ### **[Optional]**: Integration of R env
