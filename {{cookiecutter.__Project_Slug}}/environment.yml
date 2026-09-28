@@ -11,6 +11,7 @@ dependencies:
   - make
   - git>=2.30.0
   - yq
+  - jq
   - cmake
   - c-compiler
   - cxx-compiler

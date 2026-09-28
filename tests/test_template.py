@@ -29,6 +29,7 @@ def essential_deps():
         "make",
         "git",
         "yq",
+        "jq",
         "cmake",
         "c-compiler",
         "cxx-compiler",
